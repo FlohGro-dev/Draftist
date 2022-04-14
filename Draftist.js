@@ -27,8 +27,8 @@ function Draftist_getLastTodoistError(todoistObj) {
  * Draftist_succeedAction - notifies the user about a successful execution of an action
  *
  * @param  {String} actionName      the name of the action (might be empty if not displayed)
- * @param  {type} displayActionName bool if the provided name of the action shall be displayed or not
- * @param  {type} successMessage    the content for the success message
+ * @param  {Boolean} displayActionName bool if the provided name of the action shall be displayed or not
+ * @param  {String} successMessage    the content for the success message
  */
 function Draftist_succeedAction(actionName, displayActionName, successMessage) {
   app.displaySuccessMessage((displayActionName ? actionName + " succeeded: " : "") + successMessage);
@@ -41,7 +41,7 @@ function Draftist_succeedAction(actionName, displayActionName, successMessage) {
  */
 function Draftist_cancelAction(actionName, cancelReasonDescription) {
   context.cancel(actionName + " was cancelled: " + cancelReasonDescription);
-  app.displayInfoMessage(actionName + " was cancelled: " + cancelReasonDescription);
+  app.displayWarningMessage(actionName + " was cancelled: " + cancelReasonDescription);
 }
 
 /**
@@ -52,6 +52,16 @@ function Draftist_cancelAction(actionName, cancelReasonDescription) {
 function Draftist_failAction(actionName, failedReasonDescription) {
   context.fail(actionName + " failed: " + failedReasonDescription);
   alert(actionName + " failed: " + failedReasonDescription);
+}
+
+/**
+ * Draftist_infoMessage - displays a info message to the user prepended with "Draftist: "
+ *
+ * @param  {String} actionName      the name of the action (might be empty if not displayed)
+ * @param  {String} successMessage    the content for the info message
+ */
+function Draftist_infoMessage(actionName, infoMessage) {
+  app.displayInfoMessage("Draftist: " + infoMessage + (actionName.length > 0 ? "(" + actionName + ")" : ""));
 }
 
 /**
@@ -112,7 +122,7 @@ function Draftist_createTask({
   assignee = undefined
 }) {
   // check if provided content is not empty
-  if(content.length == 0){
+  if (content.length == 0) {
     Draftist_failAction("create Task", "no task content provided")
     return false;
   }
@@ -334,7 +344,7 @@ function Draftist_createTaskWithDescriptionFromPrompt() {
  */
 function Draftist_createTaskObjectWithSettingsFromPrompt(content, description) {
   // check if any map of the todoist data contains data - if not, load the data into the vars
-  if(projectsNameToIdMap.size == 0){
+  if (projectsNameToIdMap.size == 0) {
     Draftist_getStoredTodoistData();
   }
 
@@ -526,17 +536,17 @@ function Draftist_createTaskWithDescriptionAndSettingsFromPrompt() {
  * @param  {String} text the string containing the tasks seperated by new lines
  * @return {Boolean}      true if added successfully; false if adding tasks failed
  */
-function Draftist_createTasksFromLinesWithIdenticalSettings(text){
+function Draftist_createTasksFromLinesWithIdenticalSettings(text) {
   if (text.length == 0) {
     return false;
   } else {
     let taskCount = 0;
     let taskBaseObject = Draftist_createTaskObjectWithSettingsFromPrompt("multiple tasks");
     let lines = text.split("\n");
-    for(line of lines){
-      if(line.length != 0){
-      		taskBaseObject.content = line
-        if(Draftist_createTask(taskBaseObject)){
+    for (line of lines) {
+      if (line.length != 0) {
+        taskBaseObject.content = line
+        if (Draftist_createTask(taskBaseObject)) {
           // increase task counter
           taskCount = taskCount + 1;
         } else {
@@ -556,11 +566,11 @@ function Draftist_createTasksFromLinesWithIdenticalSettings(text){
  *
  * @return {Boolean}  true if added successfully; false if adding tasks failed
  */
-function Draftist_createTasksFromLinesInDraftWithIdenticalSettings(){
-  if(draft.content.length!=0){
+function Draftist_createTasksFromLinesInDraftWithIdenticalSettings() {
+  if (draft.content.length != 0) {
     return Draftist_createTasksFromLinesWithIdenticalSettings(draft.content);
   } else {
-  	  Draftist_cancelAction("Tasks from lines in current Draft with identical settings", "Draft is blank")
+    Draftist_cancelAction("Tasks from lines in current Draft with identical settings", "Draft is blank")
     return false;
   }
 }
@@ -687,9 +697,9 @@ function Draftist_findOrCreateSettingsDraft() {
 
 
 /**
-* Draftist_findOrCreateDataStoreDraft - loads the stored todoist data from the data store Draft - if it is not existing it will be created and the data will be retrieved from Todoist
-*
-* @return {Draft|Boolean}  returns the Draft Object if the data store Draft was found; if an error occured it returns false
+ * Draftist_findOrCreateDataStoreDraft - loads the stored todoist data from the data store Draft - if it is not existing it will be created and the data will be retrieved from Todoist
+ *
+ * @return {Draft|Boolean}  returns the Draft Object if the data store Draft was found; if an error occured it returns false
  */
 function Draftist_findOrCreateDataStoreDraft() {
   const draftName = dataStoreDraftName;
@@ -729,6 +739,7 @@ function Draftist_createStorageDraft(draftName) {
   let storeDraft = new Draft();
   storeDraft.syntax = Syntax.find("builtIn", "JavaScript")
   storeDraft.content = "// " + draftName + "\n// DON'T MAKE ANY CHANGES TO THIS DRAFT! IT IS USED BY THE DRAFTIST ACTION GROUP\n";
+  storeDraft.isArchived = true;
   storeDraft.update();
   return storeDraft;
 }
@@ -740,6 +751,10 @@ function Draftist_createStorageDraft(draftName) {
  * @param  {Draft} settingsDraft the Draft object of the settings Draft
  */
 function Draftist_initConfigurationSettingsDraft(settingsDraft) {
+  // remove all current tags (useful in case settings are restored to defaults)
+  for (tag of settingsDraft.tags) {
+    settingsDraft.removeTag(tag);
+  }
   // set tags according to confiuration
   for (tag of defaultSettingsParams["settingsDraftTags"]) {
     settingsDraft.addTag(tag);
@@ -801,12 +816,61 @@ function Draftist_storeCurrentConfigurationSettings(settingsDraft) {
 }
 
 
+
+/**
+ * Draftist_restoreDefaultSettings - funtion to restore the default settings
+ *
+ */
+function Draftist_restoreDefaultSettings(){
+  // get the current settingsDraft
+  let settingsDraft = Draftist_findOrCreateSettingsDraft();
+  // delete it
+  settingsDraft.isTrashed = true;
+  settingsDraft.update();
+  // and create a new one (which will be initialized with the default settings)
+  if(Draftist_findOrCreateSettingsDraft()){
+    Draftist_infoMessage("", "restored default settings")
+  } else {
+    Draftist_failAction("Restore Default Settings", "unexpected failure - this should not happen. please reach out to @FlohGro with a description what you did to fix this.\nDelete all \"Draftist\" drafts and try again")
+  }
+
+}
+
+
+/**
+ * Draftist_Settings - open the settings for Draftist - the user can either restore the default settings or change the current active settings
+ */
+function Draftist_Settings() {
+  // load current settings
+  Draftist_loadCurrentConfigurationSettings();
+
+  // ask the user if the default settings shall be restored or changes to the settings shall be made.
+
+  let pOptions = new Prompt();
+  pOptions.title = "Draftist Settings"
+  pOptions.addButton("restore default settings");
+  pOptions.addButton("change current settings");
+  if (pOptions.show()) {
+    // user selected an option
+    // execute the corresponding functions based on the selection
+    switch (pOptions.buttonPressed) {
+      case "restore default settings":
+        Draftist_restoreDefaultSettings();
+        break;
+      case "change current settings":
+        Draftist_changeConfigurationSettings();
+        break;
+    }
+  }
+}
+
 /**
  * Draftist_changeConfigurationSettings - function to change the current active settings of Draftist and store them in the settings Draft
  *
  * @param  {Draft} settingsDraft Draft object of the settings Draft
  */
-function Draftist_changeConfigurationSettings(settingsDraft) {
+function Draftist_changeConfigurationSettings() {
+  let settingsDraft = Draftist_findOrCreateSettingsDraft();
   // tags for configurationDraft
   const currentSettingsTags = activeSettings["settingsDraftTags"]
   let pSettingsDraftTags = new Prompt();
@@ -852,7 +916,7 @@ function Draftist_changeConfigurationSettings(settingsDraft) {
     for (tag of newTags) {
       storeDraft.addTag(tag);
     }
-    settingsDraft.update();
+    storeDraft.update();
     activeSettings["dataStoreDraftTags"] = newTags;
   }
 
@@ -867,9 +931,6 @@ function Draftist_changeConfigurationSettings(settingsDraft) {
     // store the setting in current active settings variable
     activeSettings["dataStoreUpdateInterval"] = parseInt(pStore.fieldValues["updateInterval"])
   }
-
-
-
   // after all settings are reconfigured, store the new settings in the file
   Draftist_storeCurrentConfigurationSettings(settingsDraft);
 }
