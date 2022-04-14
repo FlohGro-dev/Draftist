@@ -111,6 +111,13 @@ function Draftist_createTask({
   due_lang = undefined,
   assignee = undefined
 }) {
+  // check if provided content is not empty
+  if(content.length == 0){
+    Draftist_failAction("create Task", "no task content provided")
+    return false;
+  }
+
+
   let taskMap = new Map();
   taskMap.set("content", content);
   taskMap.set("description", description);
@@ -316,6 +323,15 @@ function Draftist_createTaskWithDescriptionFromPrompt() {
   }
 }
 
+
+
+/**
+ * Draftist_createTaskObjectWithSettingsFromPrompt - creates a todoist task object with settings from prompts
+ *
+ * @param  {String} content     content of the task (must not be empty)
+ * @param  {String} description description for the task (can be empty)
+ * @return {taskObject}             taskObject for a todoist task which can be passed to the Todoist.createTask() API of Drafts
+ */
 function Draftist_createTaskObjectWithSettingsFromPrompt(content, description) {
   // check if any map of the todoist data contains data - if not, load the data into the vars
   if(projectsNameToIdMap.size == 0){
@@ -475,7 +491,7 @@ function Draftist_createTaskWithDescriptionAndSettingsFromCurrentDraft() {
  */
 function Draftist_createTaskWithDescriptionAndSettingsFromPrompt() {
   let p = new Prompt();
-  p.title = "add tasks with description";
+  p.title = "add task with description";
   p.message = "first line is the tasks content; everything else will be used as description"
   p.addTextView("task", "", "", {
     wantsFocus: true
@@ -503,6 +519,13 @@ function Draftist_createTaskWithDescriptionAndSettingsFromPrompt() {
   }
 }
 
+
+/**
+ * Draftist_createTasksFromLinesWithIdenticalSettings - creates a task from each line in the passed text with identical settings from prompts
+ *
+ * @param  {String} text the string containing the tasks seperated by new lines
+ * @return {Boolean}      true if added successfully; false if adding tasks failed
+ */
 function Draftist_createTasksFromLinesWithIdenticalSettings(text){
   if (text.length == 0) {
     return false;
@@ -528,6 +551,11 @@ function Draftist_createTasksFromLinesWithIdenticalSettings(text){
 }
 
 
+/**
+ * Draftist_createTasksFromLinesInDraftWithIdenticalSettings - creates tasks for each line in the current line with settings from prompt
+ *
+ * @return {Boolean}  true if added successfully; false if adding tasks failed
+ */
 function Draftist_createTasksFromLinesInDraftWithIdenticalSettings(){
   if(draft.content.length!=0){
     return Draftist_createTasksFromLinesWithIdenticalSettings(draft.content);
@@ -538,15 +566,60 @@ function Draftist_createTasksFromLinesInDraftWithIdenticalSettings(){
 }
 
 
+/**
+ * Draftist_createTaskWithDescriptionAndSettingsFromPrompt - add task with description and Settings from prompts. use the first line as content and everything else as description
+ *
+ * @return {Boolean}  true when added successfully, false when adding task failed
+ */
+function Draftist_createTasksFromLinesInPromptWithIdenticalSettings() {
+  let p = new Prompt();
+  p.title = "add tasks with description";
+  p.message = "each line will be its own task - all use the same settings in the next prompts"
+  p.addTextView("tasks", "", "", {
+    wantsFocus: true
+  });
+  p.addButton("add tasks");
+
+  if (!p.show()) {
+    Draftist_cancelAction("Add Tasks from Prompt", "cancelled by user");
+    return false;
+  }
+  // user did select "add tasks"
+  let input = p.fieldValues["tasks"];
+  if (input.length == 0) {
+    Draftist_cancelAction("Add Tasks from Prompt", "No input provided")
+    return false;
+  } else {
+    let taskCreated = Draftist_createTasksFromLinesWithIdenticalSettings(input);
+    if (taskCreated) {
+      // succeeded
+      Draftist_succeedAction("", false, "successfully added task");
+      return true;
+    } else {
+      return false
+    }
+  }
+}
+
+
 // helper fuctions to store settings and todoist data
 // param types
 // textArray: comma seperated stings
 
+
+/**
+ * settingParamTypes: this defines the types of the settings parameters in text format
+ */
 const settingsParamTypes = {
   "settingsDraftTags": "textArray",
   "dataStoreDraftTags": "textArray",
   "dataStoreUpdateInterval": "number"
 }
+
+
+/**
+ * defaultSettingsParams: these are the default settings for the Action Group
+ */
 const defaultSettingsParams = {
   "settingsDraftTags": [
     "_draftistSettings",
@@ -559,6 +632,16 @@ const defaultSettingsParams = {
   "dataStoreUpdateInterval": 24
 }
 
+
+/**
+ * static definition of the names for the storage Drafts
+ */
+const settingsDraftName = "Draftist Action Group Settings";
+const dataStoreDraftName = "Draftist Todoist Data Store";
+
+/**
+ * global variables that are used within the various functions to access current settings - stored in variables to quicker access them in different use cases
+ */
 let activeSettings = undefined;
 let lastUpdated = undefined;
 let projects = undefined;
@@ -570,9 +653,11 @@ let labelsNameToIdMap = new Map();
 let labelsIdToNameMap = new Map();
 
 
-const settingsDraftName = "Draftist Action Group Settings";
-const dataStoreDraftName = "Draftist Todoist Data Store";
-
+/**
+ * Draftist_findOrCreateSettingsDraft - loads the configuration settings from the settings Draft - if it is not existing it will be created with the default settings
+ *
+ * @return {Draft|Boolean}  returns the Draft Object if a settings Draft was found; if an error occured it returns false
+ */
 function Draftist_findOrCreateSettingsDraft() {
   const draftName = settingsDraftName;
   let notificationMessage = ""
@@ -591,7 +676,7 @@ function Draftist_findOrCreateSettingsDraft() {
     resultDrafts.push(settingsDraft);
   }
   if (resultDrafts.length > 1) {
-    // TODO: DRAFTIST FAIL ACTION!
+    Draftist_failAction("Draftist_findOrCreateSettingsDraft", "more than one setting Drafts found")
     return false;
   } else {
     // one settings Draft was found (or just created), read the settings from it into the active settings variable
@@ -600,6 +685,12 @@ function Draftist_findOrCreateSettingsDraft() {
   }
 }
 
+
+/**
+* Draftist_findOrCreateDataStoreDraft - loads the stored todoist data from the data store Draft - if it is not existing it will be created and the data will be retrieved from Todoist
+*
+* @return {Draft|Boolean}  returns the Draft Object if the data store Draft was found; if an error occured it returns false
+ */
 function Draftist_findOrCreateDataStoreDraft() {
   const draftName = dataStoreDraftName;
   let notificationMessage = ""
@@ -627,6 +718,13 @@ function Draftist_findOrCreateDataStoreDraft() {
   }
 }
 
+
+/**
+ * Draftist_createStorageDraft - creates a Draft to store settings or todoist data - this function is used internally
+ *
+ * @param  {String} draftName title to use for the Draft
+ * @return {Draft}           Draft object of the storage Draft
+ */
 function Draftist_createStorageDraft(draftName) {
   let storeDraft = new Draft();
   storeDraft.syntax = Syntax.find("builtIn", "JavaScript")
@@ -635,6 +733,12 @@ function Draftist_createStorageDraft(draftName) {
   return storeDraft;
 }
 
+
+/**
+ * Draftist_initConfigurationSettingsDraft - function to initialize the Settings Draft with the default settings (or reset it)
+ *
+ * @param  {Draft} settingsDraft the Draft object of the settings Draft
+ */
 function Draftist_initConfigurationSettingsDraft(settingsDraft) {
   // set tags according to confiuration
   for (tag of defaultSettingsParams["settingsDraftTags"]) {
@@ -647,32 +751,61 @@ function Draftist_initConfigurationSettingsDraft(settingsDraft) {
 
 }
 
+
+/**
+ * Draftist_initDataStoreDraft - function to initialize the data store Draft with the Todoist Data - initially loads all data from todoist into the storage Draft
+ *
+ * @param  {Draft} storeDraft the Draft object of the storage Draft
+ */
 function Draftist_initDataStoreDraft(storeDraft) {
   // set tags according to confiuration
   for (tag of defaultSettingsParams["dataStoreDraftTags"]) {
     storeDraft.addTag(tag);
   }
-  // TODO: initially load totoist settings
+  // initially load all data from todoist into the Draft
+  Draftist_updateStoredTodoistData(new Todoist(), storeDraft);
   // workaround was not updated as expected.
   storeDraft.update();
   storeDraft.update();
 
 }
 
+
+/**
+ * Draftist_readConfigurationSettingsFromDraft - function to read the stored settings into the active settings variable - this function is used internally
+ *
+ * @param  {Draft} settingsDraft Draft object of the settings Draft
+ */
 function Draftist_readConfigurationSettingsFromDraft(settingsDraft) {
   activeSettings = Draftist_helperGetObjectFromStoredDraft(settingsDraft)
 }
 
+
+/**
+ * Draftist_loadCurrentConfigurationSettings - loads the current settings stored in the settings Draft into the live variable of Draftist
+ */
 function Draftist_loadCurrentConfigurationSettings() {
   let settingsDraft = Draftist_findOrCreateSettingsDraft()
   Draftist_readConfigurationSettingsFromDraft(settingsDraft);
 
 }
 
+
+/**
+ * Draftist_storeCurrentConfigurationSettings - stores the current active settings in the settings Draft
+ *
+ * @param  {Draft} settingsDraft Draft object of the settings Draft
+ */
 function Draftist_storeCurrentConfigurationSettings(settingsDraft) {
   Draftist_helperUpdateObjectInStoreDraft(settingsDraft, activeSettings)
 }
 
+
+/**
+ * Draftist_changeConfigurationSettings - function to change the current active settings of Draftist and store them in the settings Draft
+ *
+ * @param  {Draft} settingsDraft Draft object of the settings Draft
+ */
 function Draftist_changeConfigurationSettings(settingsDraft) {
   // tags for configurationDraft
   const currentSettingsTags = activeSettings["settingsDraftTags"]
@@ -742,6 +875,9 @@ function Draftist_changeConfigurationSettings(settingsDraft) {
 }
 
 
+/**
+ * Draftist_updateTodoistDataIfUpdateIntervalExceeded - checks if an update of the locally stored Todoist data is needed based on the settings of the dataStoreUpdateInterval
+ */
 function Draftist_updateTodoistDataIfUpdateIntervalExceeded() {
   // check if variable is defined (was initialized) otherwise load settings from draft
   if (!lastUpdated) {
@@ -762,7 +898,14 @@ function Draftist_updateTodoistDataIfUpdateIntervalExceeded() {
   }
 }
 
-function Draftist_updateStoredTodoistData(todoist = new Todoist()) {
+
+/**
+ * Draftist_updateStoredTodoistData - updates the locally stored todoist data in the data store Draft
+ *
+ * @param  {Todoist} todoist                (optional) the todoist object to use
+ * @param  {Draft} storeDraft             (optional) Draft object of the data store Draft
+ */
+function Draftist_updateStoredTodoistData(todoist = new Todoist(), storeDraft = Draftist_findOrCreateDataStoreDraft()) {
   // retrieve data from todoist
   const projects = todoist.getProjects();
   const sections = todoist.getSections();
@@ -777,12 +920,17 @@ function Draftist_updateStoredTodoistData(todoist = new Todoist()) {
     "labels": labels
   }
   // get data store Draft
-  let storeDraft = Draftist_findOrCreateDataStoreDraft()
   Draftist_helperUpdateObjectInStoreDraft(storeDraft, todoistDataToStore)
 }
 
 
 
+/**
+ * Draftist_helperGetObjectFromStoredDraft - helper function to get the stored object in the passed draft - this function is used internally
+ *
+ * @param  {Draft} draftToUse Draft object to read the stored object from
+ * @return {Object}            the stored object
+ */
 function Draftist_helperGetObjectFromStoredDraft(draftToUse) {
 
   let commentLinesArr = [];
@@ -798,6 +946,13 @@ function Draftist_helperGetObjectFromStoredDraft(draftToUse) {
 
 }
 
+
+/**
+ * Draftist_helperUpdateObjectInStoreDraft - helper function to store the passed object in the passed Draft - this function is used internally
+ *
+ * @param  {Draft} draftToUse    Draft object where to store the passed objectToStore
+ * @param  {Object} objectToStore the Object to store in the Draft
+ */
 function Draftist_helperUpdateObjectInStoreDraft(draftToUse, objectToStore) {
   // store lines with comments at the beginning
   let commentLinesArr = [];
@@ -813,6 +968,10 @@ function Draftist_helperUpdateObjectInStoreDraft(draftToUse, objectToStore) {
   draftToUse.update()
 }
 
+
+/**
+ * Draftist_getStoredTodoistData - function to retrieve the stored Todoist Data from the data store Draft - the stored data will be updated if the dataStoreUpdateInterval was exceeded and the stored data will be loaded into the global variables to be accessible for all other functions
+ */
 function Draftist_getStoredTodoistData() {
 
   const storeDraft = Draftist_findOrCreateDataStoreDraft();
