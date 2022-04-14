@@ -1,10 +1,11 @@
 /**
- * Draftist ActionGroup Functions
+ * Draftist Action Group Functions
  * @author FlohGro
  * @copyright 2022, FlohGro
- * @licensing free to use - but donate coffees to support development http://www.flohgro.com/donate
+ * @licensing MIT free to use - but donate coffees to support development http://www.flohgro.com/donate
  * @version 0.1
  */
+
 
 /**
  * Draftist_checkTodoistForError - This function checks the provided Todoist Object for errors.
@@ -499,6 +500,40 @@ function Draftist_createTaskWithDescriptionAndSettingsFromPrompt() {
     } else {
       return false
     }
+  }
+}
+
+function Draftist_createTasksFromLinesWithIdenticalSettings(text){
+  if (text.length == 0) {
+    return false;
+  } else {
+    let taskCount = 0;
+    let taskBaseObject = Draftist_createTaskObjectWithSettingsFromPrompt("multiple tasks");
+    let lines = text.split("\n");
+    for(line of lines){
+      if(line.length != 0){
+      		taskBaseObject.content = line
+        if(Draftist_createTask(taskBaseObject)){
+          // increase task counter
+          taskCount = taskCount + 1;
+        } else {
+          // stop adding tasks and return immideately
+          return false;
+        }
+      }
+    }
+    // succeeded
+    Draftist_succeedAction("", false, "successfully added " + taskCount + " task(s)");
+  }
+}
+
+
+function Draftist_createTasksFromLinesInDraftWithIdenticalSettings(){
+  if(draft.content.length!=0){
+    return Draftist_createTasksFromLinesWithIdenticalSettings(draft.content);
+  } else {
+  	  Draftist_cancelAction("Tasks from lines in current Draft with identical settings", "Draft is blank")
+    return false;
   }
 }
 
