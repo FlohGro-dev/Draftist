@@ -2,8 +2,8 @@
 
 Draftist - a Drafts Action Group to integrate with Todoist.
 
-This repository contains the underlying functions for the Draftist Action Group
-
+This repository contains the underlying functions and documentstion for the Draftist Action Group.
+You can download the Draftist Action Group from the Drafts directory: [Draftist](todo)
 
 <a href="https://www.buymeacoffee.com/flohgro" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 220px !important;" ></a>
 
