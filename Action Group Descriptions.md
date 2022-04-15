@@ -14,3 +14,7 @@ If you want to make you're own Action based on Draftist functions simply include
 ### Draftist Settings
 
 This Action allows changing the default settings of Draftist or restore the default settings based on the user selections.
+
+### Update local Todoist data
+
+This Action forces an update of the locally stored Todoist data. Use this if you e.g. just created a new project / label that you want to use immediately. Updates will be performed after 24 hours by default - you can change this using the [Draftist Settings](#draftist-settings) action.

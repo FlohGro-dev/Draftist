@@ -981,7 +981,8 @@ function Draftist_updateStoredTodoistData(todoist = new Todoist(), storeDraft = 
     "labels": labels
   }
   // get data store Draft
-  Draftist_helperUpdateObjectInStoreDraft(storeDraft, todoistDataToStore)
+  Draftist_helperUpdateObjectInStoreDraft(storeDraft, todoistDataToStore);
+  Draftist_infoMessage("", "updated local Todoist data");
 }
 
 
