@@ -1,6 +1,6 @@
 # Draftist Action Group Instructions
 
-**by [@FlohGro](https://mobile.twitter.com/FlohGro)**
+**created by [@FlohGro](https://mobile.twitter.com/FlohGro)**
 
 - **Website:** [flohgro.com](https://flohgro.com)  
 - **Drafts Forums:** [@FlohGro](https://forums.getdrafts.com/u/flohgro/summary)
@@ -26,6 +26,14 @@ Since Draftist contains a lot of Actions and you may not need every single of th
 You can assign keyboard shortcuts to the Actions you created to make them easily accessible (none of the Actions in Draftist has a keyboard shortcut assigned to don't conflict with your assignments).
 
 Please **never** rename the `Draftist` Action (If you do so, no other Action will work anymore).
+
+## Action Descriptions
+
+Every Draftist Action contains a short description about its purpose / what it does. Due to the big amount of Actions you can also read through all descriptions in the [Action Descriptions](https://github.com/FlohGro-dev/Draftist/blob/main/Action%20Descriptions.md) file.
+
+## Customizing Actions
+
+All Draftist Actions work out of the box with no needed configuration from you. Especially the more complex and powerful actions allow you to configure the behavior of them in the action steps. Read through the corresponding [Action Description](https://github.com/FlohGro-dev/Draftist/blob/main/Action%20Descriptions.md) to find instructions what and how you can configure the Action to your need.
 
 ## Support Development
 
