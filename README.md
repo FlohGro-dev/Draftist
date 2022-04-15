@@ -10,13 +10,15 @@ Draftist - a [Drafts](https://getdrafts.com) Action Group to integrate with [Tod
 This repository contains the underlying functions and the documentation for the Draftist Action Group.
 You can install the Draftist Action Group from the Drafts directory: [Draftist](TODO)
 
+If you encounter any issues please open an issue in the repository or reach out to me in the [Drafts Forums Post about Draftist](TODO) or on Twitter ✌🏽
+
 ## Draftist Instructions
 
 To read through the instructions of Draftist look into the dedicated file in this repository: [Draftist Instructions](https://github.com/FlohGro-dev/Draftist/blob/main/Draftist%20Instructions.md)
 
 ## Support Development
 
-I developed these functions and the Action Group in my free time to help myself and you improve workflows and remove friction from processes.
+I developed these functions and the Action Group in my free time to help myself and you improve workflows and remove friction from processes. 🚀
 
 Draftist is completely free to use for you. However if this Action Group is useful for you and supports your workflows you can give something back to support development.
 I enjoy a good coffee ☕️ (weather at home or in an actual coffee shop) and love pizza 🍕.
