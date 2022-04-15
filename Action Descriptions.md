@@ -1,4 +1,15 @@
-# Draftist Action Group Descriptions
+# Draftist Action Descriptions
+
+<!-- TOC -->
+
+- [Draftist Action Descriptions](#draftist-action-descriptions)
+  - [General Actions](#general-actions)
+    - [Draftist Instructions](#draftist-instructions)
+    - [Draftist](#draftist)
+    - [Draftist Settings](#draftist-settings)
+    - [Update local Todoist data](#update-local-todoist-data)
+
+<!-- /TOC -->
 
 ## General Actions
 
