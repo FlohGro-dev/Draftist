@@ -1,6 +1,11 @@
 # Draftist
 
-Draftist - a Drafts Action Group to integrate with Todoist.
+Draftist - a [Drafts](https://getdrafts.com) Action Group to integrate with [Todoist](https://todoist.com).
+
+**created by [@FlohGro](https://mobile.twitter.com/FlohGro)**
+- **Website:** [flohgro.com](https://flohgro.com)  
+- **Drafts Forums:** [@FlohGro](https://forums.getdrafts.com/u/flohgro/summary)
+- **Twitter:** [@FlohGro](https://twitter.com/FlohGro)
 
 This repository contains the underlying functions and the documentation for the Draftist Action Group.
 You can install the Draftist Action Group from the Drafts directory: [Draftist](TODO)
