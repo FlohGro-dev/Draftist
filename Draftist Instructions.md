@@ -2,6 +2,11 @@
 
 **by [@FlohGro](https://mobile.twitter.com/FlohGro)**
 
+- **Website:** [flohgro.com](https://flohgro.com)  
+- **Drafts Forums:** [@FlohGro](https://forums.getdrafts.com/u/flohgro/summary)
+- **Twitter:** [@FlohGro](https://twitter.com/FlohGro)
+
+
 > Welcome to Draftist - an Action Group for Draft to integrate with Todoist. This might be the most advanced Action Group to use Drafts with Todoist so please read the instructions.
 
 Draftist contains a big amount of Actions to integrate Drafts with Todoist.
@@ -24,10 +29,8 @@ Please **never** rename the `Draftist` Action (If you do so, no other Action wil
 
 ## Support Development
 
-Draftist is completely free to use for you. Full licensing details can be found in the [GitHub repository](https://github.com/FlohGro-dev/Draftist).
-
-If this Action Group is useful for you and supports your workflows you can give something back to support development.
-I enjoy good coffee ☕️ (weather at home or in an actual coffee shop) and love pizza 🍕.
+Draftist is completely free to use for you. However if this Action Group is useful for you and supports your workflows you can give something back to support development.
+I enjoy a good coffee ☕️ (weather at home or in an actual coffee shop) and love pizza 🍕.
 You can choose the amount you want to donate on those platforms.
 
 <a href="https://www.buymeacoffee.com/flohgro" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 220px !important;" ></a>
@@ -41,12 +44,4 @@ You can choose the amount you want to donate on those platforms.
 
 ## Changelog
 
-You can find a changelog of updates to Action Group in the GitHub repository of [Draftist](https://github.com/FlohGro-dev/Draftist#changelog).
-
-
-## Author Details
-
-- **Author:** FlohGro.
-- **Web Site:** [flohgro.com](https://flohgro.com)  
-- **Drafts Forums:** [@FlohGro](https://forums.getdrafts.com/u/flohgro/summary)
-- **Twitter:** [@FlohGro](https://twitter.com/FlohGro)
+You can find a changelog of updates to Action Group in the [Changelog](https://github.com/FlohGro-dev/Draftist#changelog) section of the README in this repository.
