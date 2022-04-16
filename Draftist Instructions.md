@@ -18,6 +18,7 @@ It is divided into several sections:
 **TODO:**??
 - Import Tasks
 - Create Projects
+- modify Actions
 - Switch labels
 
 ## Using Draftist
