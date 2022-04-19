@@ -21,6 +21,25 @@ It is divided into several sections:
 - modify Actions
 - Switch labels
 
+## Created Drafts
+
+Draftist will create three new drafts in your library:
+
+- Draftist Todoist Data Store
+	- this draft stores data from your Todoist account which is used by several actions
+	- the data includes:
+		- projects (and their metadata)
+		- sections (and their metadata)
+		- labels (and their metadata)
+	- none of this data leaves your drafts library - it's just used to not always request the data from Todoists API which slows down the process of e.g. creating tasks with settings a lot.
+- Draftist Action Group Settings
+	- this draft stores the settings you can modify with the [Draftist Settings Action](https://github.com/FlohGro-dev/Draftist/blob/main/Action%20Descriptions.md#Draftist%20Settings)
+- Draftist Function Store
+	- this draft stores the functions all the Draftist Actions use under the hood. This enables the update process without the need to reinstall the complete Action Group.
+
+You can archive them to move them out of your sight, but if you delete them they will be recreated.
+Using drafts to store your settings, your todoist data and the functions themselves in a Draft speeds up execution compared to storing these things in the directory of Drafts.
+
 ## Using Draftist
 
 Since Draftist contains a lot of Actions and you may not need every single of them you may want to create your own `my Draftist` Action Group to only include the Actions you want. While you can duplicate / move the Actions you use to your own Action Group(s) I recommend to leave the Draftist Action Group untouched. This ensures a single point of truth and if I need to fix/maintain Actions in Draftist your own Actions will work afterwards. Instead create your own Action and use an `include Action` Step where you paste the name of the Action you want to use - you can then give it a (shorter) name than in the Draftist Action Group.
