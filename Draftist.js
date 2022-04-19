@@ -69,14 +69,14 @@ function Draftist_infoMessage(actionName, infoMessage) {
  * This supports the Todoist natural language which will be processed by Todoist automatically.
  *
  * @param {Todoist_Object|undefined} todoist_obj - if already created, otherwise the function will create its own.
- * @param  {string} str_TaskContent the task content as string
+ * @param  {string} content the task content as string
  * @return {Boolean} true when added successfully, false when adding task failed
  */
 function Draftist_quickAdd({
   todoist = Todoist.create(),
   content
 }) {
-  if (!todoist.quickAdd(str_TaskContent)) {
+  if (!todoist.quickAdd(content)) {
     let error = Draftist_checkTodoistForError(todoist)
     let errorMsg = "adding tasks failed, todoist returned:\n" + error
     Draftist_failAction("Quick Add", errorMsg)
@@ -189,7 +189,7 @@ function Draftist_quickAddLines(text) {
   // repeat for each line
   for (line of lines) {
     if (line.length !== 0) {
-      if (!Draftist_quickAdd(todoist, line)) {
+      if (!Draftist_quickAdd({todoist: todoist, content: line})) {
         // if failed directly return, quickadd will display the error
         return false;
       } else {
@@ -355,7 +355,7 @@ function Draftist_createTaskObjectWithSettingsFromPrompt(content, description) {
   pDate.addButton("tomorrow");
   pDate.addButton("next week");
   pDate.addButton("other");
-  pDate.addButton("no du date", undefined)
+  pDate.addButton("no due date", undefined)
   pDate.isCancellable = false;
   pDate.show();
   // if buttonPressed is undefined no due date was selected
@@ -501,7 +501,7 @@ function Draftist_createTaskWithDescriptionAndSettingsFromCurrentDraft() {
  */
 function Draftist_createTaskWithDescriptionAndSettingsFromPrompt() {
   let p = new Prompt();
-  p.title = "add task with description";
+  p.title = "add task with description & settings";
   p.message = "first line is the tasks content; everything else will be used as description"
   p.addTextView("task", "", "", {
     wantsFocus: true
