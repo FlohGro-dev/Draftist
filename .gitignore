@@ -1,2 +1,8 @@
 
 .DS_Store
+docs/fonts/
+docs/scripts/
+docs/styles/
+node_modules/
+package-lock.json
+package.json

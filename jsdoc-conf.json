@@ -1,0 +1,13 @@
+{
+    "plugins": ["plugins/markdown"],
+    "source": {
+        "include": ["Draftist.js","README.md"]
+    },
+    "opts": {
+        "destination": "./docs/",
+        "template": "node_modules/clean-jsdoc-theme",
+        "theme_opts": {
+            "theme": "dark"
+        }
+    }
+}

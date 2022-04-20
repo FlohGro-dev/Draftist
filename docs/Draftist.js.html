@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Adding favicon -->
+    
+
+    <!-- Adding meta -->
+    
+
+    <!-- Adding external script-->
+    
+
+    <!-- Adding external style-->
+    
+
+    <!-- Adding scripts-->
+    
+
+    <!-- Adding style-->
+    
+
+    <!-- Adding overlay script-->
+    
+
+    <!-- Adding overlay style-->
+    
+
+
+    <title>
+      Draftist.js
+    </title>
+
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/third-party/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/third-party/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/reset.css">
+    <link type="text/css" rel="stylesheet" href="styles/clean-jsdoc-theme-base.css">
+    <link type="text/css" rel="stylesheet" href="styles/clean-jsdoc-theme-dark.css">
+    
+    <svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+    style="display:none">
+    <defs>
+        <symbol id="copy-icon" viewbox="0 0 488.3 488.3">
+            <g>
+                <path
+                    d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z" />
+                <path
+                    d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z" />
+            </g>
+        </symbol>
+        <symbol id='search-icon' viewBox="0 0 512 512">
+            <g>
+                <g>
+                    <path
+                        d="M225.474,0C101.151,0,0,101.151,0,225.474c0,124.33,101.151,225.474,225.474,225.474    c124.33,0,225.474-101.144,225.474-225.474C450.948,101.151,349.804,0,225.474,0z M225.474,409.323    c-101.373,0-183.848-82.475-183.848-183.848S124.101,41.626,225.474,41.626s183.848,82.475,183.848,183.848    S326.847,409.323,225.474,409.323z" />
+                </g>
+            </g>
+            <g>
+                <g>
+                    <path
+                        d="M505.902,476.472L386.574,357.144c-8.131-8.131-21.299-8.131-29.43,0c-8.131,8.124-8.131,21.306,0,29.43l119.328,119.328    c4.065,4.065,9.387,6.098,14.715,6.098c5.321,0,10.649-2.033,14.715-6.098C514.033,497.778,514.033,484.596,505.902,476.472z" />
+                </g>
+            </g>
+        </symbol>
+        <symbol id="down-icon" viewBox="0 0 16 16">
+            <path 
+                fill-rule="evenodd" 
+                clip-rule="evenodd" 
+                d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z"
+            >
+            </path>
+        </symbol>
+    </defs>
+</svg>
+  </head>
+
+  <body>
+
+    <nav class="navbar" id="navbar">
+      <div class="navbar-heading" id="navbar-heading"><a href="index.html"><h2 class="navbar-heading-text">Home</h2></a></div><div class="search-box" id="search-box"><div class="search-box-input-container"><input class="search-box-input" type="text" placeholder="Search..." id="search-box-input" /><svg class="search-icon" alt="search-icon"><use xlink:href="#search-icon"></use></svg></div><div class="search-item-container" id="search-item-container"><ul class="search-item-ul" id="search-item-ul"></ul></div></div><div class="sidebar-main-content" id="sidebar-main-content"><div class="accordion collapsed" id="9437241" > <h3 class="accordion-heading">Global<svg><use xlink:href="#down-icon"></use></svg></h3><ul class="accordion-content"><li class="accordion-list" id=""><a href="global.html#activeSettings">activeSettings</a></li><li class="accordion-list" id=""><a href="global.html#defaultSettingsParams">defaultSettingsParams</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_cancelAction">Draftist_cancelAction</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_changeConfigurationSettings">Draftist_changeConfigurationSettings</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_createStorageDraft">Draftist_createStorageDraft</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_createTask">Draftist_createTask</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_createTaskObjectWithSettingsFromPrompt">Draftist_createTaskObjectWithSettingsFromPrompt</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_createTasksFromLinesInDraftWithIdenticalSettings">Draftist_createTasksFromLinesInDraftWithIdenticalSettings</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_createTasksFromLinesInPromptWithIdenticalSettings">Draftist_createTasksFromLinesInPromptWithIdenticalSettings</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_createTasksFromLinesWithIdenticalSettings">Draftist_createTasksFromLinesWithIdenticalSettings</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_createTaskWithDescription">Draftist_createTaskWithDescription</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_createTaskWithDescriptionAndSettings">Draftist_createTaskWithDescriptionAndSettings</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_createTaskWithDescriptionAndSettingsFromCurrentDraft">Draftist_createTaskWithDescriptionAndSettingsFromCurrentDraft</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_createTaskWithDescriptionAndSettingsFromPrompt">Draftist_createTaskWithDescriptionAndSettingsFromPrompt</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_createTaskWithDescriptionFromCurrentDraft">Draftist_createTaskWithDescriptionFromCurrentDraft</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_createTaskWithDescriptionFromPrompt">Draftist_createTaskWithDescriptionFromPrompt</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_failAction">Draftist_failAction</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_findOrCreateDataStoreDraft">Draftist_findOrCreateDataStoreDraft</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_findOrCreateSettingsDraft">Draftist_findOrCreateSettingsDraft</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_getLastTodoistError">Draftist_getLastTodoistError</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_getStoredTodoistData">Draftist_getStoredTodoistData</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_helperGetObjectFromStoredDraft">Draftist_helperGetObjectFromStoredDraft</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_helperUpdateObjectInStoreDraft">Draftist_helperUpdateObjectInStoreDraft</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_infoMessage">Draftist_infoMessage</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_initConfigurationSettingsDraft">Draftist_initConfigurationSettingsDraft</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_initDataStoreDraft">Draftist_initDataStoreDraft</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_loadCurrentConfigurationSettings">Draftist_loadCurrentConfigurationSettings</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_quickAdd">Draftist_quickAdd</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_quickAddLines">Draftist_quickAddLines</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_quickAddLinesFromCurrentDraft">Draftist_quickAddLinesFromCurrentDraft</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_quickAddLinesFromPrompt">Draftist_quickAddLinesFromPrompt</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_readConfigurationSettingsFromDraft">Draftist_readConfigurationSettingsFromDraft</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_restoreDefaultSettings">Draftist_restoreDefaultSettings</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_Settings">Draftist_Settings</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_storeCurrentConfigurationSettings">Draftist_storeCurrentConfigurationSettings</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_succeedAction">Draftist_succeedAction</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_updateStoredTodoistData">Draftist_updateStoredTodoistData</a></li><li class="accordion-list" id=""><a href="global.html#Draftist_updateTodoistDataIfUpdateIntervalExceeded">Draftist_updateTodoistDataIfUpdateIntervalExceeded</a></li><li class="accordion-list" id=""><a href="global.html#settingsDraftName">settingsDraftName</a></li><li class="accordion-list" id=""><a href="global.html#settingsParamTypes">settingsParamTypes</a></li></ul> </div>
+      
+
+    </nav>
+    <div class="navbar-ham" id="navbar-ham">
+      <div>
+        <div class="first"></div>
+        <div class="second"></div>
+        <div class="third"></div>
+      </div>
+    </div>
+
+    <div id="main" class="main-content">
+      
+      <h1 id='page-title' class="page-title">
+        Draftist.js
+      </h1>
+      
+
+      
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Draftist Action Group Functions
+ * @author FlohGro
+ * @copyright 2022, FlohGro
+ * @licensing MIT free to use - but donate coffees to support development http://www.flohgro.com/donate
+ * @version 0.1
+ */
+
+
+/**
+ * Draftist_checkTodoistForError - This function checks the provided Todoist Object for errors.
+ * If an error was detected it will be returned, otherwise undefined will be returned.
+ * @param {Todoist_Object} todoist_obj the todoist object to check
+ * @returns {error | undefined} a present error or undefined
+ */
+function Draftist_getLastTodoistError(todoistObj) {
+  let error = todoist_obj.lastError
+  if (error) {
+    return error;
+  } else {
+    return undefined;
+  }
+}
+
+
+/**
+ * Draftist_succeedAction - notifies the user about a successful execution of an action
+ *
+ * @param  {String} actionName      the name of the action (might be empty if not displayed)
+ * @param  {Boolean} displayActionName bool if the provided name of the action shall be displayed or not
+ * @param  {String} successMessage    the content for the success message
+ */
+function Draftist_succeedAction(actionName, displayActionName, successMessage) {
+  app.displaySuccessMessage((displayActionName ? actionName + " succeeded: " : "") + successMessage);
+}
+
+/**
+ * Draftist_cancelAction - This function notifies the user which action was canceled and why.
+ * @param {String} actionName the name of the actionName
+ * @param {String} cancelReasonDescription description why the action was cancelled
+ */
+function Draftist_cancelAction(actionName, cancelReasonDescription) {
+  context.cancel(actionName + " was cancelled: " + cancelReasonDescription);
+  app.displayWarningMessage(actionName + " was cancelled: " + cancelReasonDescription);
+}
+
+/**
+ * Draftist_failAction - This function notifies the user when an action failed and why.
+ * @param {String} actionName the name of the actionName
+ * @param {String} failedReasonDescription description why the action failed
+ */
+function Draftist_failAction(actionName, failedReasonDescription) {
+  context.fail(actionName + " failed: " + failedReasonDescription);
+  alert(actionName + " failed: " + failedReasonDescription);
+}
+
+/**
+ * Draftist_infoMessage - displays a info message to the user prepended with "Draftist: "
+ *
+ * @param  {String} actionName      the name of the action (might be empty if not displayed)
+ * @param  {String} successMessage    the content for the info message
+ */
+function Draftist_infoMessage(actionName, infoMessage) {
+  app.displayInfoMessage("Draftist: " + infoMessage + (actionName.length > 0 ? "(" + actionName + ")" : ""));
+}
+
+/**
+ * Draftist_quickAdd - This function adds the provided string to Todoist using the quickAdd API.
+ * This supports the Todoist natural language which will be processed by Todoist automatically.
+ *
+ * @param {Todoist_Object|undefined} todoist_obj - if already created, otherwise the function will create its own.
+ * @param  {string} content the task content as string
+ * @return {Boolean} true when added successfully, false when adding task failed
+ */
+function Draftist_quickAdd({
+  todoist = Todoist.create(),
+  content
+}) {
+  if (!todoist.quickAdd(content)) {
+    let error = Draftist_checkTodoistForError(todoist)
+    let errorMsg = "adding tasks failed, todoist returned:\n" + error
+    Draftist_failAction("Quick Add", errorMsg)
+    return false;
+  } else {
+    return true;
+  }
+}
+
+/**
+ * Draftist_createTask - creates a Task with the given parameters
+ *
+ * @param {Todoist_Object|undefined} todoist_obj - if already created, otherwise the function will create its own.
+ * @param  {String} content: Task content. This value may contain markdown-formatted text and hyperlinks. Details on markdown support can be found in the Text Formatting article in the Todoist Help Center.
+ * @param  {String} description?: A description for the task. This value may contain markdown-formatted text and hyperlinks. Details on markdown support can be found in the Text Formatting article in the Todoist Help Center.
+ * @param  {Integer} project_id?: Task project ID. If not set, task is put to user's Inbox.
+ * @param  {Integer} section_id?: ID of section to put task into.
+ * @param  {Integer} parent_id?: Parent task ID.
+ * @param  {Integer} order?: Non-zero integer value used by clients to sort tasks under the same parent.
+ * @param  {Integer[]} label_ids?: IDs of labels associated with the task.Integer
+ * @param  {Ingeger} priority?: Task priority from 1 (normal) to 4 (urgent).
+ * @param  {String} due_string?: No	Human defined task due date (ex.: "next Monday", "Tomorrow"). Value is set using local (not UTC) time.
+ * @param  {String} due_date?: Specific date in YYYY-MM-DD format relative to user’s timezone.
+ * @param  {String} due_datetime?: Specific date and time in RFC3339 format in UTC.
+ * @param  {String} due_lang?: 2-letter code specifying language in case due_string is not written in English.
+ * @param  {Integer} assignee?: The responsible user ID (if set, and only for shared tasks).
+ * @return {Boolean} true when added successfully, false when adding task failed
+ */
+function Draftist_createTask({
+  todoist = Todoist.create(),
+  content,
+  description = "",
+  project_id = undefined,
+  section_id = undefined,
+  parent_id = undefined,
+  order = undefined,
+  label_ids = [],
+  priority = undefined,
+  due_string = undefined,
+  due_date = undefined,
+  due_datetime = undefined,
+  due_lang = undefined,
+  assignee = undefined
+}) {
+  // check if provided content is not empty
+  if (content.length == 0) {
+    Draftist_failAction("create Task", "no task content provided")
+    return false;
+  }
+
+
+  let taskMap = new Map();
+  taskMap.set("content", content);
+  taskMap.set("description", description);
+  if (project_id) {
+    taskMap.set("project_id", project_id);
+  }
+  if (section_id) {
+    taskMap.set("section_id", section_id);
+  }
+  if (parent_id) {
+    taskMap.set("parent_id", parent_id);
+  }
+  if (order) {
+    taskMap.set("order", order);
+  }
+  if (label_ids.length > 0) {
+    taskMap.set("label_ids", label_ids);
+  }
+  if (priority) {
+    taskMap.set("priority", priority);
+  }
+  if (due_string) {
+    taskMap.set("due_string", due_string);
+  }
+  if (due_date) {
+    taskMap.set("due_date", due_date);
+  }
+  if (due_datetime) {
+    taskMap.set("due_datetime", due_datetime);
+  }
+  if (due_lang) {
+    taskMap.set("due_lang", due_lang);
+  }
+  if (assignee) {
+    taskMap.set("assignee", assignee);
+  }
+
+  let taskObj = Object.fromEntries(taskMap)
+  let taskCreateResult = todoist.createTask(taskObj)
+  if (taskCreateResult) {
+    return true;
+  } else {
+    Draftist_failAction("create Task", Draftist_getLastTodoistError(todoist))
+    return false;
+  }
+}
+
+
+/**
+ * Draftist_quickAddLines - This action creates a new task for each line in the currently open Draft
+ *
+ * @param  {String} text the text which lines should be added as tasks to Todoist
+ * @return {Boolean|Number} false when adding faile, task number when adding succeeded
+ */
+function Draftist_quickAddLines(text) {
+  let todoist = Todoist.create()
+  let lines = text.split("\n");
+  let createdTasksCounter = 0;
+  // repeat for each line
+  for (line of lines) {
+    if (line.length !== 0) {
+      if (!Draftist_quickAdd({todoist: todoist, content: line})) {
+        // if failed directly return, quickadd will display the error
+        return false;
+      } else {
+        createdTasksCounter++;
+      }
+    }
+  }
+  return createdTasksCounter;
+}
+
+
+
+// Create Tasks Actions
+
+/**
+ * Draftist_quickAddLinesFromCurrentDraft - use todoist quick add for each line of the current draft
+ *
+ * @return {Boolean}  true when added successfully, false when adding task failed
+ */
+function Draftist_quickAddLinesFromCurrentDraft() {
+  if (draft.content.length == 0) {
+    Draftist_cancelAction("Add Tasks from current Draft", "Draft is blank")
+    return false;
+  } else {
+    let taskNumber = Draftist_quickAddLines(draft.content);
+    if (taskNumber) {
+      // succeeded
+      Draftist_succeedAction("", false, "successfully added " + taskNumber + " tasks :)")
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+
+/**
+ * Draftist_quickAddLinesFromPrompt - use todoist quick add for each line inserted in the prompt
+ *
+ * @return {Boolean}  true when added successfully, false when adding task failed
+ */
+function Draftist_quickAddLinesFromPrompt() {
+  let p = new Prompt();
+  p.title = "add tasks from lines";
+  p.addTextView("tasks", "", "", {
+    wantsFocus: true
+  });
+  p.addButton("add tasks");
+
+  if (!p.show()) {
+    Draftist_cancelAction("Add Tasks from Prompt", "cancelled by user");
+    return false;
+  }
+  // user did select "add tasks"
+  let input = p.fieldValues["tasks"];
+  if (input.length == 0) {
+    Draftist_cancelAction("Add Tasks from Prompt", "No input provided")
+    return false;
+  } else {
+    let taskNumber = Draftist_quickAddLines(draft.content);
+    if (taskNumber) {
+      // succeeded
+      Draftist_succeedAction("", false, "successfully added " + taskNumber + " tasks :)")
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+/**
+ * Draftist_createTaskWithDescription - reate a task with the first line of the input as content and everything else as description
+ *
+ * @param  {String} text the text which should be used for the task and description
+ * @return {Boolean}  true when added successfully, false when adding task failed
+ */
+function Draftist_createTaskWithDescription(text) {
+  let lines = text.split("\n");
+  // first line is the tasks content, remove it from the array and assign it
+  let content = lines.shift();
+  let description = lines.join("\n")
+  return Draftist_createTask({
+    content: content,
+    description: description
+  });
+}
+
+/**
+ * Draftist_createTaskWithDescriptionFromCurrentDraft - add task with description from current draft. use the first line as content and everything else as description
+ *
+ * @return {Boolean}  true when added successfully, false when adding task failed
+ */
+function Draftist_createTaskWithDescriptionFromCurrentDraft() {
+  if (draft.content.length == 0) {
+    Draftist_cancelAction("Task with description from current Draft", "Draft is blank")
+    return false;
+  } else {
+    let taskCreated = Draftist_createTaskWithDescription(draft.content);
+    if (taskCreated) {
+      // succeeded
+      Draftist_succeedAction("", false, "successfully added task");
+      return true;
+    } else {
+      return false
+    }
+  }
+}
+
+/**
+ * Draftist_createTaskWithDescriptionFromPrompt - add task with description from prompt. use the first line as content and everything else as description
+ *
+ * @return {Boolean}  true when added successfully, false when adding task failed
+ */
+function Draftist_createTaskWithDescriptionFromPrompt() {
+  let p = new Prompt();
+  p.title = "add tasks with description";
+  p.message = "first line is the tasks content; everything else will be used as description"
+  p.addTextView("task", "", "", {
+    wantsFocus: true
+  });
+  p.addButton("add task");
+
+  if (!p.show()) {
+    Draftist_cancelAction("Add Tasks from Prompt", "cancelled by user");
+    return false;
+  }
+  // user did select "add tasks"
+  let input = p.fieldValues["task"];
+  if (input.length == 0) {
+    Draftist_cancelAction("Add Tasks from Prompt", "No input provided")
+    return false;
+  } else {
+    let taskCreated = Draftist_createTaskWithDescription(input);
+    if (taskCreated) {
+      // succeeded
+      Draftist_succeedAction("", false, "successfully added task");
+      return true;
+    } else {
+      return false
+    }
+  }
+}
+
+
+
+/**
+ * Draftist_createTaskObjectWithSettingsFromPrompt - creates a todoist task object with settings from prompts
+ *
+ * @param  {String} content     content of the task (must not be empty)
+ * @param  {String} description description for the task (can be empty)
+ * @return {taskObject}             taskObject for a todoist task which can be passed to the Todoist.createTask() API of Drafts
+ */
+function Draftist_createTaskObjectWithSettingsFromPrompt(content, description) {
+  // check if any map of the todoist data contains data - if not, load the data into the vars
+  if (projectsNameToIdMap.size == 0) {
+    Draftist_getStoredTodoistData();
+  }
+
+  // due date prompt
+  let pDate = new Prompt()
+  pDate.title = "select due date:";
+  pDate.addButton("today");
+  pDate.addButton("tomorrow");
+  pDate.addButton("next week");
+  pDate.addButton("other");
+  pDate.addButton("no due date", undefined)
+  pDate.isCancellable = false;
+  pDate.show();
+  // if buttonPressed is undefined no due date was selected
+  const dateIsSet = (pDate.buttonPressed ? true : false);
+  let selectedDateString = undefined;
+  if (dateIsSet) {
+    if (pDate.buttonPressed == "other") {
+      var pSelDate = new Prompt();
+      pSelDate.title = "select custom date";
+      var today = new Date();
+      var tomorrow = new Date(new Date().setDate(new Date().getDate() + 1));
+      pSelDate.addDatePicker("dueDatePicker", "", tomorrow, {
+        "mode": "date",
+        "minimumDate": tomorrow
+      });
+
+      pSelDate.addButton("SET DATE");
+      pSelDate.isCancellable = false;
+      pSelDate.show();
+      let pickedDueDate = pSelDate.fieldValues["dueDatePicker"];
+      let day = pickedDueDate.getDate();
+      let month = pickedDueDate.getMonth() + 1;
+      let year = pickedDueDate.getFullYear();
+      selectedDateString = String(year) + "-" + String(month) + "-" + String(day);
+    } else {
+      selectedDateString = pDate.buttonPressed;
+    }
+  }
+
+  // priority prompt
+  let pPrio = new Prompt();
+  pPrio.title = "select priority:";
+  pPrio.addButton("p1");
+  pPrio.addButton("p2");
+  pPrio.addButton("p3");
+  pPrio.addButton("p4");
+  pPrio.isCancellable = false;
+  pPrio.show();
+
+  // the api of todoist uses different numbering than the user sees. p1 is reflected as value 4, p2 -> 3 and so on -> store this value
+  let selectedPriority = 0;
+  switch (pPrio.buttonPressed) {
+    case "p1":
+      selectedPriority = 4;
+      break;
+    case "p2":
+      selectedPriority = 3;
+      break;
+    case "p3":
+      selectedPriority = 2;
+      break;
+    case "p4":
+      selectedPriority = 1;
+      break;
+  }
+
+
+  // project prompt
+  let pProject = new Prompt();
+  pProject.title = "select project";
+  pProject.message = "select Inbox if you want to sort it later"
+
+  let sortedProjectNameMap = new Map([...projectsNameToIdMap].sort((a, b) => String(a[0]).localeCompare(b[0])))
+  for (const [pName, pId] of sortedProjectNameMap) {
+    // selected button will directly contain the projects id as value
+    pProject.addButton(pName, pId);
+  }
+
+  pProject.isCancellable = false;
+  pProject.show();
+  let selectedProjectId = pProject.buttonPressed;
+
+  // labels prompt
+  let pLabels = new Prompt();
+  pLabels.title = "select labels";
+  let sortedLabelsNameMap = new Map([...labelsNameToIdMap].sort((a, b) => String(a[0]).localeCompare(b[0])))
+
+  pLabels.addSelect("labels", "select labels", Array.from(sortedLabelsNameMap.keys()), [], true);
+  pLabels.addButton("set labels");
+  pLabels.isCancellable = false;
+  pLabels.show();
+  let selectedLabels = pLabels.fieldValues["labels"];
+  let selectedlabelIDs = [];
+  for (label of selectedLabels) {
+    selectedlabelIDs.push(labelsNameToIdMap.get(label));
+  }
+
+  let taskObject = {
+    content: content,
+    description: description,
+    project_id: selectedProjectId,
+    section_id: undefined,
+    label_ids: selectedlabelIDs,
+    priority: selectedPriority,
+    due_string: (selectedDateString ? selectedDateString : undefined),
+  }
+
+  return taskObject;
+
+}
+
+
+/**
+ * Draftist_createTaskWithDescriptionAndSettings - create a task with description and settings (project, labels, due date) from prompts. first line will be used as task content, everything else will be the description
+ *
+ * @param  {String} text the text which should be used for the task and description
+ * @return {Boolean}  true when added successfully, false when adding task failed
+ */
+function Draftist_createTaskWithDescriptionAndSettings(text) {
+  let lines = text.split("\n");
+  // first line is the tasks content, remove it from the array and assign it
+  let content = lines.shift();
+  let description = lines.join("\n")
+  return Draftist_createTask(Draftist_createTaskObjectWithSettingsFromPrompt(content, description));
+}
+
+
+/**
+ * Draftist_createTaskWithDescriptionAndSettingsFromCurrentDraft - add task with description and settings from prompt from current draft. use the first line as content and everything else as description
+ *
+ * @return {Boolean}  true when added successfully, false when adding task failed
+ */
+function Draftist_createTaskWithDescriptionAndSettingsFromCurrentDraft() {
+  if (draft.content.length == 0) {
+    Draftist_cancelAction("Task with description from current Draft", "Draft is blank")
+    return false;
+  } else {
+    let taskCreated = Draftist_createTaskWithDescriptionAndSettings(draft.content);
+    if (taskCreated) {
+      // succeeded
+      Draftist_succeedAction("", false, "successfully added task");
+      return true;
+    } else {
+      return false
+    }
+  }
+}
+
+/**
+ * Draftist_createTaskWithDescriptionAndSettingsFromPrompt - add task with description and Settings from prompts. use the first line as content and everything else as description
+ *
+ * @return {Boolean}  true when added successfully, false when adding task failed
+ */
+function Draftist_createTaskWithDescriptionAndSettingsFromPrompt() {
+  let p = new Prompt();
+  p.title = "add task with description &amp; settings";
+  p.message = "first line is the tasks content; everything else will be used as description"
+  p.addTextView("task", "", "", {
+    wantsFocus: true
+  });
+  p.addButton("add task");
+
+  if (!p.show()) {
+    Draftist_cancelAction("Add Tasks from Prompt", "cancelled by user");
+    return false;
+  }
+  // user did select "add tasks"
+  let input = p.fieldValues["task"];
+  if (input.length == 0) {
+    Draftist_cancelAction("Add Tasks from Prompt", "No input provided")
+    return false;
+  } else {
+    let taskCreated = Draftist_createTaskWithDescriptionAndSettings(input);
+    if (taskCreated) {
+      // succeeded
+      Draftist_succeedAction("", false, "successfully added task");
+      return true;
+    } else {
+      return false
+    }
+  }
+}
+
+
+/**
+ * Draftist_createTasksFromLinesWithIdenticalSettings - creates a task from each line in the passed text with identical settings from prompts
+ *
+ * @param  {String} text the string containing the tasks seperated by new lines
+ * @return {Boolean}      true if added successfully; false if adding tasks failed
+ */
+function Draftist_createTasksFromLinesWithIdenticalSettings(text) {
+  if (text.length == 0) {
+    return false;
+  } else {
+    let taskCount = 0;
+    let taskBaseObject = Draftist_createTaskObjectWithSettingsFromPrompt("multiple tasks");
+    let lines = text.split("\n");
+    for (line of lines) {
+      if (line.length != 0) {
+        taskBaseObject.content = line
+        if (Draftist_createTask(taskBaseObject)) {
+          // increase task counter
+          taskCount = taskCount + 1;
+        } else {
+          // stop adding tasks and return immideately
+          return false;
+        }
+      }
+    }
+    // succeeded
+    Draftist_succeedAction("", false, "successfully added " + taskCount + " task(s)");
+  }
+}
+
+
+/**
+ * Draftist_createTasksFromLinesInDraftWithIdenticalSettings - creates tasks for each line in the current line with settings from prompt
+ *
+ * @return {Boolean}  true if added successfully; false if adding tasks failed
+ */
+function Draftist_createTasksFromLinesInDraftWithIdenticalSettings() {
+  if (draft.content.length != 0) {
+    return Draftist_createTasksFromLinesWithIdenticalSettings(draft.content);
+  } else {
+    Draftist_cancelAction("Tasks from lines in current Draft with identical settings", "Draft is blank")
+    return false;
+  }
+}
+
+
+/**
+ * Draftist_createTaskWithDescriptionAndSettingsFromPrompt - add task with description and Settings from prompts. use the first line as content and everything else as description
+ *
+ * @return {Boolean}  true when added successfully, false when adding task failed
+ */
+function Draftist_createTasksFromLinesInPromptWithIdenticalSettings() {
+  let p = new Prompt();
+  p.title = "add tasks with description";
+  p.message = "each line will be its own task - all use the same settings in the next prompts"
+  p.addTextView("tasks", "", "", {
+    wantsFocus: true
+  });
+  p.addButton("add tasks");
+
+  if (!p.show()) {
+    Draftist_cancelAction("Add Tasks from Prompt", "cancelled by user");
+    return false;
+  }
+  // user did select "add tasks"
+  let input = p.fieldValues["tasks"];
+  if (input.length == 0) {
+    Draftist_cancelAction("Add Tasks from Prompt", "No input provided")
+    return false;
+  } else {
+    let taskCreated = Draftist_createTasksFromLinesWithIdenticalSettings(input);
+    if (taskCreated) {
+      // succeeded
+      Draftist_succeedAction("", false, "successfully added task");
+      return true;
+    } else {
+      return false
+    }
+  }
+}
+
+
+// helper fuctions to store settings and todoist data
+// param types
+// textArray: comma seperated stings
+
+
+/**
+ * settingParamTypes: this defines the types of the settings parameters in text format
+ */
+const settingsParamTypes = {
+  "settingsDraftTags": "textArray",
+  "dataStoreDraftTags": "textArray",
+  "dataStoreUpdateInterval": "number"
+}
+
+
+/**
+ * defaultSettingsParams: these are the default settings for the Action Group
+ */
+const defaultSettingsParams = {
+  "settingsDraftTags": [
+    "_draftistSettings",
+    "/ref-script"
+  ],
+  "dataStoreDraftTags": [
+    "_draftistSettings",
+    "/ref-script"
+  ],
+  "dataStoreUpdateInterval": 24
+}
+
+
+/**
+ * static definition of the names for the storage Drafts
+ */
+const settingsDraftName = "Draftist Action Group Settings";
+const dataStoreDraftName = "Draftist Todoist Data Store";
+
+/**
+ * global variables that are used within the various functions to access current settings - stored in variables to quicker access them in different use cases
+ */
+let activeSettings = undefined;
+let lastUpdated = undefined;
+let projects = undefined;
+let labels = undefined;
+let sections = undefined;
+let projectsNameToIdMap = new Map();
+let projectsIdToNameMap = new Map();
+let labelsNameToIdMap = new Map();
+let labelsIdToNameMap = new Map();
+
+
+/**
+ * Draftist_findOrCreateSettingsDraft - loads the configuration settings from the settings Draft - if it is not existing it will be created with the default settings
+ *
+ * @return {Draft|Boolean}  returns the Draft Object if a settings Draft was found; if an error occured it returns false
+ */
+function Draftist_findOrCreateSettingsDraft() {
+  const draftName = settingsDraftName;
+  let notificationMessage = ""
+  let resultDrafts = [];
+  let dResults = Draft.queryByTitle(draftName);
+  if (dResults.length > 0) {
+    // filter out drafts with more in the title than just the "draftName"
+    for (res of dResults) {
+      if (res.displayTitle == "// " + draftName) {
+        resultDrafts.push(res)
+      }
+    }
+  } else {
+    let settingsDraft = Draftist_createStorageDraft(draftName)
+    Draftist_initConfigurationSettingsDraft(settingsDraft)
+    resultDrafts.push(settingsDraft);
+  }
+  if (resultDrafts.length > 1) {
+    Draftist_failAction("Draftist_findOrCreateSettingsDraft", "more than one setting Drafts found")
+    return false;
+  } else {
+    // one settings Draft was found (or just created), read the settings from it into the active settings variable
+    Draftist_readConfigurationSettingsFromDraft(resultDrafts[0]);
+    return resultDrafts[0]
+  }
+}
+
+
+/**
+ * Draftist_findOrCreateDataStoreDraft - loads the stored todoist data from the data store Draft - if it is not existing it will be created and the data will be retrieved from Todoist
+ *
+ * @return {Draft|Boolean}  returns the Draft Object if the data store Draft was found; if an error occured it returns false
+ */
+function Draftist_findOrCreateDataStoreDraft() {
+  const draftName = dataStoreDraftName;
+  let notificationMessage = ""
+  let resultDrafts = [];
+  let dResults = Draft.queryByTitle(draftName);
+  if (dResults.length > 0) {
+    // filter out drafts with more in the title than just the "draftName"
+    for (res of dResults) {
+      if (res.displayTitle == "// " + draftName) {
+        resultDrafts.push(res)
+      }
+    }
+  } else {
+    let storeDraft = Draftist_createStorageDraft(draftName)
+    Draftist_initDataStoreDraft(storeDraft)
+    resultDrafts.push(storeDraft);
+  }
+
+  if (resultDrafts.length > 1) {
+    // TODO: DRAFTIST FAIL ACTION!
+    return false;
+  } else {
+    // one settings Draft was found (or just created), read the settings from it into the active settings variable
+    return resultDrafts[0];
+  }
+}
+
+
+/**
+ * Draftist_createStorageDraft - creates a Draft to store settings or todoist data - this function is used internally
+ *
+ * @param  {String} draftName title to use for the Draft
+ * @return {Draft}           Draft object of the storage Draft
+ */
+function Draftist_createStorageDraft(draftName) {
+  let storeDraft = new Draft();
+  storeDraft.syntax = Syntax.find("builtIn", "JavaScript")
+  storeDraft.content = "// " + draftName + "\n// DON'T MAKE ANY CHANGES TO THIS DRAFT! IT IS USED BY THE DRAFTIST ACTION GROUP\n";
+  storeDraft.isArchived = true;
+  storeDraft.update();
+  return storeDraft;
+}
+
+
+/**
+ * Draftist_initConfigurationSettingsDraft - function to initialize the Settings Draft with the default settings (or reset it)
+ *
+ * @param  {Draft} settingsDraft the Draft object of the settings Draft
+ */
+function Draftist_initConfigurationSettingsDraft(settingsDraft) {
+  // remove all current tags (useful in case settings are restored to defaults)
+  for (tag of settingsDraft.tags) {
+    settingsDraft.removeTag(tag);
+  }
+  // set tags according to confiuration
+  for (tag of defaultSettingsParams["settingsDraftTags"]) {
+    settingsDraft.addTag(tag);
+  }
+  settingsDraft.content = settingsDraft.content + JSON.stringify(defaultSettingsParams)
+  // workaround was not updated as expected.
+  settingsDraft.update();
+  settingsDraft.update();
+
+}
+
+
+/**
+ * Draftist_initDataStoreDraft - function to initialize the data store Draft with the Todoist Data - initially loads all data from todoist into the storage Draft
+ *
+ * @param  {Draft} storeDraft the Draft object of the storage Draft
+ */
+function Draftist_initDataStoreDraft(storeDraft) {
+  // set tags according to confiuration
+  for (tag of defaultSettingsParams["dataStoreDraftTags"]) {
+    storeDraft.addTag(tag);
+  }
+  // initially load all data from todoist into the Draft
+  Draftist_updateStoredTodoistData(new Todoist(), storeDraft);
+  // workaround was not updated as expected.
+  storeDraft.update();
+  storeDraft.update();
+
+}
+
+
+/**
+ * Draftist_readConfigurationSettingsFromDraft - function to read the stored settings into the active settings variable - this function is used internally
+ *
+ * @param  {Draft} settingsDraft Draft object of the settings Draft
+ */
+function Draftist_readConfigurationSettingsFromDraft(settingsDraft) {
+  activeSettings = Draftist_helperGetObjectFromStoredDraft(settingsDraft)
+}
+
+
+/**
+ * Draftist_loadCurrentConfigurationSettings - loads the current settings stored in the settings Draft into the live variable of Draftist
+ */
+function Draftist_loadCurrentConfigurationSettings() {
+  let settingsDraft = Draftist_findOrCreateSettingsDraft()
+  Draftist_readConfigurationSettingsFromDraft(settingsDraft);
+
+}
+
+
+/**
+ * Draftist_storeCurrentConfigurationSettings - stores the current active settings in the settings Draft
+ *
+ * @param  {Draft} settingsDraft Draft object of the settings Draft
+ */
+function Draftist_storeCurrentConfigurationSettings(settingsDraft) {
+  Draftist_helperUpdateObjectInStoreDraft(settingsDraft, activeSettings)
+}
+
+
+
+/**
+ * Draftist_restoreDefaultSettings - funtion to restore the default settings
+ *
+ */
+function Draftist_restoreDefaultSettings(){
+  // get the current settingsDraft
+  let settingsDraft = Draftist_findOrCreateSettingsDraft();
+  // delete it
+  settingsDraft.isTrashed = true;
+  settingsDraft.update();
+  // and create a new one (which will be initialized with the default settings)
+  if(Draftist_findOrCreateSettingsDraft()){
+    Draftist_infoMessage("", "restored default settings")
+  } else {
+    Draftist_failAction("Restore Default Settings", "unexpected failure - this should not happen. please reach out to @FlohGro with a description what you did to fix this.\nDelete all \"Draftist\" drafts and try again")
+  }
+
+}
+
+
+/**
+ * Draftist_Settings - open the settings for Draftist - the user can either restore the default settings or change the current active settings
+ */
+function Draftist_Settings() {
+  // load current settings
+  Draftist_loadCurrentConfigurationSettings();
+
+  // ask the user if the default settings shall be restored or changes to the settings shall be made.
+
+  let pOptions = new Prompt();
+  pOptions.title = "Draftist Settings"
+  pOptions.addButton("restore default settings");
+  pOptions.addButton("change current settings");
+  if (pOptions.show()) {
+    // user selected an option
+    // execute the corresponding functions based on the selection
+    switch (pOptions.buttonPressed) {
+      case "restore default settings":
+        Draftist_restoreDefaultSettings();
+        break;
+      case "change current settings":
+        Draftist_changeConfigurationSettings();
+        break;
+    }
+  }
+}
+
+/**
+ * Draftist_changeConfigurationSettings - function to change the current active settings of Draftist and store them in the settings Draft
+ *
+ * @param  {Draft} settingsDraft Draft object of the settings Draft
+ */
+function Draftist_changeConfigurationSettings() {
+  let settingsDraft = Draftist_findOrCreateSettingsDraft();
+  // tags for configurationDraft
+  const currentSettingsTags = activeSettings["settingsDraftTags"]
+  let pSettingsDraftTags = new Prompt();
+  pSettingsDraftTags.title = "set tags for config Draft"
+  pSettingsDraftTags.message = "You can use as many tags as you like, seperate each tag by a comma without spaces between the tags.\nThe configuration Draft will only contain the tags in this textfield afterwards"
+  pSettingsDraftTags.addTextView("newTags", "", currentSettingsTags.join(","), {
+    wantsFocus: true
+  })
+  pSettingsDraftTags.addButton("apply tags");
+  if (pSettingsDraftTags.show()) {
+    // user selected to apply new tags
+    let newTags = pSettingsDraftTags.fieldValues["newTags"].split(",");
+    // now first remove all current tags
+    for (tag of currentSettingsTags) {
+      settingsDraft.removeTag(tag);
+    }
+    // now add all new tags
+    for (tag of newTags) {
+      settingsDraft.addTag(tag);
+    }
+    settingsDraft.update();
+    activeSettings["settingsDraftTags"] = newTags;
+  }
+
+  const currentStoreDraftTags = activeSettings["dataStoreDraftTags"]
+  let pStoreDraftTags = new Prompt();
+  pStoreDraftTags.title = "set tags for Data Store Draft"
+  pStoreDraftTags.message = "You can use as many tags as you like, seperate each tag by a comma without spaces between the tags.\nThe configuration Draft will only contain the tags in this textfield afterwards"
+  pStoreDraftTags.addTextView("newTags", "", currentStoreDraftTags.join(","), {
+    wantsFocus: true
+  })
+  pStoreDraftTags.addButton("apply tags");
+  if (pStoreDraftTags.show()) {
+    // find Data Store Draft
+    let storeDraft = Draftist_findOrCreateDataStoreDraft();
+    // user selected to apply new tags
+    let newTags = pStoreDraftTags.fieldValues["newTags"].split(",");
+    // now first remove all current tags
+    for (tag of currentStoreDraftTags) {
+      storeDraft.removeTag(tag);
+    }
+    // now add all new tags
+    for (tag of newTags) {
+      storeDraft.addTag(tag);
+    }
+    storeDraft.update();
+    activeSettings["dataStoreDraftTags"] = newTags;
+  }
+
+  // setting for local storage usage
+  let pStore = new Prompt();
+  pStore.title = "update inteval for todoist data"
+  pStore.message = "the action group stores todoist data locally in a Draft, this includes e.g. project/label names, ids which are necessary to quickly add tasks to projects (or add labels to tasks), the local storage speeds up creating tasks a lot. The data will be updated in the time period of your choice (in hours default: every 24h)";
+  pStore.addSelect("updateInterval", "update interval [h]", ["1", "2", "5", "10", "24", "36", "48"], [activeSettings["dataStoreUpdateInterval"].toString()], false)
+  pStore.addButton("Apply");
+  if (pStore.show()) {
+    // user selected to apply the settings
+    // store the setting in current active settings variable
+    activeSettings["dataStoreUpdateInterval"] = parseInt(pStore.fieldValues["updateInterval"])
+  }
+  // after all settings are reconfigured, store the new settings in the file
+  Draftist_storeCurrentConfigurationSettings(settingsDraft);
+}
+
+
+/**
+ * Draftist_updateTodoistDataIfUpdateIntervalExceeded - checks if an update of the locally stored Todoist data is needed based on the settings of the dataStoreUpdateInterval
+ */
+function Draftist_updateTodoistDataIfUpdateIntervalExceeded() {
+  // check if variable is defined (was initialized) otherwise load settings from draft
+  if (!lastUpdated) {
+    Draftist_getStoredTodoistData()
+  }
+  const now = Date.now();
+  let tDiffLastUpdate = now - lastUpdated
+  // check if variable is defined (was initialized) otherwise load settings from draft
+  if (!activeSettings) {
+    Draftist_loadCurrentConfigurationSettings()
+  }
+  let updateInterval = activeSettings["dataStoreUpdateInterval"] * 3600000;
+
+  if (tDiffLastUpdate > updateInterval) {
+    // update is necessary
+    Draftist_updateStoredTodoistData();
+    //Draftist_getStoredTodoistData();
+  }
+}
+
+
+/**
+ * Draftist_updateStoredTodoistData - updates the locally stored todoist data in the data store Draft
+ *
+ * @param  {Todoist} todoist                (optional) the todoist object to use
+ * @param  {Draft} storeDraft             (optional) Draft object of the data store Draft
+ */
+function Draftist_updateStoredTodoistData(todoist = new Todoist(), storeDraft = Draftist_findOrCreateDataStoreDraft()) {
+  // retrieve data from todoist
+  const projects = todoist.getProjects();
+  const sections = todoist.getSections();
+  const labels = todoist.getLabels();
+  const updatedTimeUnixMilliseconds = Date.now();
+
+  // create object with all todoist data
+  const todoistDataToStore = {
+    "lastUpdated": updatedTimeUnixMilliseconds,
+    "projects": projects,
+    "sections": sections,
+    "labels": labels
+  }
+  // get data store Draft
+  Draftist_helperUpdateObjectInStoreDraft(storeDraft, todoistDataToStore);
+  Draftist_infoMessage("", "updated local Todoist data");
+}
+
+
+
+/**
+ * Draftist_helperGetObjectFromStoredDraft - helper function to get the stored object in the passed draft - this function is used internally
+ *
+ * @param  {Draft} draftToUse Draft object to read the stored object from
+ * @return {Object}            the stored object
+ */
+function Draftist_helperGetObjectFromStoredDraft(draftToUse) {
+
+  let commentLinesArr = [];
+  let jsonLinesArr = [];
+  for (line of draftToUse.content.split("\n")) {
+    if (line.startsWith("// ")) {
+      commentLinesArr.push(line);
+    } else {
+      jsonLinesArr.push(line)
+    }
+  }
+  return JSON.parse(jsonLinesArr.join("\n"))
+
+}
+
+
+/**
+ * Draftist_helperUpdateObjectInStoreDraft - helper function to store the passed object in the passed Draft - this function is used internally
+ *
+ * @param  {Draft} draftToUse    Draft object where to store the passed objectToStore
+ * @param  {Object} objectToStore the Object to store in the Draft
+ */
+function Draftist_helperUpdateObjectInStoreDraft(draftToUse, objectToStore) {
+  // store lines with comments at the beginning
+  let commentLinesArr = [];
+  for (line of draftToUse.content.split("\n")) {
+    if (line.startsWith("// ")) {
+      commentLinesArr.push(line);
+    }
+  }
+  // join the lines again and parse the json string into the settings variable
+  let comments = commentLinesArr.join("\n");
+  let jsonData = JSON.stringify(objectToStore);
+  draftToUse.content = comments + "\n" + jsonData;
+  draftToUse.update()
+}
+
+
+/**
+ * Draftist_getStoredTodoistData - function to retrieve the stored Todoist Data from the data store Draft - the stored data will be updated if the dataStoreUpdateInterval was exceeded and the stored data will be loaded into the global variables to be accessible for all other functions
+ */
+function Draftist_getStoredTodoistData() {
+
+  const storeDraft = Draftist_findOrCreateDataStoreDraft();
+  const storedData = Draftist_helperGetObjectFromStoredDraft(storeDraft);
+
+  lastUpdated = parseInt(storedData["lastUpdated"]);
+  //projects = storedData["projects"]
+  projects = storedData["projects"].map((project) => {
+    return [project["name"], project["id"]];
+  })
+  labels = storedData["labels"].map((label) => {
+    return [label["name"], label["id"]];
+  })
+  sections = storedData["sections"].map((section) => {
+    return [section["name"], section["id"]];
+  })
+  for (p of projects) {
+    projectsNameToIdMap.set(p[0], p[1])
+    projectsIdToNameMap.set(p[1], p[0])
+  }
+  for (l of labels) {
+    labelsNameToIdMap.set(l[0], l[1])
+    labelsIdToNameMap.set(l[1], l[0])
+  }
+
+  // update data from Todoist if necessary
+  Draftist_updateTodoistDataIfUpdateIntervalExceeded();
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    </div>
+
+    <footer class="footer" id="footer">
+      
+    </footer>
+
+    <script src="scripts/third-party/prettify.js"></script>
+    <script src="scripts/third-party/lang-css.js"></script>
+    <script type="text/javascript" src="scripts/misc.js"></script>
+
+    <script>prettyPrint();</script>
+    <script src="scripts/linenumber.js"></script>
+    <script src="scripts/fix-code-block.js"></script>
+    <script src="scripts/fix-navbar.js"></script>
+    
+      <script src="scripts/search.js"></script>
+      <script src="scripts/third-party/fuse.js"></script>
+      <script>
+        var list = [{"title":"activeSettings","link":"<a href=\"global.html#activeSettings\">activeSettings</a>"},{"title":"defaultSettingsParams","link":"<a href=\"global.html#defaultSettingsParams\">defaultSettingsParams</a>"},{"title":"Draftist_cancelAction","link":"<a href=\"global.html#Draftist_cancelAction\">Draftist_cancelAction</a>"},{"title":"Draftist_changeConfigurationSettings","link":"<a href=\"global.html#Draftist_changeConfigurationSettings\">Draftist_changeConfigurationSettings</a>"},{"title":"Draftist_createStorageDraft","link":"<a href=\"global.html#Draftist_createStorageDraft\">Draftist_createStorageDraft</a>"},{"title":"Draftist_createTask","link":"<a href=\"global.html#Draftist_createTask\">Draftist_createTask</a>"},{"title":"Draftist_createTaskObjectWithSettingsFromPrompt","link":"<a href=\"global.html#Draftist_createTaskObjectWithSettingsFromPrompt\">Draftist_createTaskObjectWithSettingsFromPrompt</a>"},{"title":"Draftist_createTasksFromLinesInDraftWithIdenticalSettings","link":"<a href=\"global.html#Draftist_createTasksFromLinesInDraftWithIdenticalSettings\">Draftist_createTasksFromLinesInDraftWithIdenticalSettings</a>"},{"title":"Draftist_createTasksFromLinesInPromptWithIdenticalSettings","link":"<a href=\"global.html#Draftist_createTasksFromLinesInPromptWithIdenticalSettings\">Draftist_createTasksFromLinesInPromptWithIdenticalSettings</a>"},{"title":"Draftist_createTasksFromLinesWithIdenticalSettings","link":"<a href=\"global.html#Draftist_createTasksFromLinesWithIdenticalSettings\">Draftist_createTasksFromLinesWithIdenticalSettings</a>"},{"title":"Draftist_createTaskWithDescription","link":"<a href=\"global.html#Draftist_createTaskWithDescription\">Draftist_createTaskWithDescription</a>"},{"title":"Draftist_createTaskWithDescriptionAndSettings","link":"<a href=\"global.html#Draftist_createTaskWithDescriptionAndSettings\">Draftist_createTaskWithDescriptionAndSettings</a>"},{"title":"Draftist_createTaskWithDescriptionAndSettingsFromCurrentDraft","link":"<a href=\"global.html#Draftist_createTaskWithDescriptionAndSettingsFromCurrentDraft\">Draftist_createTaskWithDescriptionAndSettingsFromCurrentDraft</a>"},{"title":"Draftist_createTaskWithDescriptionAndSettingsFromPrompt","link":"<a href=\"global.html#Draftist_createTaskWithDescriptionAndSettingsFromPrompt\">Draftist_createTaskWithDescriptionAndSettingsFromPrompt</a>"},{"title":"Draftist_createTaskWithDescriptionFromCurrentDraft","link":"<a href=\"global.html#Draftist_createTaskWithDescriptionFromCurrentDraft\">Draftist_createTaskWithDescriptionFromCurrentDraft</a>"},{"title":"Draftist_createTaskWithDescriptionFromPrompt","link":"<a href=\"global.html#Draftist_createTaskWithDescriptionFromPrompt\">Draftist_createTaskWithDescriptionFromPrompt</a>"},{"title":"Draftist_failAction","link":"<a href=\"global.html#Draftist_failAction\">Draftist_failAction</a>"},{"title":"Draftist_findOrCreateDataStoreDraft","link":"<a href=\"global.html#Draftist_findOrCreateDataStoreDraft\">Draftist_findOrCreateDataStoreDraft</a>"},{"title":"Draftist_findOrCreateSettingsDraft","link":"<a href=\"global.html#Draftist_findOrCreateSettingsDraft\">Draftist_findOrCreateSettingsDraft</a>"},{"title":"Draftist_getLastTodoistError","link":"<a href=\"global.html#Draftist_getLastTodoistError\">Draftist_getLastTodoistError</a>"},{"title":"Draftist_getStoredTodoistData","link":"<a href=\"global.html#Draftist_getStoredTodoistData\">Draftist_getStoredTodoistData</a>"},{"title":"Draftist_helperGetObjectFromStoredDraft","link":"<a href=\"global.html#Draftist_helperGetObjectFromStoredDraft\">Draftist_helperGetObjectFromStoredDraft</a>"},{"title":"Draftist_helperUpdateObjectInStoreDraft","link":"<a href=\"global.html#Draftist_helperUpdateObjectInStoreDraft\">Draftist_helperUpdateObjectInStoreDraft</a>"},{"title":"Draftist_infoMessage","link":"<a href=\"global.html#Draftist_infoMessage\">Draftist_infoMessage</a>"},{"title":"Draftist_initConfigurationSettingsDraft","link":"<a href=\"global.html#Draftist_initConfigurationSettingsDraft\">Draftist_initConfigurationSettingsDraft</a>"},{"title":"Draftist_initDataStoreDraft","link":"<a href=\"global.html#Draftist_initDataStoreDraft\">Draftist_initDataStoreDraft</a>"},{"title":"Draftist_loadCurrentConfigurationSettings","link":"<a href=\"global.html#Draftist_loadCurrentConfigurationSettings\">Draftist_loadCurrentConfigurationSettings</a>"},{"title":"Draftist_quickAdd","link":"<a href=\"global.html#Draftist_quickAdd\">Draftist_quickAdd</a>"},{"title":"Draftist_quickAddLines","link":"<a href=\"global.html#Draftist_quickAddLines\">Draftist_quickAddLines</a>"},{"title":"Draftist_quickAddLinesFromCurrentDraft","link":"<a href=\"global.html#Draftist_quickAddLinesFromCurrentDraft\">Draftist_quickAddLinesFromCurrentDraft</a>"},{"title":"Draftist_quickAddLinesFromPrompt","link":"<a href=\"global.html#Draftist_quickAddLinesFromPrompt\">Draftist_quickAddLinesFromPrompt</a>"},{"title":"Draftist_readConfigurationSettingsFromDraft","link":"<a href=\"global.html#Draftist_readConfigurationSettingsFromDraft\">Draftist_readConfigurationSettingsFromDraft</a>"},{"title":"Draftist_restoreDefaultSettings","link":"<a href=\"global.html#Draftist_restoreDefaultSettings\">Draftist_restoreDefaultSettings</a>"},{"title":"Draftist_Settings","link":"<a href=\"global.html#Draftist_Settings\">Draftist_Settings</a>"},{"title":"Draftist_storeCurrentConfigurationSettings","link":"<a href=\"global.html#Draftist_storeCurrentConfigurationSettings\">Draftist_storeCurrentConfigurationSettings</a>"},{"title":"Draftist_succeedAction","link":"<a href=\"global.html#Draftist_succeedAction\">Draftist_succeedAction</a>"},{"title":"Draftist_updateStoredTodoistData","link":"<a href=\"global.html#Draftist_updateStoredTodoistData\">Draftist_updateStoredTodoistData</a>"},{"title":"Draftist_updateTodoistDataIfUpdateIntervalExceeded","link":"<a href=\"global.html#Draftist_updateTodoistDataIfUpdateIntervalExceeded\">Draftist_updateTodoistDataIfUpdateIntervalExceeded</a>"},{"title":"settingsDraftName","link":"<a href=\"global.html#settingsDraftName\">settingsDraftName</a>"},{"title":"settingsParamTypes","link":"<a href=\"global.html#settingsParamTypes\">settingsParamTypes</a>"}];
+        var options = 
+          setupSearch(list, options)
+      </script>
+    
+
+    
+
+    
+
+    
+
+
+  </body>
+
+</html>
