@@ -22,7 +22,6 @@ function Draftist_getLastTodoistError(todoistObj) {
   }
 }
 
-
 /**
  * Draftist_succeedAction - notifies the user about a successful execution of an action
  *
@@ -342,7 +341,7 @@ function Draftist_createTaskWithDescriptionFromPrompt() {
  * @param  {String} description description for the task (can be empty)
  * @return {taskObject}             taskObject for a todoist task which can be passed to the Todoist.createTask() API of Drafts
  */
-function Draftist_createTaskObjectWithSettingsFromPrompt(content, description) {
+function Draftist_createTaskObjectWithSettingsFromPrompt(content, description = "") {
   // check if any map of the todoist data contains data - if not, load the data into the vars
   if (projectsNameToIdMap.size == 0) {
     Draftist_getStoredTodoistData();
@@ -350,7 +349,7 @@ function Draftist_createTaskObjectWithSettingsFromPrompt(content, description) {
 
   // due date prompt
   let pDate = new Prompt()
-  pDate.title = "select due date:";
+  pDate.title = "select due date for \"" + content + "\":";
   pDate.addButton("today");
   pDate.addButton("tomorrow");
   pDate.addButton("next week");
@@ -364,7 +363,7 @@ function Draftist_createTaskObjectWithSettingsFromPrompt(content, description) {
   if (dateIsSet) {
     if (pDate.buttonPressed == "other") {
       var pSelDate = new Prompt();
-      pSelDate.title = "select custom date";
+      pSelDate.title = "select custom date for \"" + content + "\":";
       var today = new Date();
       var tomorrow = new Date(new Date().setDate(new Date().getDate() + 1));
       pSelDate.addDatePicker("dueDatePicker", "", tomorrow, {
@@ -372,7 +371,7 @@ function Draftist_createTaskObjectWithSettingsFromPrompt(content, description) {
         "minimumDate": tomorrow
       });
 
-      pSelDate.addButton("SET DATE");
+      pSelDate.addButton("set due date");
       pSelDate.isCancellable = false;
       pSelDate.show();
       let pickedDueDate = pSelDate.fieldValues["dueDatePicker"];
@@ -387,7 +386,7 @@ function Draftist_createTaskObjectWithSettingsFromPrompt(content, description) {
 
   // priority prompt
   let pPrio = new Prompt();
-  pPrio.title = "select priority:";
+  pPrio.title = "select priority for \"" + content + "\":";
   pPrio.addButton("p1");
   pPrio.addButton("p2");
   pPrio.addButton("p3");
@@ -415,7 +414,7 @@ function Draftist_createTaskObjectWithSettingsFromPrompt(content, description) {
 
   // project prompt
   let pProject = new Prompt();
-  pProject.title = "select project";
+  pProject.title = "select project for \"" + content + "\":";
   pProject.message = "select Inbox if you want to sort it later"
 
   let sortedProjectNameMap = new Map([...projectsNameToIdMap].sort((a, b) => String(a[0]).localeCompare(b[0])))
@@ -430,7 +429,7 @@ function Draftist_createTaskObjectWithSettingsFromPrompt(content, description) {
 
   // labels prompt
   let pLabels = new Prompt();
-  pLabels.title = "select labels";
+  pLabels.title = "select labels for \"" + content + "\":";
   let sortedLabelsNameMap = new Map([...labelsNameToIdMap].sort((a, b) => String(a[0]).localeCompare(b[0])))
 
   pLabels.addSelect("labels", "select labels", Array.from(sortedLabelsNameMap.keys()), [], true);
@@ -457,7 +456,6 @@ function Draftist_createTaskObjectWithSettingsFromPrompt(content, description) {
 
 }
 
-
 /**
  * Draftist_createTaskWithDescriptionAndSettings - create a task with description and settings (project, labels, due date) from prompts. first line will be used as task content, everything else will be the description
  *
@@ -471,7 +469,6 @@ function Draftist_createTaskWithDescriptionAndSettings(text) {
   let description = lines.join("\n")
   return Draftist_createTask(Draftist_createTaskObjectWithSettingsFromPrompt(content, description));
 }
-
 
 /**
  * Draftist_createTaskWithDescriptionAndSettingsFromCurrentDraft - add task with description and settings from prompt from current draft. use the first line as content and everything else as description
@@ -562,7 +559,7 @@ function Draftist_createTasksFromLinesWithIdenticalSettings(text) {
 
 
 /**
- * Draftist_createTasksFromLinesInDraftWithIdenticalSettings - creates tasks for each line in the current line with settings from prompt
+ * Draftist_createTasksFromLinesInDraftWithIdenticalSettings - creates tasks for each line in the current draft with identical settings from prompts
  *
  * @return {Boolean}  true if added successfully; false if adding tasks failed
  */
@@ -577,13 +574,13 @@ function Draftist_createTasksFromLinesInDraftWithIdenticalSettings() {
 
 
 /**
- * Draftist_createTaskWithDescriptionAndSettingsFromPrompt - add task with description and Settings from prompts. use the first line as content and everything else as description
+ * Draftist_createTasksFromLinesInPromptWithIdenticalSettings - creates tasks for each line in the displayed prompt with identical settings from prompts
  *
  * @return {Boolean}  true when added successfully, false when adding task failed
  */
 function Draftist_createTasksFromLinesInPromptWithIdenticalSettings() {
   let p = new Prompt();
-  p.title = "add tasks with description";
+  p.title = "add tasks with same settings";
   p.message = "each line will be its own task - all use the same settings in the next prompts"
   p.addTextView("tasks", "", "", {
     wantsFocus: true
@@ -601,6 +598,84 @@ function Draftist_createTasksFromLinesInPromptWithIdenticalSettings() {
     return false;
   } else {
     let taskCreated = Draftist_createTasksFromLinesWithIdenticalSettings(input);
+    if (taskCreated) {
+      // succeeded
+      Draftist_succeedAction("", false, "successfully added task");
+      return true;
+    } else {
+      return false
+    }
+  }
+}
+
+
+/**
+ * Draftist_createTasksFromLinesWithIndividualSettings - creates a task from each line in the passed text with individual settings for each line from prompts
+ *
+ * @param  {String} text the string containing the tasks seperated by new lines
+ * @return {Boolean}      true if added successfully; false if adding tasks failed
+ */
+function Draftist_createTasksFromLinesWithIndividualSettings(text) {
+  if (text.length == 0) {
+    return false;
+  } else {
+    let taskCount = 0;
+    let lines = text.split("\n");
+    for (line of lines) {
+      if (line.length != 0) {
+        if (Draftist_createTask(Draftist_createTaskObjectWithSettingsFromPrompt(line))) {
+          // increase task counter
+          taskCount = taskCount + 1;
+        } else {
+          // stop adding tasks and return immideately
+          return false;
+        }
+      }
+    }
+    // succeeded
+    Draftist_succeedAction("", false, "successfully added " + taskCount + " task(s)");
+  }
+}
+
+/**
+ * Draftist_createTasksFromLinesInDraftWithIndividualSettings - creates tasks for each line in the current draft with individual settings from prompts
+ *
+ * @return {Boolean}  true if added successfully; false if adding tasks failed
+ */
+function Draftist_createTasksFromLinesInDraftWithIndividualSettings() {
+  if (draft.content.length != 0) {
+    return Draftist_createTasksFromLinesWithIndividualSettings(draft.content);
+  } else {
+    Draftist_cancelAction("Tasks from lines in current Draft with individual settings", "Draft is blank")
+    return false;
+  }
+}
+
+/**
+ * Draftist_createTasksFromLinesInPromptWithIndividualSettings - creates tasks for each line in the displayed prompt with individual settings from prompts
+ *
+ * @return {Boolean}  true when added successfully, false when adding task failed
+ */
+function Draftist_createTasksFromLinesInPromptWithIndividualSettings() {
+  let p = new Prompt();
+  p.title = "add tasks with individual settings";
+  p.message = "each line will be its own task - each uses different settings from the next prompts"
+  p.addTextView("tasks", "", "", {
+    wantsFocus: true
+  });
+  p.addButton("add tasks");
+
+  if (!p.show()) {
+    Draftist_cancelAction("Add Tasks from Prompt", "cancelled by user");
+    return false;
+  }
+  // user did select "add tasks"
+  let input = p.fieldValues["tasks"];
+  if (input.length == 0) {
+    Draftist_cancelAction("Add Tasks from Prompt", "No input provided")
+    return false;
+  } else {
+    let taskCreated = Draftist_createTasksFromLinesWithIndividualSettings(input);
     if (taskCreated) {
       // succeeded
       Draftist_succeedAction("", false, "successfully added task");

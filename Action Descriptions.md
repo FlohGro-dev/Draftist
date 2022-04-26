@@ -43,6 +43,8 @@ If you want to make you're own Action based on Draftist functions simply include
 > This Action forces an update of the locally stored Todoist data. Use this if you e.g. just created a new project / label that you want to use immediately. Updates will be performed after 24 hours by default - you can change this using the [Draftist Settings](#draftist-settings) action.
 > After Success Setting: Nothing
 
+## Create Single Tasks
+
 ### quick add lines from draft
 
 > This Action will create a new task in Todoist for each line in the current draft. The content of each line will be parsed by todoist, so you can e.g. use dates or project/label notation in each lines just like you normally would directly in Todoist.
@@ -65,33 +67,35 @@ If you want to make you're own Action based on Draftist functions simply include
 
 ### task with description & settings from draft
 
-> This Action creates a task from the title (first line) of the current draft in Todoist with settings from prompts and the body of the draft as description. This means that the first line of the current draft will be used as the content of the task and everything else will be used as the description.
+> This Action creates a task from the title (first line) of the current draft in Todoist with settings (due date, project, labels) from prompts and the body of the draft as description. This means that the first line of the current draft will be used as the content of the task and everything else will be used as the description.
 > After Success Setting: Trash
 
 ### task with description & settings from prompt
 
-> This Action creates a task in Todoist with content, description and settings from prompts. The first line of the text in the "add task with description & settings" prompt will be used as the content of the task and everything else will be used as the description.
+> This Action creates a task in Todoist with content, description and settings (due date, project, labels) from prompts. The first line of the text in the "add task with description & settings" prompt will be used as the content of the task and everything else will be used as the description.
 > After Success Setting: Nothing
 
-### []
+## Create multiple tasks
 
->
-> After Success Setting:
+### tasks with same settings from draft
 
-### []
+> This Action creates a task for each line in the current draft. Each task will use the same settings (due date, project, labels) you select in the displayed prompts.
+> After Success Setting: Trash
 
->
-> After Success Setting:
+### tasks with same settings from prompt
 
-### []
+> This Action will create a new task in Todoist for each line you type into the displayed prompt. Each task will use the same settings (due date, project, labels) you select in the displayed prompts.
+> After Success Setting: Nothing
 
->
-> After Success Setting:
+### tasks with individual settings from draft
 
-### []
+> This Action creates a task for each line in the current draft. The settings (due date, project, label) can be set individually for each task in displayed prompts
+> After Success Setting: Trash
 
->
-> After Success Setting:
+### tasks with individual settings from draft
+
+> This Action creates a task for each line you type in the first prompt. The settings (due date, project, label) can be set individually for each task in displayed prompts
+> After Success Setting Nothing
 
 ### []
 
