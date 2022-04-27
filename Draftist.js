@@ -14,7 +14,7 @@
  * @returns {error | undefined} a present error or undefined
  */
 function Draftist_getLastTodoistError(todoistObj) {
-  let error = todoist_obj.lastError
+  let error = todoistObj.lastError
   if (error) {
     return error;
   } else {
@@ -72,7 +72,7 @@ function Draftist_infoMessage(actionName, infoMessage) {
  * @return {Boolean} true when added successfully, false when adding task failed
  */
 function Draftist_quickAdd({
-  todoist = Todoist.create(),
+  todoist = new Todoist(),
   content
 }) {
   if (!todoist.quickAdd(content)) {
@@ -105,7 +105,7 @@ function Draftist_quickAdd({
  * @return {Boolean} true when added successfully, false when adding task failed
  */
 function Draftist_createTask({
-  todoist = Todoist.create(),
+  todoist = new Todoist(),
   content,
   description = "",
   project_id = undefined,
@@ -182,7 +182,7 @@ function Draftist_createTask({
  * @return {Boolean|Number} false when adding faile, task number when adding succeeded
  */
 function Draftist_quickAddLines(text) {
-  let todoist = Todoist.create()
+  let todoist = new Todoist()
   let lines = text.split("\n");
   let createdTasksCounter = 0;
   // repeat for each line
@@ -332,7 +332,9 @@ function Draftist_createTaskWithDescriptionFromPrompt() {
   }
 }
 
-
+// #############################################################################
+// CREATE TASK OBJECT
+// #############################################################################
 
 /**
  * Draftist_createTaskObjectWithSettingsFromPrompt - creates a todoist task object with settings from prompts
@@ -456,6 +458,10 @@ function Draftist_createTaskObjectWithSettingsFromPrompt(content, description = 
 
 }
 
+// #############################################################################
+// CREATE TASKS WITH SETTINGS
+// #############################################################################
+
 /**
  * Draftist_createTaskWithDescriptionAndSettings - create a task with description and settings (project, labels, due date) from prompts. first line will be used as task content, everything else will be the description
  *
@@ -526,6 +532,9 @@ function Draftist_createTaskWithDescriptionAndSettingsFromPrompt() {
   }
 }
 
+// #############################################################################
+// CREATE MULTIPLE TASKS
+// #############################################################################
 
 /**
  * Draftist_createTasksFromLinesWithIdenticalSettings - creates a task from each line in the passed text with identical settings from prompts
@@ -686,11 +695,52 @@ function Draftist_createTasksFromLinesInPromptWithIndividualSettings() {
   }
 }
 
+// #############################################################################
+// IMPORT TASKS
+// #############################################################################
 
-// helper fuctions to store settings and todoist data
-// param types
-// textArray: comma seperated stings
+function Draftist_createStringFromTasks({
+  tasks
+}){
+  let tasksString = ""
+  for(task of tasks){
+    tasksString = tasksString + "- [ ] " + task.content
+    // TODO include options
+    tasksString = tasksString + " [link](" + task.url + ")";
+    tasksString = tasksString + "\n"
+  }
+  return tasksString;
+}
 
+
+function Draftist_getTodoistTasksFromFilter(filterString){
+  let todoist = new Todoist()
+  let tasks = todoist.getTasks({
+    filter: filterString
+  })
+  const occuredError = Draftist_getLastTodoistError(todoist)
+  if(occuredError){
+    //error occured
+    Draftist_failAction("get tasks from filter \"" + filterString + "\"",occuredError)
+    return false;
+  }
+  return tasks;
+}
+
+function Draftist_importTodaysTasks(){
+  let tasks = Draftist_getTodoistTasksFromFilter("overdue, today");
+  let stringToInsert = Draftist_createStringFromTasks({tasks: tasks})
+  draft.content = draft.content + "\n" + stringToInsert;
+  draft.update()
+}
+
+
+
+
+
+// #############################################################################
+// SETTINGS AND DATA STORAGE
+// #############################################################################
 
 /**
  * settingParamTypes: this defines the types of the settings parameters in text format
