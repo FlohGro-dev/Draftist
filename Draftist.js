@@ -188,7 +188,10 @@ function Draftist_quickAddLines(text) {
   // repeat for each line
   for (line of lines) {
     if (line.length !== 0) {
-      if (!Draftist_quickAdd({todoist: todoist, content: line})) {
+      if (!Draftist_quickAdd({
+          todoist: todoist,
+          content: line
+        })) {
         // if failed directly return, quickadd will display the error
         return false;
       } else {
@@ -695,15 +698,89 @@ function Draftist_createTasksFromLinesInPromptWithIndividualSettings() {
   }
 }
 
+
+/**
+ * Draftist_helperGetMdTasksFromCurrentDraft - searches the current draft for markdown tasks "- [ ]" and retruns an array with the "content" of the tasks
+ *
+ * @return {String[]}  array of task contents
+ */
+function Draftist_helperGetMdTasksFromCurrentDraft(){
+  let content = draft.content;
+  // find all lines with a task marker at the beginning which are uncompleted
+  const regex = /^- \[\s\]\s(.*)$/gm;
+  const subst = `$1`;
+  let matches = [...content.matchAll(regex)]
+  // the first group of each match is the task content (without the md task marker)
+  let taskContents = matches.map(match => match[1])
+  return taskContents
+}
+
+
+/**
+ * Draftist_quickAddTasksFromMdTodoLinesInDraft - creates tasks for each md task in the current open draft. This function uses the Todoist quickAdd API which allows adding due dates, labels, projects with the syntax also used in the Todoist task input.
+ *
+ * @return {Boolean}  true if added successfully (or no task was found), false if adding task failed
+ */
+function Draftist_quickAddTasksFromMdTodoLinesInDraft(){
+  let tasks = Draftist_helperGetMdTasksFromCurrentDraft()
+  if(tasks.length > 0){
+    // combine task contents by new lines to work with the quickAddLines function
+    let taskNumber = Draftist_quickAddLines(tasks.join("\n"));
+    if (taskNumber) {
+      // succeeded
+      Draftist_succeedAction("", false, "successfully added " + taskNumber + " tasks :)")
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    Draftist_infoMessage("","no (uncompleted) tasks found in draft");
+    return true;
+  }
+}
+
+
+/**
+ * Draftist_createTasksWithIdenticalSettingsFromMdTasksInCurrentDraft - creates tasks with same settings for every md task in the current document. The settings can be selected in the displayed prompts.
+ *
+ * @return {Boolean}  true if added successfully (or no task was found), false if adding task failed
+ */
+function Draftist_createTasksWithIdenticalSettingsFromMdTasksInCurrentDraft(){
+  let tasks = Draftist_helperGetMdTasksFromCurrentDraft()
+  if(tasks.length > 0){
+    // combine task contents by new lines to input a text which is split in the called function
+    return Draftist_createTasksFromLinesWithIdenticalSettings(tasks.join("\n"));
+  } else {
+    Draftist_infoMessage("","no (uncompleted) tasks found in draft");
+    return true;
+  }
+}
+
+/**
+ * Draftist_createTasksWithIndividualSettingsFromMdTasksInCurrentDraft - creates tasks with individual settings for every md task in the current document. The settings can be selected in the displayed prompts.
+ *
+ * @return {Boolean}  true if added successfully (or no task was found), false if adding task failed
+ */
+function Draftist_createTasksWithIndividualSettingsFromMdTasksInCurrentDraft(){
+  let tasks = Draftist_helperGetMdTasksFromCurrentDraft()
+  if(tasks.length > 0){
+    // combine task contents by new lines to input a text which is split in the called function
+    return Draftist_createTasksFromLinesWithIndividualSettings(tasks.join("\n"));
+  } else {
+    Draftist_infoMessage("","no (uncompleted) tasks found in draft");
+    return true;
+  }
+}
+
 // #############################################################################
 // IMPORT TASKS
 // #############################################################################
 
 function Draftist_createStringFromTasks({
   tasks
-}){
+}) {
   let tasksString = ""
-  for(task of tasks){
+  for (task of tasks) {
     tasksString = tasksString + "- [ ] " + task.content
     // TODO include options
     tasksString = tasksString + " [link](" + task.url + ")";
@@ -713,23 +790,35 @@ function Draftist_createStringFromTasks({
 }
 
 
-function Draftist_getTodoistTasksFromFilter(filterString){
+/**
+ * Draftist_getTodoistTasksFromFilter - description
+ *
+ * @param  {type} filterString description
+ * @return {type}              description
+ */
+function Draftist_getTodoistTasksFromFilter(filterString) {
   let todoist = new Todoist()
   let tasks = todoist.getTasks({
     filter: filterString
   })
   const occuredError = Draftist_getLastTodoistError(todoist)
-  if(occuredError){
+  if (occuredError) {
     //error occured
-    Draftist_failAction("get tasks from filter \"" + filterString + "\"",occuredError)
+    Draftist_failAction("get tasks from filter \"" + filterString + "\"", occuredError)
     return false;
   }
   return tasks;
 }
 
-function Draftist_importTodaysTasks(){
-  let tasks = Draftist_getTodoistTasksFromFilter("overdue, today");
-  let stringToInsert = Draftist_createStringFromTasks({tasks: tasks})
+function Draftist_getTodaysTasks() {
+  return tasks = Draftist_getTodoistTasksFromFilter("overdue, today");
+}
+
+function Draftist_importTodaysTasksIntoDraft() {
+  let tasks = Draftist_getTodaysTasks();
+  let stringToInsert = Draftist_createStringFromTasks({
+    tasks: tasks
+  })
   draft.content = draft.content + "\n" + stringToInsert;
   draft.update()
 }
@@ -946,14 +1035,14 @@ function Draftist_storeCurrentConfigurationSettings(settingsDraft) {
  * Draftist_restoreDefaultSettings - funtion to restore the default settings
  *
  */
-function Draftist_restoreDefaultSettings(){
+function Draftist_restoreDefaultSettings() {
   // get the current settingsDraft
   let settingsDraft = Draftist_findOrCreateSettingsDraft();
   // delete it
   settingsDraft.isTrashed = true;
   settingsDraft.update();
   // and create a new one (which will be initialized with the default settings)
-  if(Draftist_findOrCreateSettingsDraft()){
+  if (Draftist_findOrCreateSettingsDraft()) {
     Draftist_infoMessage("", "restored default settings")
   } else {
     Draftist_failAction("Restore Default Settings", "unexpected failure - this should not happen. please reach out to @FlohGro with a description what you did to fix this.\nDelete all \"Draftist\" drafts and try again")

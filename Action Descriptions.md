@@ -7,7 +7,35 @@
     - [Draftist Instructions](#draftist-instructions)
     - [Draftist](#draftist)
     - [Draftist Settings](#draftist-settings)
+    - [Draftist Update](#draftist-update)
     - [Update local Todoist data](#update-local-todoist-data)
+  - [Quick Add Tasks](#quick-add-tasks)
+    - [quick add lines from draft](#quick-add-lines-from-draft)
+    - [quick add lines from prompt](#quick-add-lines-from-prompt)
+  - [Create Single Tasks](#create-single-tasks)
+    - [task with description from draft](#task-with-description-from-draft)
+    - [task with description from prompt](#task-with-description-from-prompt)
+    - [task with description & settings from draft](#task-with-description--settings-from-draft)
+    - [task with description & settings from prompt](#task-with-description--settings-from-prompt)
+  - [Create multiple tasks](#create-multiple-tasks)
+    - [tasks with same settings from draft](#tasks-with-same-settings-from-draft)
+    - [tasks with same settings from prompt](#tasks-with-same-settings-from-prompt)
+    - [tasks with individual settings from draft](#tasks-with-individual-settings-from-draft)
+    - [tasks with individual settings from draft](#tasks-with-individual-settings-from-draft-1)
+  - [Create Tasks from MD Tasks in Draft](#create-tasks-from-md-tasks-in-draft)
+    - [quick add tasks from md tasks in draft](#quick-add-tasks-from-md-tasks-in-draft)
+    - [create tasks with same settings from md tasks in draft](#create-tasks-with-same-settings-from-md-tasks-in-draft)
+    - [create tasks with individual settings from md tasks in draft](#create-tasks-with-individual-settings-from-md-tasks-in-draft)
+    - [[]](#)
+    - [[]](#-1)
+    - [[]](#-2)
+    - [[]](#-3)
+    - [[]](#-4)
+    - [[]](#-5)
+    - [[]](#-6)
+    - [[]](#-7)
+    - [[]](#-8)
+    - [[]](#-9)
 
 <!-- /TOC -->
 
@@ -77,7 +105,7 @@ If you want to make you're own Action based on Draftist functions simply include
 > This Action creates a task in Todoist with content, description and settings (due date, project, labels) from prompts. The first line of the text in the "add task with description & settings" prompt will be used as the content of the task and everything else will be used as the description.
 > After Success Setting: Nothing
 
-## Create multiple tasks
+## Create Multiple tasks
 
 ### tasks with same settings from draft
 
@@ -99,10 +127,77 @@ If you want to make you're own Action based on Draftist functions simply include
 > This Action creates a task for each line you type in the first prompt. The settings (due date, project, label) can be set individually for each task in displayed prompts
 > After Success Setting Nothing
 
+## Create Tasks from MD Tasks in Draft
+
+### quick add tasks from md tasks in draft
+
+> This Action will create a new task for each md task ("- [ ]") in the current draft. Similar to the [quick add lines from draft](#quick-add-lines-from-draft) the contents of the tasks will be parsed by Todoist.
+> After Success Setting: Noting
+
+### create tasks with same settings from md tasks in draft
+
+> This Action will create tasks with identical settings for each md task ("- [ ]") in the current draft. The Action will display prompts to select the settings (due date, labels, project)
+> After Success Setting: Nothing
+
+### create tasks with individual settings from md tasks in draft
+
+> This Action will create tasks with individual settings for each md task ("- [ ]") in the current draft. The Action will display prompts for each task to select the individual settings (due date, labels, project)
+> After Success Setting: Nothing
+
+
 ### []
 
 >
 > After Success Setting:
+
+
+### []
+
+>
+> After Success Setting:
+
+
+### []
+
+>
+> After Success Setting:
+
+
+### []
+
+>
+> After Success Setting:
+
+
+### []
+
+>
+> After Success Setting:
+
+
+### []
+
+>
+> After Success Setting:
+
+
+### []
+
+>
+> After Success Setting:
+
+
+### []
+
+>
+> After Success Setting:
+
+
+### []
+
+>
+> After Success Setting:
+
 
 ### []
 
