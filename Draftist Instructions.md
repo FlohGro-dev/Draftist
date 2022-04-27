@@ -43,7 +43,7 @@ Using drafts to store your settings, your todoist data and the functions themsel
 ## Using Draftist
 
 Since Draftist contains a lot of Actions and you may not need every single of them you may want to create your own `my Draftist` Action Group to only include the Actions you want.
-While you can duplicate / move the Actions you use to your own Action Group(s) I recommend to leave the Draftist Action Group untouched. This ensures a single point of truth and if I need to fix/maintain Actions in Draftist your own Actions will work afterwards. Instead create your own Action and use an `include Action` Step where you paste the name of the Action you want to use - you can then give your own action a (shorter) name than in the Draftist Action Group (especially on mobile devices the names of some actions are too long to distinguish them easily.).
+While you can duplicate / move the Actions you use to your own Action Group(s) I recommend to leave the Draftist Action Group untouched. This ensures a single point of truth and if I need to fix/maintain Actions in Draftist your own Actions will work afterwards. Instead you can use the `Draftist Action Replicator` Action to reinstall an existing Draftist Action to your `my Draftist` Action Group. When you replicated a Draftist Action you can then give your own action a (shorter) name than in the Draftist Action Group (especially on mobile devices the names of some actions are too long to distinguish them easily.).
 You can assign keyboard shortcuts to the Actions you created to make them easily accessible (none of the Actions in Draftist has a keyboard shortcut assigned to don't conflict with your assignments).
 
 Please **never** rename the `Draftist` Action (If you do so, no other Action will work anymore).

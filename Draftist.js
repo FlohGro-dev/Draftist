@@ -704,7 +704,7 @@ function Draftist_createTasksFromLinesInPromptWithIndividualSettings() {
  *
  * @return {String[]}  array of task contents
  */
-function Draftist_helperGetMdTasksFromCurrentDraft(){
+function Draftist_helperGetMdTasksFromCurrentDraft() {
   let content = draft.content;
   // find all lines with a task marker at the beginning which are uncompleted
   const regex = /^- \[\s\]\s(.*)$/gm;
@@ -721,9 +721,9 @@ function Draftist_helperGetMdTasksFromCurrentDraft(){
  *
  * @return {Boolean}  true if added successfully (or no task was found), false if adding task failed
  */
-function Draftist_quickAddTasksFromMdTodoLinesInDraft(){
+function Draftist_quickAddTasksFromMdTodoLinesInDraft() {
   let tasks = Draftist_helperGetMdTasksFromCurrentDraft()
-  if(tasks.length > 0){
+  if (tasks.length > 0) {
     // combine task contents by new lines to work with the quickAddLines function
     let taskNumber = Draftist_quickAddLines(tasks.join("\n"));
     if (taskNumber) {
@@ -734,7 +734,7 @@ function Draftist_quickAddTasksFromMdTodoLinesInDraft(){
       return false;
     }
   } else {
-    Draftist_infoMessage("","no (uncompleted) tasks found in draft");
+    Draftist_infoMessage("", "no (uncompleted) tasks found in draft");
     return true;
   }
 }
@@ -745,13 +745,13 @@ function Draftist_quickAddTasksFromMdTodoLinesInDraft(){
  *
  * @return {Boolean}  true if added successfully (or no task was found), false if adding task failed
  */
-function Draftist_createTasksWithIdenticalSettingsFromMdTasksInCurrentDraft(){
+function Draftist_createTasksWithIdenticalSettingsFromMdTasksInCurrentDraft() {
   let tasks = Draftist_helperGetMdTasksFromCurrentDraft()
-  if(tasks.length > 0){
+  if (tasks.length > 0) {
     // combine task contents by new lines to input a text which is split in the called function
     return Draftist_createTasksFromLinesWithIdenticalSettings(tasks.join("\n"));
   } else {
-    Draftist_infoMessage("","no (uncompleted) tasks found in draft");
+    Draftist_infoMessage("", "no (uncompleted) tasks found in draft");
     return true;
   }
 }
@@ -761,13 +761,13 @@ function Draftist_createTasksWithIdenticalSettingsFromMdTasksInCurrentDraft(){
  *
  * @return {Boolean}  true if added successfully (or no task was found), false if adding task failed
  */
-function Draftist_createTasksWithIndividualSettingsFromMdTasksInCurrentDraft(){
+function Draftist_createTasksWithIndividualSettingsFromMdTasksInCurrentDraft() {
   let tasks = Draftist_helperGetMdTasksFromCurrentDraft()
-  if(tasks.length > 0){
+  if (tasks.length > 0) {
     // combine task contents by new lines to input a text which is split in the called function
     return Draftist_createTasksFromLinesWithIndividualSettings(tasks.join("\n"));
   } else {
-    Draftist_infoMessage("","no (uncompleted) tasks found in draft");
+    Draftist_infoMessage("", "no (uncompleted) tasks found in draft");
     return true;
   }
 }
@@ -776,6 +776,12 @@ function Draftist_createTasksWithIndividualSettingsFromMdTasksInCurrentDraft(){
 // IMPORT TASKS
 // #############################################################################
 
+/**
+ * Draftist_createStringFromTasks - converts the passed tasks to strings with contents using the active settings for task strings
+ *
+ * @param {Tasks[]}   tasks - Todoist task objects to convert to strings
+ * @return {String}   string containing the task informations
+ */
 function Draftist_createStringFromTasks({
   tasks
 }) {
@@ -1275,4 +1281,35 @@ function Draftist_getStoredTodoistData() {
 
   // update data from Todoist if necessary
   Draftist_updateTodoistDataIfUpdateIntervalExceeded();
+}
+
+
+/**
+ * Draftist_helperDraftistActionReplicator - opens the installURL for the selected Action of the Draftist Action Group to easily duplicate an Action of Draftist into another ActionGroup. The user has to manually rename the created Action afterwards.
+ *
+ * @return {undefined}  always returns undefined
+ */
+function Draftist_helperDraftistActionReplicator() {
+  const actionGroup = ActionGroup.find("Draftist");
+  if(!actionGroup){
+    // ActionGroup not found
+    Draftist_failAction("replicate Action", "Draftist Action Group name was changed")
+    return undefined
+  }
+  let pAction = new Prompt();
+  pAction.title = "select action to replicate";
+  for (action of actionGroup.actions) {
+    if (action.isSeparator) {
+      // nothing to be done
+    } else {
+      pAction.addButton(action.name, action)
+    }
+  }
+  if (!pAction.show()) {
+    Draftist_cancelAction("replicate Draftist Action", "user cancelled")
+    return undefined
+  }
+  const actionToReplicate = pAction.buttonPressed;
+  app.openURL(actionToReplicate.installURL)
+  return undefined
 }

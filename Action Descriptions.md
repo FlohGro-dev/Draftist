@@ -7,6 +7,7 @@
     - [Draftist Instructions](#draftist-instructions)
     - [Draftist](#draftist)
     - [Draftist Settings](#draftist-settings)
+    - [Draftist Action Replicator](#draftist-action-replicator)
     - [Draftist Update](#draftist-update)
     - [Update local Todoist data](#update-local-todoist-data)
   - [Quick Add Tasks](#quick-add-tasks)
@@ -17,7 +18,7 @@
     - [task with description from prompt](#task-with-description-from-prompt)
     - [task with description & settings from draft](#task-with-description--settings-from-draft)
     - [task with description & settings from prompt](#task-with-description--settings-from-prompt)
-  - [Create multiple tasks](#create-multiple-tasks)
+  - [Create Multiple tasks](#create-multiple-tasks)
     - [tasks with same settings from draft](#tasks-with-same-settings-from-draft)
     - [tasks with same settings from prompt](#tasks-with-same-settings-from-prompt)
     - [tasks with individual settings from draft](#tasks-with-individual-settings-from-draft)
@@ -61,9 +62,14 @@ If you want to make you're own Action based on Draftist functions simply include
 > This Action allows changing the default settings of Draftist or restore the default settings based on the user selections.
 > After Success Setting: Nothing
 
+### Draftist Action Replicator
+
+> This Action eases the replication of an Action in the Draftist Action Group. When a user runs this Action it will display a prompt with all available Draftist Actions as buttons. When the user selects one action the installURL of this Action will be opened. This results in an *Action Import* prompt. Make sure to select `Import as New Action` in the prompt and select the destination Action Group of the replicated Action. After the Action is installed rename it to your personal choice.
+> After Success Setting: Nothing
+
 ### Draftist Update
 
->
+> **TODO**
 > After Success Setting:
 
 ### Update local Todoist data
