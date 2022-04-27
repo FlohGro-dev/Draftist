@@ -43,7 +43,7 @@ If you want to make you're own Action based on Draftist functions simply include
 > This Action forces an update of the locally stored Todoist data. Use this if you e.g. just created a new project / label that you want to use immediately. Updates will be performed after 24 hours by default - you can change this using the [Draftist Settings](#draftist-settings) action.
 > After Success Setting: Nothing
 
-## Create Single Tasks
+## Quick Add Tasks
 
 ### quick add lines from draft
 
@@ -54,6 +54,8 @@ If you want to make you're own Action based on Draftist functions simply include
 
 > This Action will create a new task in Todoist for each line you type into the displayed prompt. The content of each line will be parsed by todoist, so you can e.g. use dates or project/label notation in each lines just like you normally would directly in Todoist.
 > After Success Setting: Nothing
+
+## Create Single Tasks
 
 ### task with description from draft
 
