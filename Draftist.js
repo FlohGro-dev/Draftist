@@ -340,122 +340,6 @@ function Draftist_createTaskWithDescriptionFromPrompt() {
   }
 }
 
-
-/**
- * Draftist_helperCreateMdLinkToCurrentDraft - creates a markdown link to the current draft in the editor
- *
- * @return {String}  markdown link to the current open draft in the editor
- */
-function Draftist_helperCreateMdLinkToCurrentDraft(){
-  return "["+draft.displayTitle+"]"+"("+draft.permalink+")"
-}
-
-
-/**
- * Draftist_helperCreateOpenTaskUrlFromTaskObject - creates the weblink to the given task object
- *
- * @param  {Task} taskObject Todoist Task Object in JSON format
- * @return {String}          web link to the Todoist task
- */
-function Draftist_helperCreateOpenTaskUrlFromTaskObject(taskObject){
-  // load settings
-  Draftist_loadCurrentConfigurationSettings()
-  const webLink = "[Todoist Task Weblink](" + taskObject.url + ")";
-  const mobileLink = "[Todoist Task Applink](todoist://task?id=" + taskObject.id + ")";
-  if(activeSettings["taskLinkTypes"].includes("web") && activeSettings["taskLinkTypes"].includes("app")){
-    return webLink + "\n" +  mobileLink;
-  } else if(activeSettings["taskLinkTypes"].includes("web") && !activeSettings["taskLinkTypes"].includes("app")){
-    return webLink;
-  } else if(!activeSettings["taskLinkTypes"].includes("web") && activeSettings["taskLinkTypes"].includes("app")){
-    return mobileLink;
-  }
-}
-
-
-/**
- * Draftist_createTaskInInboxWithLinkToDraft - creates a task in the Todoist Inbox containing the title and link to the current draft
- *
- * @return {Boolean}  true if succeeded, otherwise false
- */
-function Draftist_createTaskInInboxWithLinkToDraft(){
-  if(Draftist_createTask({content: Draftist_helperCreateMdLinkToCurrentDraft()})){
-    Draftist_succeedAction("",false,"added linked task");
-    return true;
-  } else {
-    return false;
-  }
-}
-
-/**
- * Draftist_createTaskWithSettingsAndLinkToDraft - creates a task in the Todoist with settings from prompts containing the title and link to the current draft
- *
- * @return {Boolean}  true if succeeded, otherwise false
- */
-function Draftist_createTaskWithSettingsAndLinkToDraft(){
-  let taskObject = Draftist_createTaskObjectWithSettingsFromPrompt(Draftist_helperCreateMdLinkToCurrentDraft());
-  if(Draftist_createTask(taskObject)){
-    Draftist_succeedAction("",false,"added linked task with settings");
-    return true;
-  } else {
-    return false;
-  }
-}
-
-
-/**
- * Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft - adds the provided text between the title and body of the current draft the added text will be surrounded by empty lines
- *
- * @param  {type} textToAdd the text to add between title and body
- */
-function Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft(textToAdd){
-  let lines = draft.content.split("\n");
-  let curIndex = 1
-  if(lines[curIndex].length != 0){
-    lines.splice(curIndex,0,"");
-  }
-  curIndex++;
-  lines.splice(curIndex,0,textToAdd)
-  curIndex++;
-  if(lines[curIndex].length != 0){
-    lines.splice(curIndex,0,"")
-  }
-  draft.content = lines.join("\n");
-  draft.update()
-}
-
-/**
- * Draftist_createTaskInInboxWithLinkToDraft - creates a task in the Todoist Inbox containing the title and link to the current draft. A link to the created Task in Todoist will be added to the Draft between the title and the body
- *
- * @return {Boolean}  true if succeeded, otherwise false
- */
-function Draftist_createCrosslinkedTaskInInbox(){
-  let createdTask = Draftist_createTask({content: Draftist_helperCreateMdLinkToCurrentDraft()}, true)
-  if(createdTask){
-    Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft(Draftist_helperCreateOpenTaskUrlFromTaskObject(createdTask));
-    Draftist_succeedAction("",false,"added linked task");
-    return true;
-  } else {
-    return false;
-  }
-}
-
-/**
- * Draftist_createCrosslinkedTaskWithSettings - creates a task in the Todoist with settings from prompts containing the title and link to the current draft. A link to the created Task in Todoist will be added to the Draft between the title and the body
- *
- * @return {Boolean}  true if succeeded, otherwise false
- */
-function Draftist_createCrosslinkedTaskWithSettings(){
-  let taskObject = Draftist_createTaskObjectWithSettingsFromPrompt(Draftist_helperCreateMdLinkToCurrentDraft());
-  let createdTask = Draftist_createTask(taskObject, true)
-  if(createdTask){
-    Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft(Draftist_helperCreateOpenTaskUrlFromTaskObject(createdTask));
-    Draftist_succeedAction("",false,"added linked task");
-    return true;
-  } else {
-    return false;
-  }
-}
-
 // #############################################################################
 // CREATE TASK OBJECT
 // #############################################################################
@@ -653,6 +537,125 @@ function Draftist_createTaskWithDescriptionAndSettingsFromPrompt() {
     } else {
       return false
     }
+  }
+}
+
+// #############################################################################
+// CREATE LINKED TASKS
+// #############################################################################
+
+/**
+ * Draftist_helperCreateMdLinkToCurrentDraft - creates a markdown link to the current draft in the editor
+ *
+ * @return {String}  markdown link to the current open draft in the editor
+ */
+function Draftist_helperCreateMdLinkToCurrentDraft(){
+  return "["+draft.displayTitle+"]"+"("+draft.permalink+")"
+}
+
+
+/**
+ * Draftist_helperCreateOpenTaskUrlFromTaskObject - creates the weblink to the given task object
+ *
+ * @param  {Task} taskObject Todoist Task Object in JSON format
+ * @return {String}          web link to the Todoist task
+ */
+function Draftist_helperCreateOpenTaskUrlFromTaskObject(taskObject){
+  // load settings
+  Draftist_loadCurrentConfigurationSettings()
+  const webLink = "[Todoist Task Weblink](" + taskObject.url + ")";
+  const mobileLink = "[Todoist Task Applink](todoist://task?id=" + taskObject.id + ")";
+  if(activeSettings["taskLinkTypes"].includes("web") && activeSettings["taskLinkTypes"].includes("app")){
+    return webLink + "\n" +  mobileLink;
+  } else if(activeSettings["taskLinkTypes"].includes("web") && !activeSettings["taskLinkTypes"].includes("app")){
+    return webLink;
+  } else if(!activeSettings["taskLinkTypes"].includes("web") && activeSettings["taskLinkTypes"].includes("app")){
+    return mobileLink;
+  }
+}
+
+
+/**
+ * Draftist_createTaskInInboxWithLinkToDraft - creates a task in the Todoist Inbox containing the title and link to the current draft
+ *
+ * @return {Boolean}  true if succeeded, otherwise false
+ */
+function Draftist_createTaskInInboxWithLinkToDraft(){
+  if(Draftist_createTask({content: Draftist_helperCreateMdLinkToCurrentDraft()})){
+    Draftist_succeedAction("",false,"added linked task");
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/**
+ * Draftist_createTaskWithSettingsAndLinkToDraft - creates a task in the Todoist with settings from prompts containing the title and link to the current draft
+ *
+ * @return {Boolean}  true if succeeded, otherwise false
+ */
+function Draftist_createTaskWithSettingsAndLinkToDraft(){
+  let taskObject = Draftist_createTaskObjectWithSettingsFromPrompt(Draftist_helperCreateMdLinkToCurrentDraft());
+  if(Draftist_createTask(taskObject)){
+    Draftist_succeedAction("",false,"added linked task with settings");
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+/**
+ * Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft - adds the provided text between the title and body of the current draft the added text will be surrounded by empty lines
+ *
+ * @param  {type} textToAdd the text to add between title and body
+ */
+function Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft(textToAdd){
+  let lines = draft.content.split("\n");
+  let curIndex = 1
+  if(lines[curIndex].length != 0){
+    lines.splice(curIndex,0,"");
+  }
+  curIndex++;
+  lines.splice(curIndex,0,textToAdd)
+  curIndex++;
+  if(lines[curIndex].length != 0){
+    lines.splice(curIndex,0,"")
+  }
+  draft.content = lines.join("\n");
+  draft.update()
+}
+
+/**
+ * Draftist_createTaskInInboxWithLinkToDraft - creates a task in the Todoist Inbox containing the title and link to the current draft. A link to the created Task in Todoist will be added to the Draft between the title and the body
+ *
+ * @return {Boolean}  true if succeeded, otherwise false
+ */
+function Draftist_createCrosslinkedTaskInInbox(){
+  let createdTask = Draftist_createTask({content: Draftist_helperCreateMdLinkToCurrentDraft()}, true)
+  if(createdTask){
+    Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft(Draftist_helperCreateOpenTaskUrlFromTaskObject(createdTask));
+    Draftist_succeedAction("",false,"added linked task");
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/**
+ * Draftist_createCrosslinkedTaskWithSettings - creates a task in the Todoist with settings from prompts containing the title and link to the current draft. A link to the created Task in Todoist will be added to the Draft between the title and the body
+ *
+ * @return {Boolean}  true if succeeded, otherwise false
+ */
+function Draftist_createCrosslinkedTaskWithSettings(){
+  let taskObject = Draftist_createTaskObjectWithSettingsFromPrompt(Draftist_helperCreateMdLinkToCurrentDraft());
+  let createdTask = Draftist_createTask(taskObject, true)
+  if(createdTask){
+    Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft(Draftist_helperCreateOpenTaskUrlFromTaskObject(createdTask));
+    Draftist_succeedAction("",false,"added linked task");
+    return true;
+  } else {
+    return false;
   }
 }
 
