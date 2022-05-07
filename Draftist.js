@@ -909,11 +909,40 @@ function Draftist_createTasksWithIndividualSettingsFromMdTasksInCurrentDraft() {
 function Draftist_createStringFromTasks({
   tasks
 }) {
+  Draftist_loadCurrentConfigurationSettings();
+  const contentSettings = activeSettings["taskImportContents"];
   let tasksString = ""
   for (task of tasks) {
+    // task content
     tasksString = tasksString + "- [ ] " + task.content
-    // TODO include options
-    tasksString = tasksString + " [link](" + task.url + ")";
+    // app link
+    if(contentSettings.includes("appLink")){
+      tasksString = tasksString + " [app link](todoist://task?id=" + task.id + ")";
+    }
+    // web link
+    if(contentSettings.includes("webLink")){
+      tasksString = tasksString + " [web link](" + task.url + ")";
+    }
+
+    if(contentSettings.includes("projectName")){
+      if (projectsIdToNameMap.size == 0) {
+        Draftist_getStoredTodoistData();
+      }
+      tasksString = tasksString + " *" + projectsIdToNameMap.get(task.project_id) + "*"
+    }
+
+    if(contentSettings.includes("priority")){
+      tasksString = tasksString + " p" + (5 - task.priority);
+    }
+
+    if(contentSettings.includes("labels")){
+      if (labelsIdToNameMap.size == 0) {
+        Draftist_getStoredTodoistData();
+      }
+      for(labelId of task.label_ids){
+          tasksString = tasksString + " @" + labelsIdToNameMap.get(labelId);
+      }
+    }
     tasksString = tasksString + "\n"
   }
   return tasksString;
@@ -921,10 +950,10 @@ function Draftist_createStringFromTasks({
 
 
 /**
- * Draftist_getTodoistTasksFromFilter - description
+ * Draftist_getTodoistTasksFromFilter - returns the tasks in todoist for a given filter string
  *
- * @param  {type} filterString description
- * @return {type}              description
+ * @param  {String} filterString a valid todoist filter string
+ * @return {Task[]}              array of Task objects (JSON) for the given filter string
  */
 function Draftist_getTodoistTasksFromFilter(filterString) {
   let todoist = new Todoist()
@@ -940,20 +969,152 @@ function Draftist_getTodoistTasksFromFilter(filterString) {
   return tasks;
 }
 
-function Draftist_getTodaysTasks() {
-  return tasks = Draftist_getTodoistTasksFromFilter("overdue, today");
-}
 
+/**
+ * Draftist_importTodaysTasksIntoDraft - appends the tasks due today (or overdue) to the current draft
+ *
+ */
 function Draftist_importTodaysTasksIntoDraft() {
-  let tasks = Draftist_getTodaysTasks();
-  let stringToInsert = Draftist_createStringFromTasks({
+  const tasks = Draftist_getTodoistTasksFromFilter("overdue, today");
+  const stringToInsert = Draftist_createStringFromTasks({
     tasks: tasks
   })
-  draft.content = draft.content + "\n" + stringToInsert;
+  draft.content = draft.content + "\n **TODAYs TASKs:**\n\n" + stringToInsert;
   draft.update()
 }
 
 
+/**
+ * Draftist_importTasksFromProjectName - imports the tasks from the provided project name into the current draft
+ *
+ * @param  {String} projectName the project name for the tasks to import
+ */
+function Draftist_importTasksFromProjectName(projectName){
+  if (projectsNameToIdMap.size == 0) {
+    Draftist_getStoredTodoistData();
+  }
+  const projectNames = Array.from( projectsNameToIdMap.keys() );
+  // check if project name is available, if not fail the action
+  if(!projectNames.includes(projectName)){
+    Draftist_failAction("import tasks from project","project with name \"" + projectName + "\" is not existing in your Todoist Account")
+    return
+  }
+  const tasks = Draftist_getTodoistTasksFromFilter("##" + projectName)
+  const stringToInsert = Draftist_createStringFromTasks({
+    tasks: tasks
+  })
+  draft.content = draft.content + "\n **TASKs from " + projectName + ":**\n\n" + stringToInsert;
+  draft.update()
+}
+
+
+/**
+ * Draftist_importTasksFromSelectedProject - presents a prompt to let the user select a project and then imports the task of the selected project into the current draft
+ *
+ */
+function Draftist_importTasksFromSelectedProject(){
+  if (projectsNameToIdMap.size == 0) {
+    Draftist_getStoredTodoistData();
+  }
+  let pProject = new Prompt();
+  pProject.title = "select the project"
+  let sortedProjectNameMap = new Map([...projectsNameToIdMap].sort((a, b) => String(a[0]).localeCompare(b[0])))
+  for (const [pName, pId] of sortedProjectNameMap) {
+    // selected button will directly contain the projects id as value
+    pProject.addButton(pName);
+  }
+  if(pProject.show()){
+    Draftist_importTasksFromProjectName(pProject.buttonPressed);
+  } else {
+    Draftist_cancelAction("import tasks from project","user cancelled")
+  }
+
+}
+
+ /**
+  * Draftist_importTasksWithLabels - imports the tasks with the provided label names into the current draft. Depending on the input parameter either all or any given labels must be included in a task.
+  *
+  * @param  {String} labelNames the label names for the tasks to import (separated by a comma)
+  * @param  {Boolean} requireAllLabels if set to true all given labels must be present in the task to be imported, if set to false only one of the given labels must be present in the task
+  */
+
+function Draftist_importTasksWithLabels(labelNames, requireAllLabels){
+  const requestedLabels = labelNames.split(",");
+  if(labelsNameToIdMap.size == 0){
+    Draftist_getStoredTodoistData();
+  }
+  const validLabelNames = Array.from(labelsNameToIdMap.keys());
+  let labelStrings = [];
+  for(labelName of requestedLabels){
+    // check if all given label names are available, if not fail the action
+    if(!validLabelNames.includes(labelName)){
+      Draftist_failAction("import tasks with label","label with name \"" + labelName + "\" is not existing in your Todoist Account")
+      return
+    }
+    labelStrings.push("@" + labelName);
+  }
+  const filterString = labelStrings.join((requireAllLabels ? " & ":" | "))
+  const tasks = Draftist_getTodoistTasksFromFilter(filterString)
+  const stringToInsert = Draftist_createStringFromTasks({tasks: tasks})
+  draft.content = draft.content + "\n **TASKs with label(s) " + filterString + ":**\n\n" + stringToInsert;
+  draft.update()
+}
+
+
+/**
+ * Draftist_importTasksWithSelectedLabels - imports the tasks from the selected labels in a prompt into the current draft. Depending on the input parameter either all or any given labels must be included in a task.
+ *
+ * @param  {type} requireAllLabels if set to true all given labels must be present in the task to be imported, if set to false only one of the given labels must be present in the task
+ */
+function Draftist_importTasksWithSelectedLabels(requireAllLabels){
+  if(labelsNameToIdMap.size == 0){
+    Draftist_getStoredTodoistData();
+  }
+  let pLabels = new Prompt();
+  pLabels.title = "select the labels"
+  pLabels.message = (requireAllLabels ? "all selected labels " : "any selected label") + " must be present in the task"
+  let sortedLabelNameMap = new Map([...labelsNameToIdMap].sort((a, b) => String(a[0]).localeCompare(b[0])))
+  pLabels.addSelect("selectedLabels","",Array.from(sortedLabelNameMap.keys()),[],true)
+  pLabels.addButton("Apply")
+  if(pLabels.show()){
+    Draftist_importTasksWithLabels(pLabels.fieldValues["selectedLabels"].join(","),requireAllLabels);
+  } else {
+    Draftist_cancelAction("import tasks from project","user cancelled")
+  }
+}
+
+
+/**
+ * Draftist_importTasksFromFilter - imports the tasks for the given filter string into the current draft
+ *
+ * @param  {type} filterString filter string for Todoist tasks
+ */
+function Draftist_importTasksFromFilter(filterString){
+   const tasks = Draftist_getTodoistTasksFromFilter(filterString);
+   if(tasks){
+   const stringToInsert = Draftist_createStringFromTasks({tasks: tasks})
+   draft.content = draft.content + "\n **TASKs from filter \"" + filterString + "\":**\n\n" + stringToInsert;
+   draft.update()
+ }
+}
+
+
+/**
+ * Draftist_importTasksFromFilterInPrompt - imports the tasks from the filter typed into the text field in the prompt
+ *
+ */
+function Draftist_importTasksFromFilterInPrompt(){
+  let pFilter = new Prompt()
+  pFilter.title = "set the filter query";
+  pFilter.message = "you can use any supported filter query by Todoist"
+  pFilter.addTextField("filterString","","",{wantsFocus: true});
+  pFilter.addButton("Apply");
+  if(pFilter.show()){
+    Draftist_importTasksFromFilter(pFilter.fieldValues["filterString"]);
+  } else {
+    Draftist_cancelAction("import tasks from filter", "user cancelled")
+  }
+}
 
 
 
@@ -968,7 +1129,8 @@ const settingsParamTypes = {
   "settingsDraftTags": "textArray",
   "dataStoreDraftTags": "textArray",
   "dataStoreUpdateInterval": "number",
-  "taskLinkTypes": "textArray"
+  "taskLinkTypes": "textArray",
+  "taskImportContents": "textArray"
 }
 
 
@@ -985,7 +1147,8 @@ const defaultSettingsParams = {
     "/ref-script"
   ],
   "dataStoreUpdateInterval": 24,
-  "taskLinkTypes": ["app", "web"]
+  "taskLinkTypes": ["app", "web"],
+  "taskImportContents": ["appLink", "webLink", "projectName", "priority", "labels"]
 }
 
 
@@ -1286,6 +1449,16 @@ function Draftist_changeConfigurationSettings() {
   pTaskLinks.addButton("Apply");
   if(pTaskLinks.show()){
     activeSettings["taskLinkTypes"] = pTaskLinks.fieldValues["linkTypes"]
+  }
+
+  // settings for import task contents
+  let pImportContents = new Prompt();
+  pImportContents.title = "task import content settings"
+  pImportContents.message = "each imported tasks will contain the information you select in this prompt"
+  pImportContents.addSelect("taskImportContents", "task import contents", ["appLink", "webLink", "projectName", "priority", "labels"], activeSettings["taskImportContents"], true)
+  pImportContents.addButton("Apply");
+  if(pImportContents.show()){
+    activeSettings["taskImportContents"] = pImportContents.fieldValues["taskImportContents"]
   }
 
   // after all settings are reconfigured, store the new settings in the file

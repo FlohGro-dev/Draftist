@@ -13,11 +13,16 @@
   - [Quick Add Tasks](#quick-add-tasks)
     - [quick add lines from draft](#quick-add-lines-from-draft)
     - [quick add lines from prompt](#quick-add-lines-from-prompt)
-  - [Create Single Tasks](#create-single-tasks)
+  - [Create Single Task](#create-single-task)
     - [task with description from draft](#task-with-description-from-draft)
     - [task with description from prompt](#task-with-description-from-prompt)
     - [task with description & settings from draft](#task-with-description--settings-from-draft)
     - [task with description & settings from prompt](#task-with-description--settings-from-prompt)
+  - [Create (cross)Linked Task From Draft](#create-crosslinked-task-from-draft)
+    - [create linked task in inbox](#create-linked-task-in-inbox)
+    - [create linked task with settings](#create-linked-task-with-settings)
+    - [create crosslinked task in inbox](#create-crosslinked-task-in-inbox)
+    - [create crosslinked task with settings](#create-crosslinked-task-with-settings)
   - [Create Multiple tasks](#create-multiple-tasks)
     - [tasks with same settings from draft](#tasks-with-same-settings-from-draft)
     - [tasks with same settings from prompt](#tasks-with-same-settings-from-prompt)
@@ -25,18 +30,18 @@
     - [tasks with individual settings from draft](#tasks-with-individual-settings-from-draft-1)
   - [Create Tasks from MD Tasks in Draft](#create-tasks-from-md-tasks-in-draft)
     - [quick add tasks from md tasks in draft](#quick-add-tasks-from-md-tasks-in-draft)
-    - [create tasks with same settings from md tasks in draft](#create-tasks-with-same-settings-from-md-tasks-in-draft)
-    - [create tasks with individual settings from md tasks in draft](#create-tasks-with-individual-settings-from-md-tasks-in-draft)
-    - [[]](#)
-    - [[]](#-1)
-    - [[]](#-2)
-    - [[]](#-3)
-    - [[]](#-4)
-    - [[]](#-5)
-    - [[]](#-6)
-    - [[]](#-7)
-    - [[]](#-8)
-    - [[]](#-9)
+    - [tasks with same settings from md tasks in draft](#tasks-with-same-settings-from-md-tasks-in-draft)
+    - [tasks with individual settings from md tasks in draft](#tasks-with-individual-settings-from-md-tasks-in-draft)
+  - [Import Tasks](#import-tasks)
+    - [import todays tasks](#import-todays-tasks)
+    - [import tasks from project](#import-tasks-from-project)
+    - [import tasks from selected project](#import-tasks-from-selected-project)
+    - [import tasks with all configured label(s)](#import-tasks-with-all-configured-labels)
+    - [import tasks with any configured label(s)](#import-tasks-with-any-configured-labels)
+    - [import tasks with all selected label(s)](#import-tasks-with-all-selected-labels)
+    - [import tasks with any selected label(s)](#import-tasks-with-any-selected-labels)
+    - [import tasks from filter](#import-tasks-from-filter)
+    - [import tasks from filter in prompt](#import-tasks-from-filter-in-prompt)
 
 <!-- /TOC -->
 
@@ -195,23 +200,59 @@ If you want to make you're own Action based on Draftist functions simply include
 
 > After Success Setting: Nothing
 
+## Import Tasks
 
-### []
+### import todays tasks
 
->
+> This Action imports the tasks due today and appends them to the current draft. The meta information included for each task can be configured with the `Draftist Settings` Action.
 
-> After Success Setting:
+> After Success Setting: Nothing
+
+### import tasks from project
+
+> This Action imports the tasks from the configured project and appends them to the current draft. The meta information included for each task can be configured with the `Draftist Settings` Action. To configure the project which should be used by the Action, edit the "Define Template Tag" step and change the Template from "UNCONFIGURED" to the project name (best you copy the name from your Todoist project).
+
+> After Success Setting: Nothing
+
+### import tasks from selected project
+
+> This Action imports the tasks from the selected project and appends them to the current draft. The meta information included for each task can be configured with the `Draftist Settings` Action.
+
+> After Success Setting: Nothing
 
 
-### []
+### import tasks with all configured label(s)
 
->
+> This Action imports tasks which contain all configured labels and appends them to the current draft. The meta information included for each task can be configured with the `Draftist Settings` Action. To configure the labels which should be used by the Action, edit the "Define Template Tag" step and change the Template from "UNCONFIGURED" to the label names (best you copy the names from your Todoist labels) and separate them by commas with no spaces in between.
 
-> After Success Setting:
+> After Success Setting: Nothing
 
+### import tasks with any configured label(s)
 
-### []
+> This Action imports tasks which contain any configured label and appends them to the current draft. The meta information included for each task can be configured with the `Draftist Settings` Action. To configure the labels which should be used by the Action, edit the "Define Template Tag" step and change the Template from "UNCONFIGURED" to the label names (best you copy the names from your Todoist labels) and separate them by commas with no spaces in between.
 
->
+> After Success Setting: Nothing
 
-> After Success Setting:
+### import tasks with all selected label(s)
+
+> This Action imports tasks which contain all selected labels and appends them to the current draft. The meta information included for each task can be configured with the `Draftist Settings` Action.
+
+> After Success Setting: Nothing
+
+### import tasks with any selected label(s)
+
+> This Action imports tasks which contain any selected label and appends them to the current draft. The meta information included for each task can be configured with the `Draftist Settings` Action.
+
+> After Success Setting: Nothing
+
+### import tasks from filter
+
+> This Action imports tasks for the configured filter and appends them to the current draft. The meta information included for each task can be configured with the `Draftist Settings` Action. To configure the used filter , edit the "Define Template Tag" step and change the Template from "UNCONFIGURED" to the filter query you want to use (best you test the filter in todoist and then copy it into the template step).
+
+> After Success Setting: Nothing
+
+### import tasks from filter in prompt
+
+> This Action imports tasks for the filter query provided into the text field of the presented prompt. The meta information included for each task can be configured with the `Draftist Settings` Action.
+
+> After Success Setting: Nothing
