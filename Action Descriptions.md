@@ -89,7 +89,7 @@ If you want to make you're own Action based on Draftist functions simply include
 > This Action will create a new task in Todoist for each line you type into the displayed prompt. The content of each line will be parsed by todoist, so you can e.g. use dates or project/label notation in each lines just like you normally would directly in Todoist.
 > After Success Setting: Nothing
 
-## Create Single Tasks
+## Create Single Task
 
 ### task with description from draft
 
@@ -109,6 +109,28 @@ If you want to make you're own Action based on Draftist functions simply include
 ### task with description & settings from prompt
 
 > This Action creates a task in Todoist with content, description and settings (due date, project, labels) from prompts. The first line of the text in the "add task with description & settings" prompt will be used as the content of the task and everything else will be used as the description.
+> After Success Setting: Nothing
+
+## Create (cross)Linked Task From Draft
+
+### create linked task in inbox
+
+> This Action creates a task in the inbox of Todoist with the displayed title of the current draft as content. The created Task will contain a clickable link to directly open the linked draft.
+> After Success Setting: Nothing
+
+### create linked task with settings
+
+> This Action creates a task with settings (due date, project, labels) from prompts with the displayed title of the current draft as content. The created Task will contain a clickable link to directly open the linked draft.
+> After Success Setting: Nothing
+
+### create crosslinked task in inbox
+
+> This Action creates a crosslinked task in the inbox of Todoist with the displayed title of the current draft as content. The created Task will contain a clickable link to directly open the linked draft. The link to the created task will be added between the title and the body of the current draft. The added link types (app, web) can be configured with the `Draftist Settings` Action.
+> After Success Setting: Nothing
+
+### create crosslinked task with settings
+
+> This Action creates a crosslinked task with settings (due date, project, labels) from prompts in the inbox of Todoist with the displayed title of the current draft as content. The created Task will contain a clickable link to directly open the linked draft. The link to the created task will be added between the title and the body of the current draft. The added link types (app, web) can be configured with the `Draftist Settings` Action.
 > After Success Setting: Nothing
 
 ## Create Multiple tasks
@@ -140,12 +162,12 @@ If you want to make you're own Action based on Draftist functions simply include
 > This Action will create a new task for each md task ("- [ ]") in the current draft. Similar to the [quick add lines from draft](#quick-add-lines-from-draft) the contents of the tasks will be parsed by Todoist.
 > After Success Setting: Noting
 
-### create tasks with same settings from md tasks in draft
+### tasks with same settings from md tasks in draft
 
 > This Action will create tasks with identical settings for each md task ("- [ ]") in the current draft. The Action will display prompts to select the settings (due date, labels, project)
 > After Success Setting: Nothing
 
-### create tasks with individual settings from md tasks in draft
+### tasks with individual settings from md tasks in draft
 
 > This Action will create tasks with individual settings for each md task ("- [ ]") in the current draft. The Action will display prompts for each task to select the individual settings (due date, labels, project)
 > After Success Setting: Nothing

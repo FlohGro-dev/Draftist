@@ -102,6 +102,7 @@ function Draftist_quickAdd({
  * @param  {String} due_datetime?: Specific date and time in RFC3339 format in UTC.
  * @param  {String} due_lang?: 2-letter code specifying language in case due_string is not written in English.
  * @param  {Integer} assignee?: The responsible user ID (if set, and only for shared tasks).
+ * @param  {Boolean} getTaskResult?: if set to true, the function will return the api response of the created Task
  * @return {Boolean} true when added successfully, false when adding task failed
  */
 function Draftist_createTask({
@@ -119,7 +120,7 @@ function Draftist_createTask({
   due_datetime = undefined,
   due_lang = undefined,
   assignee = undefined
-}) {
+}, getTaskResult = false) {
   // check if provided content is not empty
   if (content.length == 0) {
     Draftist_failAction("create Task", "no task content provided")
@@ -167,7 +168,11 @@ function Draftist_createTask({
   let taskObj = Object.fromEntries(taskMap)
   let taskCreateResult = todoist.createTask(taskObj)
   if (taskCreateResult) {
-    return true;
+    if(getTaskResult){
+      return taskCreateResult;
+    } else {
+      return true;
+    }
   } else {
     Draftist_failAction("create Task", Draftist_getLastTodoistError(todoist))
     return false;
@@ -335,6 +340,122 @@ function Draftist_createTaskWithDescriptionFromPrompt() {
   }
 }
 
+
+/**
+ * Draftist_helperCreateMdLinkToCurrentDraft - creates a markdown link to the current draft in the editor
+ *
+ * @return {String}  markdown link to the current open draft in the editor
+ */
+function Draftist_helperCreateMdLinkToCurrentDraft(){
+  return "["+draft.displayTitle+"]"+"("+draft.permalink+")"
+}
+
+
+/**
+ * Draftist_helperCreateOpenTaskUrlFromTaskObject - creates the weblink to the given task object
+ *
+ * @param  {Task} taskObject Todoist Task Object in JSON format
+ * @return {String}          web link to the Todoist task
+ */
+function Draftist_helperCreateOpenTaskUrlFromTaskObject(taskObject){
+  // load settings
+  Draftist_loadCurrentConfigurationSettings()
+  const webLink = "[Todoist Task Weblink](" + taskObject.url + ")";
+  const mobileLink = "[Todoist Task Applink](todoist://task?id=" + taskObject.id + ")";
+  if(activeSettings["taskLinkTypes"].includes("web") && activeSettings["taskLinkTypes"].includes("app")){
+    return webLink + "\n" +  mobileLink;
+  } else if(activeSettings["taskLinkTypes"].includes("web") && !activeSettings["taskLinkTypes"].includes("app")){
+    return webLink;
+  } else if(!activeSettings["taskLinkTypes"].includes("web") && activeSettings["taskLinkTypes"].includes("app")){
+    return mobileLink;
+  }
+}
+
+
+/**
+ * Draftist_createTaskInInboxWithLinkToDraft - creates a task in the Todoist Inbox containing the title and link to the current draft
+ *
+ * @return {Boolean}  true if succeeded, otherwise false
+ */
+function Draftist_createTaskInInboxWithLinkToDraft(){
+  if(Draftist_createTask({content: Draftist_helperCreateMdLinkToCurrentDraft()})){
+    Draftist_succeedAction("",false,"added linked task");
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/**
+ * Draftist_createTaskWithSettingsAndLinkToDraft - creates a task in the Todoist with settings from prompts containing the title and link to the current draft
+ *
+ * @return {Boolean}  true if succeeded, otherwise false
+ */
+function Draftist_createTaskWithSettingsAndLinkToDraft(){
+  let taskObject = Draftist_createTaskObjectWithSettingsFromPrompt(Draftist_helperCreateMdLinkToCurrentDraft());
+  if(Draftist_createTask(taskObject)){
+    Draftist_succeedAction("",false,"added linked task with settings");
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+/**
+ * Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft - adds the provided text between the title and body of the current draft the added text will be surrounded by empty lines
+ *
+ * @param  {type} textToAdd the text to add between title and body
+ */
+function Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft(textToAdd){
+  let lines = draft.content.split("\n");
+  let curIndex = 1
+  if(lines[curIndex].length != 0){
+    lines.splice(curIndex,0,"");
+  }
+  curIndex++;
+  lines.splice(curIndex,0,textToAdd)
+  curIndex++;
+  if(lines[curIndex].length != 0){
+    lines.splice(curIndex,0,"")
+  }
+  draft.content = lines.join("\n");
+  draft.update()
+}
+
+/**
+ * Draftist_createTaskInInboxWithLinkToDraft - creates a task in the Todoist Inbox containing the title and link to the current draft. A link to the created Task in Todoist will be added to the Draft between the title and the body
+ *
+ * @return {Boolean}  true if succeeded, otherwise false
+ */
+function Draftist_createCrosslinkedTaskInInbox(){
+  let createdTask = Draftist_createTask({content: Draftist_helperCreateMdLinkToCurrentDraft()}, true)
+  if(createdTask){
+    Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft(Draftist_helperCreateOpenTaskUrlFromTaskObject(createdTask));
+    Draftist_succeedAction("",false,"added linked task");
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/**
+ * Draftist_createCrosslinkedTaskWithSettings - creates a task in the Todoist with settings from prompts containing the title and link to the current draft. A link to the created Task in Todoist will be added to the Draft between the title and the body
+ *
+ * @return {Boolean}  true if succeeded, otherwise false
+ */
+function Draftist_createCrosslinkedTaskWithSettings(){
+  let taskObject = Draftist_createTaskObjectWithSettingsFromPrompt(Draftist_helperCreateMdLinkToCurrentDraft());
+  let createdTask = Draftist_createTask(taskObject, true)
+  if(createdTask){
+    Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft(Draftist_helperCreateOpenTaskUrlFromTaskObject(createdTask));
+    Draftist_succeedAction("",false,"added linked task");
+    return true;
+  } else {
+    return false;
+  }
+}
+
 // #############################################################################
 // CREATE TASK OBJECT
 // #############################################################################
@@ -343,7 +464,7 @@ function Draftist_createTaskWithDescriptionFromPrompt() {
  * Draftist_createTaskObjectWithSettingsFromPrompt - creates a todoist task object with settings from prompts
  *
  * @param  {String} content     content of the task (must not be empty)
- * @param  {String} description description for the task (can be empty)
+ * @param  {String} description? description for the task (can be empty)
  * @return {taskObject}             taskObject for a todoist task which can be passed to the Todoist.createTask() API of Drafts
  */
 function Draftist_createTaskObjectWithSettingsFromPrompt(content, description = "") {
@@ -843,7 +964,8 @@ function Draftist_importTodaysTasksIntoDraft() {
 const settingsParamTypes = {
   "settingsDraftTags": "textArray",
   "dataStoreDraftTags": "textArray",
-  "dataStoreUpdateInterval": "number"
+  "dataStoreUpdateInterval": "number",
+  "taskLinkTypes": "textArray"
 }
 
 
@@ -859,7 +981,8 @@ const defaultSettingsParams = {
     "_draftistSettings",
     "/ref-script"
   ],
-  "dataStoreUpdateInterval": 24
+  "dataStoreUpdateInterval": 24,
+  "taskLinkTypes": ["app", "web"]
 }
 
 
@@ -1151,6 +1274,17 @@ function Draftist_changeConfigurationSettings() {
     // store the setting in current active settings variable
     activeSettings["dataStoreUpdateInterval"] = parseInt(pStore.fieldValues["updateInterval"])
   }
+
+  // settings for crosslinked Task Urls
+  let pTaskLinks = new Prompt();
+  pTaskLinks.title = "task link settings"
+  pTaskLinks.message = "the crosslink task actions can append / prepend links to the created tasks in Todoist to the current draft. App links only work reliably on iOS / iPadOS - If you want to use task links on macOS, too you need to enable web links"
+  pTaskLinks.addSelect("linkTypes", "link types", ["app", "web"], activeSettings["taskLinkTypes"],true)
+  pTaskLinks.addButton("Apply");
+  if(pTaskLinks.show()){
+    activeSettings["taskLinkTypes"] = pTaskLinks.fieldValues["linkTypes"]
+  }
+
   // after all settings are reconfigured, store the new settings in the file
   Draftist_storeCurrentConfigurationSettings(settingsDraft);
 }

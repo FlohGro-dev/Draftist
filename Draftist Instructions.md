@@ -46,7 +46,9 @@ Since Draftist contains a lot of Actions and you may not need every single of th
 While you can duplicate / move the Actions you use to your own Action Group(s) I recommend to leave the Draftist Action Group untouched. This ensures a single point of truth and if I need to fix/maintain Actions in Draftist your own Actions will work afterwards. Instead you can use the `Draftist Action Replicator` Action to reinstall an existing Draftist Action to your `my Draftist` Action Group. When you replicated a Draftist Action you can then give your own action a (shorter) name than in the Draftist Action Group (especially on mobile devices the names of some actions are too long to distinguish them easily.).
 You can assign keyboard shortcuts to the Actions you created to make them easily accessible (none of the Actions in Draftist has a keyboard shortcut assigned to don't conflict with your assignments).
 
-Please **never** rename the `Draftist` Action (If you do so, no other Action will work anymore).
+Please **never** rename the `Draftist` Action at the top of the Action Group (If you do so, no other Action will work anymore).
+
+Draftist is not displayed as Action Bar (over the keyboard) by default since (again) it contains a lot of Actions which sometimes use the same icons. If you want access to the Actions in the Action Bar - again i recommend to replicate the subset of Draftist Actions you need into your own Action Group and then display these Actions in the Action Bar.
 
 ## Action Descriptions
 
