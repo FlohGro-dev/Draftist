@@ -168,7 +168,7 @@ function Draftist_createTask({
   let taskObj = Object.fromEntries(taskMap)
   let taskCreateResult = todoist.createTask(taskObj)
   if (taskCreateResult) {
-    if(getTaskResult){
+    if (getTaskResult) {
       return taskCreateResult;
     } else {
       return true;
@@ -549,8 +549,8 @@ function Draftist_createTaskWithDescriptionAndSettingsFromPrompt() {
  *
  * @return {String}  markdown link to the current open draft in the editor
  */
-function Draftist_helperCreateMdLinkToCurrentDraft(){
-  return "["+draft.displayTitle+"]"+"("+draft.permalink+")"
+function Draftist_helperCreateMdLinkToCurrentDraft() {
+  return "[" + draft.displayTitle + "]" + "(" + draft.permalink + ")"
 }
 
 
@@ -560,16 +560,16 @@ function Draftist_helperCreateMdLinkToCurrentDraft(){
  * @param  {Task} taskObject Todoist Task Object in JSON format
  * @return {String}          web link to the Todoist task
  */
-function Draftist_helperCreateOpenTaskUrlFromTaskObject(taskObject){
+function Draftist_helperCreateOpenTaskUrlFromTaskObject(taskObject) {
   // load settings
   Draftist_loadCurrentConfigurationSettings()
   const webLink = "[Todoist Task Weblink](" + taskObject.url + ")";
   const mobileLink = "[Todoist Task Applink](todoist://task?id=" + taskObject.id + ")";
-  if(activeSettings["taskLinkTypes"].includes("web") && activeSettings["taskLinkTypes"].includes("app")){
-    return webLink + "\n" +  mobileLink;
-  } else if(activeSettings["taskLinkTypes"].includes("web") && !activeSettings["taskLinkTypes"].includes("app")){
+  if (activeSettings["taskLinkTypes"].includes("web") && activeSettings["taskLinkTypes"].includes("app")) {
+    return webLink + "\n" + mobileLink;
+  } else if (activeSettings["taskLinkTypes"].includes("web") && !activeSettings["taskLinkTypes"].includes("app")) {
     return webLink;
-  } else if(!activeSettings["taskLinkTypes"].includes("web") && activeSettings["taskLinkTypes"].includes("app")){
+  } else if (!activeSettings["taskLinkTypes"].includes("web") && activeSettings["taskLinkTypes"].includes("app")) {
     return mobileLink;
   }
 }
@@ -580,9 +580,11 @@ function Draftist_helperCreateOpenTaskUrlFromTaskObject(taskObject){
  *
  * @return {Boolean}  true if succeeded, otherwise false
  */
-function Draftist_createTaskInInboxWithLinkToDraft(){
-  if(Draftist_createTask({content: Draftist_helperCreateMdLinkToCurrentDraft()})){
-    Draftist_succeedAction("",false,"added linked task");
+function Draftist_createTaskInInboxWithLinkToDraft() {
+  if (Draftist_createTask({
+      content: Draftist_helperCreateMdLinkToCurrentDraft()
+    })) {
+    Draftist_succeedAction("", false, "added linked task");
     return true;
   } else {
     return false;
@@ -594,10 +596,10 @@ function Draftist_createTaskInInboxWithLinkToDraft(){
  *
  * @return {Boolean}  true if succeeded, otherwise false
  */
-function Draftist_createTaskWithSettingsAndLinkToDraft(){
+function Draftist_createTaskWithSettingsAndLinkToDraft() {
   let taskObject = Draftist_createTaskObjectWithSettingsFromPrompt(Draftist_helperCreateMdLinkToCurrentDraft());
-  if(Draftist_createTask(taskObject)){
-    Draftist_succeedAction("",false,"added linked task with settings");
+  if (Draftist_createTask(taskObject)) {
+    Draftist_succeedAction("", false, "added linked task with settings");
     return true;
   } else {
     return false;
@@ -610,17 +612,17 @@ function Draftist_createTaskWithSettingsAndLinkToDraft(){
  *
  * @param  {type} textToAdd the text to add between title and body
  */
-function Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft(textToAdd){
+function Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft(textToAdd) {
   let lines = draft.content.split("\n");
   let curIndex = 1
-  if(lines[curIndex].length != 0){
-    lines.splice(curIndex,0,"");
+  if (lines[curIndex].length != 0) {
+    lines.splice(curIndex, 0, "");
   }
   curIndex++;
-  lines.splice(curIndex,0,textToAdd)
+  lines.splice(curIndex, 0, textToAdd)
   curIndex++;
-  if(lines[curIndex].length != 0){
-    lines.splice(curIndex,0,"")
+  if (lines[curIndex].length != 0) {
+    lines.splice(curIndex, 0, "")
   }
   draft.content = lines.join("\n");
   draft.update()
@@ -631,11 +633,13 @@ function Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft(textToAdd){
  *
  * @return {Boolean}  true if succeeded, otherwise false
  */
-function Draftist_createCrosslinkedTaskInInbox(){
-  let createdTask = Draftist_createTask({content: Draftist_helperCreateMdLinkToCurrentDraft()}, true)
-  if(createdTask){
+function Draftist_createCrosslinkedTaskInInbox() {
+  let createdTask = Draftist_createTask({
+    content: Draftist_helperCreateMdLinkToCurrentDraft()
+  }, true)
+  if (createdTask) {
     Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft(Draftist_helperCreateOpenTaskUrlFromTaskObject(createdTask));
-    Draftist_succeedAction("",false,"added linked task");
+    Draftist_succeedAction("", false, "added linked task");
     return true;
   } else {
     return false;
@@ -647,12 +651,12 @@ function Draftist_createCrosslinkedTaskInInbox(){
  *
  * @return {Boolean}  true if succeeded, otherwise false
  */
-function Draftist_createCrosslinkedTaskWithSettings(){
+function Draftist_createCrosslinkedTaskWithSettings() {
   let taskObject = Draftist_createTaskObjectWithSettingsFromPrompt(Draftist_helperCreateMdLinkToCurrentDraft());
   let createdTask = Draftist_createTask(taskObject, true)
-  if(createdTask){
+  if (createdTask) {
     Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft(Draftist_helperCreateOpenTaskUrlFromTaskObject(createdTask));
-    Draftist_succeedAction("",false,"added linked task");
+    Draftist_succeedAction("", false, "added linked task");
     return true;
   } else {
     return false;
@@ -916,31 +920,31 @@ function Draftist_createStringFromTasks({
     // task content
     tasksString = tasksString + "- [ ] " + task.content
     // app link
-    if(contentSettings.includes("appLink")){
+    if (contentSettings.includes("appLink")) {
       tasksString = tasksString + " [app link](todoist://task?id=" + task.id + ")";
     }
     // web link
-    if(contentSettings.includes("webLink")){
+    if (contentSettings.includes("webLink")) {
       tasksString = tasksString + " [web link](" + task.url + ")";
     }
 
-    if(contentSettings.includes("projectName")){
+    if (contentSettings.includes("projectName")) {
       if (projectsIdToNameMap.size == 0) {
         Draftist_getStoredTodoistData();
       }
       tasksString = tasksString + " *" + projectsIdToNameMap.get(task.project_id) + "*"
     }
 
-    if(contentSettings.includes("priority")){
+    if (contentSettings.includes("priority")) {
       tasksString = tasksString + " p" + (5 - task.priority);
     }
 
-    if(contentSettings.includes("labels")){
+    if (contentSettings.includes("labels")) {
       if (labelsIdToNameMap.size == 0) {
         Draftist_getStoredTodoistData();
       }
-      for(labelId of task.label_ids){
-          tasksString = tasksString + " @" + labelsIdToNameMap.get(labelId);
+      for (labelId of task.label_ids) {
+        tasksString = tasksString + " @" + labelsIdToNameMap.get(labelId);
       }
     }
     tasksString = tasksString + "\n"
@@ -989,14 +993,14 @@ function Draftist_importTodaysTasksIntoDraft() {
  *
  * @param  {String} projectName the project name for the tasks to import
  */
-function Draftist_importTasksFromProjectName(projectName){
+function Draftist_importTasksFromProjectName(projectName) {
   if (projectsNameToIdMap.size == 0) {
     Draftist_getStoredTodoistData();
   }
-  const projectNames = Array.from( projectsNameToIdMap.keys() );
+  const projectNames = Array.from(projectsNameToIdMap.keys());
   // check if project name is available, if not fail the action
-  if(!projectNames.includes(projectName)){
-    Draftist_failAction("import tasks from project","project with name \"" + projectName + "\" is not existing in your Todoist Account")
+  if (!projectNames.includes(projectName)) {
+    Draftist_failAction("import tasks from project", "project with name \"" + projectName + "\" is not existing in your Todoist Account")
     return
   }
   const tasks = Draftist_getTodoistTasksFromFilter("##" + projectName)
@@ -1012,7 +1016,7 @@ function Draftist_importTasksFromProjectName(projectName){
  * Draftist_importTasksFromSelectedProject - presents a prompt to let the user select a project and then imports the task of the selected project into the current draft
  *
  */
-function Draftist_importTasksFromSelectedProject(){
+function Draftist_importTasksFromSelectedProject() {
   if (projectsNameToIdMap.size == 0) {
     Draftist_getStoredTodoistData();
   }
@@ -1023,39 +1027,41 @@ function Draftist_importTasksFromSelectedProject(){
     // selected button will directly contain the projects id as value
     pProject.addButton(pName);
   }
-  if(pProject.show()){
+  if (pProject.show()) {
     Draftist_importTasksFromProjectName(pProject.buttonPressed);
   } else {
-    Draftist_cancelAction("import tasks from project","user cancelled")
+    Draftist_cancelAction("import tasks from project", "user cancelled")
   }
 
 }
 
- /**
-  * Draftist_importTasksWithLabels - imports the tasks with the provided label names into the current draft. Depending on the input parameter either all or any given labels must be included in a task.
-  *
-  * @param  {String} labelNames the label names for the tasks to import (separated by a comma)
-  * @param  {Boolean} requireAllLabels if set to true all given labels must be present in the task to be imported, if set to false only one of the given labels must be present in the task
-  */
+/**
+ * Draftist_importTasksWithLabels - imports the tasks with the provided label names into the current draft. Depending on the input parameter either all or any given labels must be included in a task.
+ *
+ * @param  {String} labelNames the label names for the tasks to import (separated by a comma)
+ * @param  {Boolean} requireAllLabels if set to true all given labels must be present in the task to be imported, if set to false only one of the given labels must be present in the task
+ */
 
-function Draftist_importTasksWithLabels(labelNames, requireAllLabels){
+function Draftist_importTasksWithLabels(labelNames, requireAllLabels) {
   const requestedLabels = labelNames.split(",");
-  if(labelsNameToIdMap.size == 0){
+  if (labelsNameToIdMap.size == 0) {
     Draftist_getStoredTodoistData();
   }
   const validLabelNames = Array.from(labelsNameToIdMap.keys());
   let labelStrings = [];
-  for(labelName of requestedLabels){
+  for (labelName of requestedLabels) {
     // check if all given label names are available, if not fail the action
-    if(!validLabelNames.includes(labelName)){
-      Draftist_failAction("import tasks with label","label with name \"" + labelName + "\" is not existing in your Todoist Account")
+    if (!validLabelNames.includes(labelName)) {
+      Draftist_failAction("import tasks with label", "label with name \"" + labelName + "\" is not existing in your Todoist Account")
       return
     }
     labelStrings.push("@" + labelName);
   }
-  const filterString = labelStrings.join((requireAllLabels ? " & ":" | "))
+  const filterString = labelStrings.join((requireAllLabels ? " & " : " | "))
   const tasks = Draftist_getTodoistTasksFromFilter(filterString)
-  const stringToInsert = Draftist_createStringFromTasks({tasks: tasks})
+  const stringToInsert = Draftist_createStringFromTasks({
+    tasks: tasks
+  })
   draft.content = draft.content + "\n **TASKs with label(s) " + filterString + ":**\n\n" + stringToInsert;
   draft.update()
 }
@@ -1066,20 +1072,20 @@ function Draftist_importTasksWithLabels(labelNames, requireAllLabels){
  *
  * @param  {type} requireAllLabels if set to true all given labels must be present in the task to be imported, if set to false only one of the given labels must be present in the task
  */
-function Draftist_importTasksWithSelectedLabels(requireAllLabels){
-  if(labelsNameToIdMap.size == 0){
+function Draftist_importTasksWithSelectedLabels(requireAllLabels) {
+  if (labelsNameToIdMap.size == 0) {
     Draftist_getStoredTodoistData();
   }
   let pLabels = new Prompt();
   pLabels.title = "select the labels"
   pLabels.message = (requireAllLabels ? "all selected labels " : "any selected label") + " must be present in the task"
   let sortedLabelNameMap = new Map([...labelsNameToIdMap].sort((a, b) => String(a[0]).localeCompare(b[0])))
-  pLabels.addSelect("selectedLabels","",Array.from(sortedLabelNameMap.keys()),[],true)
+  pLabels.addSelect("selectedLabels", "", Array.from(sortedLabelNameMap.keys()), [], true)
   pLabels.addButton("Apply")
-  if(pLabels.show()){
-    Draftist_importTasksWithLabels(pLabels.fieldValues["selectedLabels"].join(","),requireAllLabels);
+  if (pLabels.show()) {
+    Draftist_importTasksWithLabels(pLabels.fieldValues["selectedLabels"].join(","), requireAllLabels);
   } else {
-    Draftist_cancelAction("import tasks from project","user cancelled")
+    Draftist_cancelAction("import tasks from project", "user cancelled")
   }
 }
 
@@ -1089,13 +1095,15 @@ function Draftist_importTasksWithSelectedLabels(requireAllLabels){
  *
  * @param  {type} filterString filter string for Todoist tasks
  */
-function Draftist_importTasksFromFilter(filterString){
-   const tasks = Draftist_getTodoistTasksFromFilter(filterString);
-   if(tasks){
-   const stringToInsert = Draftist_createStringFromTasks({tasks: tasks})
-   draft.content = draft.content + "\n **TASKs from filter \"" + filterString + "\":**\n\n" + stringToInsert;
-   draft.update()
- }
+function Draftist_importTasksFromFilter(filterString) {
+  const tasks = Draftist_getTodoistTasksFromFilter(filterString);
+  if (tasks) {
+    const stringToInsert = Draftist_createStringFromTasks({
+      tasks: tasks
+    })
+    draft.content = draft.content + "\n **TASKs from filter \"" + filterString + "\":**\n\n" + stringToInsert;
+    draft.update()
+  }
 }
 
 
@@ -1103,13 +1111,15 @@ function Draftist_importTasksFromFilter(filterString){
  * Draftist_importTasksFromFilterInPrompt - imports the tasks from the filter typed into the text field in the prompt
  *
  */
-function Draftist_importTasksFromFilterInPrompt(){
+function Draftist_importTasksFromFilterInPrompt() {
   let pFilter = new Prompt()
   pFilter.title = "set the filter query";
   pFilter.message = "you can use any supported filter query by Todoist"
-  pFilter.addTextField("filterString","","",{wantsFocus: true});
+  pFilter.addTextField("filterString", "", "", {
+    wantsFocus: true
+  });
   pFilter.addButton("Apply");
-  if(pFilter.show()){
+  if (pFilter.show()) {
     Draftist_importTasksFromFilter(pFilter.fieldValues["filterString"]);
   } else {
     Draftist_cancelAction("import tasks from filter", "user cancelled")
@@ -1445,9 +1455,9 @@ function Draftist_changeConfigurationSettings() {
   let pTaskLinks = new Prompt();
   pTaskLinks.title = "task link settings"
   pTaskLinks.message = "the crosslink task actions can append / prepend links to the created tasks in Todoist to the current draft. App links only work reliably on iOS / iPadOS - If you want to use task links on macOS, too you need to enable web links"
-  pTaskLinks.addSelect("linkTypes", "link types", ["app", "web"], activeSettings["taskLinkTypes"],true)
+  pTaskLinks.addSelect("linkTypes", "link types", ["app", "web"], activeSettings["taskLinkTypes"], true)
   pTaskLinks.addButton("Apply");
-  if(pTaskLinks.show()){
+  if (pTaskLinks.show()) {
     activeSettings["taskLinkTypes"] = pTaskLinks.fieldValues["linkTypes"]
   }
 
@@ -1457,7 +1467,7 @@ function Draftist_changeConfigurationSettings() {
   pImportContents.message = "each imported tasks will contain the information you select in this prompt"
   pImportContents.addSelect("taskImportContents", "task import contents", ["appLink", "webLink", "projectName", "priority", "labels"], activeSettings["taskImportContents"], true)
   pImportContents.addButton("Apply");
-  if(pImportContents.show()){
+  if (pImportContents.show()) {
     activeSettings["taskImportContents"] = pImportContents.fieldValues["taskImportContents"]
   }
 
@@ -1601,7 +1611,7 @@ function Draftist_getStoredTodoistData() {
  */
 function Draftist_helperDraftistActionReplicator() {
   const actionGroup = ActionGroup.find("Draftist");
-  if(!actionGroup){
+  if (!actionGroup) {
     // ActionGroup not found
     Draftist_failAction("replicate Action", "Draftist Action Group name was changed")
     return undefined
