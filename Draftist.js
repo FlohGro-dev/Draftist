@@ -1126,6 +1126,68 @@ function Draftist_importTasksFromFilterInPrompt() {
   }
 }
 
+// #############################################################################
+// MODIFY TASKS
+// #############################################################################
+
+
+function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToRemove,labelNamesToAdd}){
+  const taskId = taskToUpdate.id;
+  const currentLabels = taskToUpdate.label_ids;
+  // add all labelsToAdd to the array
+  let labelIdsToRemove = [];
+  let labelIdsToAdd = [];
+  // load todoist data if not already loaded
+  if(labelsNameToIdMap.size == 0){
+    Draftist_getStoredTodoistData();
+  }
+  
+  for(labelName of labelNamesToRemove){
+    labelIdsToRemove.push(labelsNameToIdMap.get(labelName));
+  }
+  
+  for(labelName of labelNamesToAdd){
+    labelIdsToAdd.push(labelsNameToIdMap.get(labelName));
+  }
+  
+  let updatedLabelIds = labelIdsToAdd;
+  
+  for(curLabel of currentLabels){
+    // add the label to the updated array if its not already included and it is not contained in the labelsToRemove Array
+    if(!labelIdsToRemove.includes(curLabel) && !updatedLabelIds.includes(curLabel)){
+      updatedLabelIds.push(curLabel);
+    }
+  }
+  
+  // create task options
+  let options = {
+    "content": taskToUpdate.content,
+    "description": taskToUpdate.description,
+    "project_id": taskToUpdate.project_id,
+    "section_id": taskToUpdate.section_id,
+    "parent_id": taskToUpdate.parent_id,
+    "order": taskToUpdate.order,
+    "label_ids": updatedLabelIds,
+    "priority": taskToUpdate.priority,
+    "due_date": taskToUpdate.due_date,
+    "due_datetime": taskToUpdate.due_datetime,
+    "assignee": taskToUpdate.assignee
+  };
+
+  todoist.updateTask(taskId,options);
+}
+
+function Draftist_updateTaskTester(){
+  let tasksToUpdate = Draftist_getTodoistTasksFromFilter("@ASAP");
+  for(taskToUpdate of tasksToUpdate){
+    Draftist_updateTask({taskToUpdate:taskToUpdate, labelNamesToRemove:[],labelNamesToAdd:["thisWEEK"]
+    })
+  }
+  
+  
+  
+}
+
 
 
 // #############################################################################
