@@ -1131,8 +1131,10 @@ function Draftist_importTasksFromFilterInPrompt() {
 // #############################################################################
 
 
-function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToRemove,labelNamesToAdd}){
+function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToRemove = [],labelNamesToAdd = [],newDueDate = undefined, newDueDateTime = undefined}){
   const taskId = taskToUpdate.id;
+  
+  // update labels
   const currentLabels = taskToUpdate.label_ids;
   // add all labelsToAdd to the array
   let labelIdsToRemove = [];
@@ -1159,6 +1161,26 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
     }
   }
   
+  // update due date / date time
+  
+  // if date and datetime are provided, return false since this is not possible
+  if(newDueDate && newDueDateTime){
+    Draftist_failAction("update task", "due date and due date time where provided, this is not allowed")
+    return false
+  }
+  
+  let dueDate = taskToUpdate.due_date;
+  if(newDueDate){
+    // new due date was provided
+    dueDate = newDueDate
+  }
+  
+  let dueDateTime = taskToUpdate.due_datetime;
+  if(newDueDateTime){
+    // new due date time was provided
+    dueDateTime = newDueDateTime
+  }
+  
   // create task options
   let options = {
     "content": taskToUpdate.content,
@@ -1169,18 +1191,54 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
     "order": taskToUpdate.order,
     "label_ids": updatedLabelIds,
     "priority": taskToUpdate.priority,
-    "due_date": taskToUpdate.due_date,
-    "due_datetime": taskToUpdate.due_datetime,
+    "due_date": dueDate,
+    "due_datetime": dueDateTime,
     "assignee": taskToUpdate.assignee
   };
 
-  todoist.updateTask(taskId,options);
+  const updateTaskResult = todoist.updateTask(taskId,options);
+  if(!updateTaskResult){
+    const lastError = Draftist_getLastTodoistError(todoist);
+    if(lastError){
+      Draftist_failAction("update task", "todoist returned error: " + lastError)
+    } else {
+      Draftist_failAction("update task", "unknown error occured. please try again and contact @FlohGro with steps to reproduce")
+    }
+    return false;
+  } else {
+    return true;
+  }
+  
+}
+
+function Draftist_updateLabelsOfTask({todoist = new Todoist(),taskToUpdate,labelNamesToRemove,labelNamesToAdd}){
+  return Draftist_updateTask({todoist:todoist,taskToUpdate:taskToUpdate,labelNamesToRemove:labelNamesToRemove,labelNamesToAdd:labelNamesToAdd})
+}
+
+function Draftist_selectTasksFromTaskObjects(taskObjects, allowSelectMultiple, promptMessage){
+  let selectedTasks = [];
+  let pTasks = new Prompt();
+  pTasks.title = "select tasks";
+  pTasks.message = promptMessage;
+  pTasks.addSelect("selectedTasks","",taskObjects.map(task => task.content),[],allowSelectMultiple)
+  pTasks.addButton("select")
+  if(pTasks.show()){
+    const selectedTaskContents = pTasks.fieldValues["selectedTasks"];
+    // iterate through the selected task contents
+    for(taskContent of selectedTaskContents){
+      // add the task Object with the selected content to the array
+      selectedTasks = selectedTasks.concat(taskObjects.filter(task => (task.content == taskContent)))
+    }
+  } else {
+    Draftist_cancelAction("","user cancelled selection")
+  }
+  return selectedTasks;
 }
 
 function Draftist_updateTaskTester(){
-  let tasksToUpdate = Draftist_getTodoistTasksFromFilter("@ASAP");
+  let tasksToUpdate = Draftist_selectTasksFromTaskObjects(Draftist_getTodoistTasksFromFilter("@testlabel"),true,"");
   for(taskToUpdate of tasksToUpdate){
-    Draftist_updateTask({taskToUpdate:taskToUpdate, labelNamesToRemove:[],labelNamesToAdd:["thisWEEK"]
+    Draftist_updateTask({taskToUpdate:taskToUpdate, labelNamesToRemove:[],labelNamesToAdd:["thisWEEK","ASAP","idea💡"]
     })
   }
   

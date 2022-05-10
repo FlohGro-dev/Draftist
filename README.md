@@ -2,7 +2,7 @@
 
 Draftist - a [Drafts](https://getdrafts.com) Action Group to integrate with [Todoist](https://todoist.com).
 
-**created by [@FlohGro](https://mobile.twitter.com/FlohGro)**
+**created by [@FlohGro](https://twitter.com/FlohGro)**
 - **Website:** [flohgro.com](https://flohgro.com)  
 - **Drafts Forums:** [@FlohGro](https://forums.getdrafts.com/u/flohgro/summary)
 - **Twitter:** [@FlohGro](https://twitter.com/FlohGro)
@@ -29,3 +29,7 @@ You can choose the amount you want to donate on those platforms.
 <a href="https://www.patreon.com/flohgro" target="_blank"><img src="https://user-images.githubusercontent.com/13785667/162812708-55b96cdc-8c32-4433-a340-6dd4c1f7326d.jpg" alt="Become A patreon" style="height: 110px !important;width: 220px !important;" ></a>
 
 ## Changelog
+
+### Draftist 1.0 - initial Release
+
+*this is the initial version of Draftist*
