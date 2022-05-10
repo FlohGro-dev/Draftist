@@ -27,7 +27,7 @@
     - [tasks with same settings from draft](#tasks-with-same-settings-from-draft)
     - [tasks with same settings from prompt](#tasks-with-same-settings-from-prompt)
     - [tasks with individual settings from draft](#tasks-with-individual-settings-from-draft)
-    - [tasks with individual settings from draft](#tasks-with-individual-settings-from-draft-1)
+    - [tasks with individual settings from prompt](#tasks-with-individual-settings-from-prompt)
   - [Create Tasks from MD Tasks in Draft](#create-tasks-from-md-tasks-in-draft)
     - [quick add tasks from md tasks in draft](#quick-add-tasks-from-md-tasks-in-draft)
     - [tasks with same settings from md tasks in draft](#tasks-with-same-settings-from-md-tasks-in-draft)
@@ -174,10 +174,9 @@ If you want to make you're own Action based on Draftist functions simply include
 
 > After Success Setting: Trash
 
-### tasks with individual settings from draft
+### tasks with individual settings from prompt
 
 > This Action creates a task for each line you type in the first prompt. The settings (due date, project, label) can be set individually for each task in displayed prompts
-
 > After Success Setting Nothing
 
 ## Create Tasks from MD Tasks in Draft
