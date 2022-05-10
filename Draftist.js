@@ -1130,62 +1130,69 @@ function Draftist_importTasksFromFilterInPrompt() {
 // MODIFY TASKS
 // #############################################################################
 
-
-function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToRemove = [],labelNamesToAdd = [],newDueDate = undefined, newDueDateTime = undefined}){
+function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToRemove = [],labelNamesToAdd = [],newDueDate = undefined, newDueDateTime = undefined, newProjectName = undefined}){
   const taskId = taskToUpdate.id;
-  
+
   // update labels
   const currentLabels = taskToUpdate.label_ids;
-  // add all labelsToAdd to the array
-  let labelIdsToRemove = [];
-  let labelIdsToAdd = [];
-  // load todoist data if not already loaded
-  if(labelsNameToIdMap.size == 0){
+  // init projectId variable
+
+  // load todoist data if not already loaded and a relevant parameter is present & contains relevant values (e.g. labels, project id)
+  if(labelsNameToIdMap.size == 0 && (labelNamesToRemove.length > 0 || labelNamesToAdd.length > 0 || newProjectName)){
     Draftist_getStoredTodoistData();
   }
-  
+
+  // init labelId arrays
+  let labelIdsToRemove = [];
+  let labelIdsToAdd = [];
+
   for(labelName of labelNamesToRemove){
     labelIdsToRemove.push(labelsNameToIdMap.get(labelName));
   }
-  
+
   for(labelName of labelNamesToAdd){
     labelIdsToAdd.push(labelsNameToIdMap.get(labelName));
   }
-  
+
   let updatedLabelIds = labelIdsToAdd;
-  
+
   for(curLabel of currentLabels){
     // add the label to the updated array if its not already included and it is not contained in the labelsToRemove Array
     if(!labelIdsToRemove.includes(curLabel) && !updatedLabelIds.includes(curLabel)){
       updatedLabelIds.push(curLabel);
     }
   }
-  
+
   // update due date / date time
-  
+
   // if date and datetime are provided, return false since this is not possible
   if(newDueDate && newDueDateTime){
     Draftist_failAction("update task", "due date and due date time where provided, this is not allowed")
     return false
   }
-  
+
   let dueDate = taskToUpdate.due_date;
   if(newDueDate){
     // new due date was provided
     dueDate = newDueDate
   }
-  
+
   let dueDateTime = taskToUpdate.due_datetime;
   if(newDueDateTime){
     // new due date time was provided
     dueDateTime = newDueDateTime
   }
-  
+
+  let projectId = taskToUpdate.project_id;
+  if(newProjectName){
+    projectId = projectsNameToIdMap.get(newProjectName);
+  }
+
   // create task options
   let options = {
     "content": taskToUpdate.content,
     "description": taskToUpdate.description,
-    "project_id": taskToUpdate.project_id,
+    "project_id": projectId,
     "section_id": taskToUpdate.section_id,
     "parent_id": taskToUpdate.parent_id,
     "order": taskToUpdate.order,
@@ -1208,18 +1215,16 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
   } else {
     return true;
   }
-  
-}
 
-function Draftist_updateLabelsOfTask({todoist = new Todoist(),taskToUpdate,labelNamesToRemove,labelNamesToAdd}){
-  return Draftist_updateTask({todoist:todoist,taskToUpdate:taskToUpdate,labelNamesToRemove:labelNamesToRemove,labelNamesToAdd:labelNamesToAdd})
 }
 
 function Draftist_selectTasksFromTaskObjects(taskObjects, allowSelectMultiple, promptMessage){
   let selectedTasks = [];
   let pTasks = new Prompt();
   pTasks.title = "select tasks";
-  pTasks.message = promptMessage;
+  if(promptMessage != ""){
+    pTasks.message = promptMessage;
+  }
   pTasks.addSelect("selectedTasks","",taskObjects.map(task => task.content),[],allowSelectMultiple)
   pTasks.addButton("select")
   if(pTasks.show()){
@@ -1235,15 +1240,76 @@ function Draftist_selectTasksFromTaskObjects(taskObjects, allowSelectMultiple, p
   return selectedTasks;
 }
 
-function Draftist_updateTaskTester(){
-  let tasksToUpdate = Draftist_selectTasksFromTaskObjects(Draftist_getTodoistTasksFromFilter("@testlabel"),true,"");
-  for(taskToUpdate of tasksToUpdate){
-    Draftist_updateTask({taskToUpdate:taskToUpdate, labelNamesToRemove:[],labelNamesToAdd:["thisWEEK","ASAP","idea💡"]
-    })
+function Draftist_updateLabelsOfTask({todoist = new Todoist(),taskToUpdate,labelNamesToRemove,labelNamesToAdd}){
+  return Draftist_updateTask({todoist:todoist,taskToUpdate:taskToUpdate,labelNamesToRemove:labelNamesToRemove,labelNamesToAdd:labelNamesToAdd})
+}
+
+function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString){
+  let tasksFromFilter = Draftist_getTodoistTasksFromFilter(filterString)
+  let selectedTasks = Draftist_selectTasksFromTaskObjects(tasksFromFilter,true,"from filter \"" + filterString + "\"");
+  
+  if(selectedTasks.length == 0){
+    return
+  }
+  // load stored data if not laoded already
+  if(labelsNameToIdMap.size == 0){
+    Draftist_getStoredTodoistData();
+  }
+
+  let dbgstr = ""
+  for(task of selectedTasks){
+    dbgstr = dbgstr + task.content + "\n"
+  }
+  alert(dbgstr)
+  
+  let labelNamesToRemove = []
+  let pLabelsToRemove = new Prompt()
+  pLabelsToRemove.title = "select labels to remove";
+  pLabelsToRemove.message = "all selected labels will be removed from the selected tasks. If you don't want to remove labels, just select no label and press \"select\""
+  pLabelsToRemove.addSelect("labelsToRemove","",Array.from(labelsNameToIdMap.keys()),[],true)
+  pLabelsToRemove.addButton("select")
+  if(pLabelsToRemove.show()){
+    labelNamesToRemove = pLabelsToRemove.fieldValues["labelsToRemove"]
+  } else {
+    Draftist_cancelAction("update labels","user cancelled")
+    return
+  }
+
+  let labelNamesToAdd = []
+  let pLabelsToAdd = new Prompt()
+  pLabelsToAdd.title = "select labels to add";
+  pLabelsToAdd.message = "all selected labels will be added to the selected tasks. If you don't want to add labels, just select no label and press \"select\""
+  pLabelsToAdd.addSelect("labelsToAdd","",Array.from(labelsNameToIdMap.keys()),[],true)
+  pLabelsToAdd.addButton("select")
+  if(pLabelsToAdd.show()){
+    labelNamesToAdd = pLabelsToAdd.fieldValues["labelsToAdd"]
+  } else {
+    Draftist_cancelAction("update labels","user cancelled")
+    return
+  }
+
+  // create todoist oobject to use
+  let todoistObj = new Todoist()
+  let updatedTasksCount = 0;
+  // iterate through all selected tasks and update them
+  for(task of selectedTasks){
+    if(!Draftist_updateLabelsOfTask({todoist:todoistObj, taskToUpdate:task, labelNamesToRemove:labelNamesToRemove, labelNamesToAdd:labelNamesToAdd})){
+      // failed updating failure is already presented, just exit the function here
+      return
+    } else {
+      updatedTasksCount = updatedTasksCount + 1;
+    }
   }
   
-  
-  
+  Draftist_succeedAction("update labels",false,"updated labels of " + updatedTasksCount + " tasks")
+
+}
+
+
+
+
+function Draftist_updateTaskTester(){
+  Draftist_updateLabelsOfSelectedTasksFromFilter("@testlabel")
 }
 
 
