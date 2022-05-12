@@ -1534,14 +1534,6 @@ function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString){
  * defaultSettingsParams: these are the default settings for the Action Group
  */
 const defaultSettingsParams = {
-  "settingsDraftTags": [
-    "_draftistSettings",
-    "/ref-script"
-  ],
-  "dataStoreDraftTags": [
-    "_draftistSettings",
-    "/ref-script"
-  ],
   "dataStoreUpdateInterval": 24,
   "taskLinkTypes": ["app", "web"],
   "taskImportContents": ["appLink", "webLink", "projectName", "priority", "labels"]
@@ -1567,53 +1559,32 @@ let projectsIdToNameMap = new Map();
 let labelsNameToIdMap = new Map();
 let labelsIdToNameMap = new Map();
 const settingsFilePath = "/Library/Scripts/DraftistSettings.json"
+const dataStoreFilePath = "/Library/Scripts/DraftistDataStore.json"
 
 
 /**
- * Draftist_findOrCreateSettingsDraft - loads the configuration settings from the settings Draft - if it is not existing it will be created with the default settings
- *
- * @return {Draft|Boolean}  returns the Draft Object if a settings Draft was found; if an error occured it returns false
+ * Draftist_getSettingsFromFile - reads the settings from the stored file, creates file with default settings if not already present
+ * @returns {Object} the settings object stored in the settings file
  */
-function Draftist_findOrCreateSettingsDraft() {
-  const draftName = settingsDraftName;
-  let resultDrafts = [];
-  let dResults = Draft.queryByTitle(draftName);
-  if (dResults.length > 0) {
-    // filter out drafts with more in the title than just the "draftName"
-    for (res of dResults) {
-      if (res.displayTitle == "// " + draftName) {
-        resultDrafts.push(res)
-      }
-    }
-  } else {
-    let settingsDraft = Draftist_createStorageDraft(draftName)
-    Draftist_initConfigurationSettingsDraft(settingsDraft)
-    resultDrafts.push(settingsDraft);
-  }
-  if (resultDrafts.length > 1) {
-    Draftist_failAction("Draftist_findOrCreateSettingsDraft", "more than one setting Drafts found")
-    return false;
-  } else {
-    // one settings Draft was found (or just created), read the settings from it into the active settings variable
-    Draftist_readConfigurationSettingsFromDraft(resultDrafts[0]);
-    return resultDrafts[0]
-  }
-}
-
-function Draftist_readSettingsFromFile(){
+function Draftist_getSettingsFromFile(){
   // iCloud file manager
   let fmCloud = FileManager.createCloud();
   const readResult = fmCloud.readJSON(settingsFilePath);
   if(!readResult){
     // file is not existing, write initial Data
     fmCloud.writeJSON(settingsFilePath,defaultSettingsParams)
+    return defaultSettingsParams;
   } else {
     // read settings into global variable
-    activeSettings = readResult;
+    return readResult;
   }
 }
 
-function Draftist_writeSettingsToFile(){
+/**
+ * Draftist_writeActiveSettingsToFile - writes the current active loaded settings to the settings file
+ * @returns {Boolean} true if writing was successfull or no settings are loaded right now; false if writing failed
+ */
+function Draftist_writeActiveSettingsToFile(){
   if(!activeSettings){
     // active Settings are undefined, nothing to write (but nothing failed either)
     return true;
@@ -1625,126 +1596,12 @@ function Draftist_writeSettingsToFile(){
   return writeResult;
 }
 
-
 /**
- * Draftist_findOrCreateDataStoreDraft - loads the stored todoist data from the data store Draft - if it is not existing it will be created and the data will be retrieved from Todoist
- *
- * @return {Draft|Boolean}  returns the Draft Object if the data store Draft was found; if an error occured it returns false
- */
-function Draftist_findOrCreateDataStoreDraft() {
-  const draftName = dataStoreDraftName;
-  let notificationMessage = ""
-  let resultDrafts = [];
-  let dResults = Draft.queryByTitle(draftName);
-  if (dResults.length > 0) {
-    // filter out drafts with more in the title than just the "draftName"
-    for (res of dResults) {
-      if (res.displayTitle == "// " + draftName) {
-        resultDrafts.push(res)
-      }
-    }
-  } else {
-    let storeDraft = Draftist_createStorageDraft(draftName)
-    Draftist_initDataStoreDraft(storeDraft)
-    resultDrafts.push(storeDraft);
-  }
-
-  if (resultDrafts.length > 1) {
-    // TODO: DRAFTIST FAIL ACTION!
-    return false;
-  } else {
-    // one settings Draft was found (or just created), read the settings from it into the active settings variable
-    return resultDrafts[0];
-  }
-}
-
-
-/**
- * Draftist_createStorageDraft - creates a Draft to store settings or todoist data - this function is used internally
- *
- * @param  {String} draftName title to use for the Draft
- * @return {Draft}           Draft object of the storage Draft
- */
-function Draftist_createStorageDraft(draftName) {
-  let storeDraft = new Draft();
-  storeDraft.syntax = Syntax.find("builtIn", "JavaScript")
-  storeDraft.content = "// " + draftName + "\n// DON'T MAKE ANY CHANGES TO THIS DRAFT! IT IS USED BY THE DRAFTIST ACTION GROUP\n";
-  storeDraft.isArchived = true;
-  storeDraft.update();
-  return storeDraft;
-}
-
-
-/**
- * Draftist_initConfigurationSettingsDraft - function to initialize the Settings Draft with the default settings (or reset it)
- *
- * @param  {Draft} settingsDraft the Draft object of the settings Draft
- */
-function Draftist_initConfigurationSettingsDraft(settingsDraft) {
-  // remove all current tags (useful in case settings are restored to defaults)
-  for (tag of settingsDraft.tags) {
-    settingsDraft.removeTag(tag);
-  }
-  // set tags according to confiuration
-  for (tag of defaultSettingsParams["settingsDraftTags"]) {
-    settingsDraft.addTag(tag);
-  }
-  settingsDraft.content = settingsDraft.content + JSON.stringify(defaultSettingsParams)
-  // workaround was not updated as expected.
-  settingsDraft.update();
-  settingsDraft.update();
-
-}
-
-
-/**
- * Draftist_initDataStoreDraft - function to initialize the data store Draft with the Todoist Data - initially loads all data from todoist into the storage Draft
- *
- * @param  {Draft} storeDraft the Draft object of the storage Draft
- */
-function Draftist_initDataStoreDraft(storeDraft) {
-  // set tags according to confiuration
-  for (tag of defaultSettingsParams["dataStoreDraftTags"]) {
-    storeDraft.addTag(tag);
-  }
-  // initially load all data from todoist into the Draft
-  Draftist_updateStoredTodoistData(new Todoist(), storeDraft);
-  // workaround was not updated as expected.
-  storeDraft.update();
-  storeDraft.update();
-
-}
-
-
-/**
- * Draftist_readConfigurationSettingsFromDraft - function to read the stored settings into the active settings variable - this function is used internally
- *
- * @param  {Draft} settingsDraft Draft object of the settings Draft
- */
-function Draftist_readConfigurationSettingsFromDraft(settingsDraft) {
-  activeSettings = Draftist_helperGetObjectFromStoredDraft(settingsDraft)
-}
-
-
-/**
- * Draftist_loadCurrentConfigurationSettings - loads the current settings stored in the settings Draft into the live variable of Draftist
+ * Draftist_loadCurrentConfigurationSettings - loads the current settings stored in the settings file into the live variable of Draftist
  */
 function Draftist_loadCurrentConfigurationSettings() {
-  let settingsDraft = Draftist_findOrCreateSettingsDraft()
-  Draftist_readConfigurationSettingsFromDraft(settingsDraft);
-
+  activeSettings = Draftist_getSettingsFromFile();
 }
-
-
-/**
- * Draftist_storeCurrentConfigurationSettings - stores the current active settings in the settings Draft
- *
- * @param  {Draft} settingsDraft Draft object of the settings Draft
- */
-function Draftist_storeCurrentConfigurationSettings(settingsDraft) {
-  Draftist_helperUpdateObjectInStoreDraft(settingsDraft, activeSettings)
-}
-
 
 
 /**
@@ -1752,18 +1609,15 @@ function Draftist_storeCurrentConfigurationSettings(settingsDraft) {
  *
  */
 function Draftist_restoreDefaultSettings() {
-  // get the current settingsDraft
-  let settingsDraft = Draftist_findOrCreateSettingsDraft();
-  // delete it
-  settingsDraft.isTrashed = true;
-  settingsDraft.update();
-  // and create a new one (which will be initialized with the default settings)
-  if (Draftist_findOrCreateSettingsDraft()) {
-    Draftist_infoMessage("", "restored default settings")
+  // iCloud file manager
+  let fmCloud = FileManager.createCloud();
+  // write active Settings to file
+  const writeResult = fmCloud.writeJSON(settingsFilePath,defaultSettingsParams);
+  if(!writeResult){
+    Draftist_failAction("restore default settings","failed writing settings");
   } else {
-    Draftist_failAction("Restore Default Settings", "unexpected failure - this should not happen. please reach out to @FlohGro with a description what you did to fix this.\nDelete all \"Draftist\" drafts and try again")
+    Draftist_infoMessage("", "restored default settings")
   }
-
 }
 
 
@@ -1797,60 +1651,11 @@ function Draftist_Settings() {
 /**
  * Draftist_changeConfigurationSettings - function to change the current active settings of Draftist and store them in the settings Draft
  *
- * @param  {Draft} settingsDraft Draft object of the settings Draft
  */
 function Draftist_changeConfigurationSettings() {
-  let settingsDraft = Draftist_findOrCreateSettingsDraft();
-  // tags for configurationDraft
-  const currentSettingsTags = activeSettings["settingsDraftTags"]
-  let pSettingsDraftTags = new Prompt();
-  pSettingsDraftTags.title = "set tags for config Draft"
-  pSettingsDraftTags.message = "You can use as many tags as you like, seperate each tag by a comma without spaces between the tags.\nThe configuration Draft will only contain the tags in this textfield afterwards"
-  pSettingsDraftTags.addTextView("newTags", "", currentSettingsTags.join(","), {
-    wantsFocus: true
-  })
-  pSettingsDraftTags.addButton("apply tags");
-  if (pSettingsDraftTags.show()) {
-    // user selected to apply new tags
-    let newTags = pSettingsDraftTags.fieldValues["newTags"].split(",");
-    // now first remove all current tags
-    for (tag of currentSettingsTags) {
-      settingsDraft.removeTag(tag);
-    }
-    // now add all new tags
-    for (tag of newTags) {
-      settingsDraft.addTag(tag);
-    }
-    settingsDraft.update();
-    activeSettings["settingsDraftTags"] = newTags;
-  }
-
-  const currentStoreDraftTags = activeSettings["dataStoreDraftTags"]
-  let pStoreDraftTags = new Prompt();
-  pStoreDraftTags.title = "set tags for Data Store Draft"
-  pStoreDraftTags.message = "You can use as many tags as you like, seperate each tag by a comma without spaces between the tags.\nThe configuration Draft will only contain the tags in this textfield afterwards"
-  pStoreDraftTags.addTextView("newTags", "", currentStoreDraftTags.join(","), {
-    wantsFocus: true
-  })
-  pStoreDraftTags.addButton("apply tags");
-  if (pStoreDraftTags.show()) {
-    // find Data Store Draft
-    let storeDraft = Draftist_findOrCreateDataStoreDraft();
-    // user selected to apply new tags
-    let newTags = pStoreDraftTags.fieldValues["newTags"].split(",");
-    // now first remove all current tags
-    for (tag of currentStoreDraftTags) {
-      storeDraft.removeTag(tag);
-    }
-    // now add all new tags
-    for (tag of newTags) {
-      storeDraft.addTag(tag);
-    }
-    storeDraft.update();
-    activeSettings["dataStoreDraftTags"] = newTags;
-  }
-
-  // setting for local storage usage
+  let proceedSettingsPrompts = true;
+  if(proceedSettingsPrompts){
+    // setting for local storage usage
   let pStore = new Prompt();
   pStore.title = "update inteval for todoist data"
   pStore.message = "the action group stores todoist data locally in a Draft, this includes e.g. project/label names, ids which are necessary to quickly add tasks to projects (or add labels to tasks), the local storage speeds up creating tasks a lot. The data will be updated in the time period of your choice (in hours default: every 24h)";
@@ -1860,8 +1665,11 @@ function Draftist_changeConfigurationSettings() {
     // user selected to apply the settings
     // store the setting in current active settings variable
     activeSettings["dataStoreUpdateInterval"] = parseInt(pStore.fieldValues["updateInterval"])
+  } else {
+    proceedSettingsPrompts = false;
   }
-
+  }
+  if(proceedSettingsPrompts){
   // settings for crosslinked Task Urls
   let pTaskLinks = new Prompt();
   pTaskLinks.title = "task link settings"
@@ -1870,8 +1678,12 @@ function Draftist_changeConfigurationSettings() {
   pTaskLinks.addButton("Apply");
   if (pTaskLinks.show()) {
     activeSettings["taskLinkTypes"] = pTaskLinks.fieldValues["linkTypes"]
+  } else {
+    proceedSettingsPrompts = false;
+  }
   }
 
+  if(proceedSettingsPrompts){
   // settings for import task contents
   let pImportContents = new Prompt();
   pImportContents.title = "task import content settings"
@@ -1880,10 +1692,44 @@ function Draftist_changeConfigurationSettings() {
   pImportContents.addButton("Apply");
   if (pImportContents.show()) {
     activeSettings["taskImportContents"] = pImportContents.fieldValues["taskImportContents"]
+  } else {
+    proceedSettingsPrompts = false;
+  }
   }
 
-  // after all settings are reconfigured, store the new settings in the file
-  Draftist_storeCurrentConfigurationSettings(settingsDraft);
+  if(!Draftist_writeActiveSettingsToFile()){
+    Draftist_failAction("change settings","unexpected failure, please try again and if the issue persists, contact @FlohGro with a description to reproduce the issue.")
+  } else {
+    Draftist_infoMessage("","settings updated")
+  }
+}
+
+
+function Draftist_getDataStoreFromFile(){
+  // iCloud file manager
+  let fmCloud = FileManager.createCloud();
+  const readResult = fmCloud.readJSON(dataStoreFilePath);
+  if(!readResult){
+    // file is not existing, write initial Data
+    if(!Draftist_updateStoredTodoistData()){
+      Draftist_failAction("get data store","unexpected failure, please try again and if the issue persists, contact @FlohGro with a description to reproduce the issue.")
+    }
+  } else {
+    // return the read object
+    return readResult
+  }
+}
+
+function Draftist_writeDataStoreToFile(dataToStore){
+  if(!dataToStore){
+    // lastUpdated, nothing to write (but nothing failed either)
+    return true;
+  }
+  // iCloud file manager
+  let fmCloud = FileManager.createCloud();
+  // write data to file
+  const writeResult = fmCloud.writeJSON(dataStoreFilePath,dataToStore);
+  return writeResult;
 }
 
 
@@ -1906,18 +1752,16 @@ function Draftist_updateTodoistDataIfUpdateIntervalExceeded() {
   if (tDiffLastUpdate > updateInterval) {
     // update is necessary
     Draftist_updateStoredTodoistData();
-    //Draftist_getStoredTodoistData();
   }
 }
 
 
 /**
- * Draftist_updateStoredTodoistData - updates the locally stored todoist data in the data store Draft
+ * Draftist_updateStoredTodoistData - updates the locally stored todoist data in the data store file
  *
- * @param  {Todoist} todoist                (optional) the todoist object to use
- * @param  {Draft} storeDraft             (optional) Draft object of the data store Draft
+ * @param  {Todoist} todoist? - the todoist object to use
  */
-function Draftist_updateStoredTodoistData(todoist = new Todoist(), storeDraft = Draftist_findOrCreateDataStoreDraft()) {
+function Draftist_updateStoredTodoistData(todoist = new Todoist()) {
   // retrieve data from todoist
   const projects = todoist.getProjects();
   const sections = todoist.getSections();
@@ -1931,64 +1775,19 @@ function Draftist_updateStoredTodoistData(todoist = new Todoist(), storeDraft = 
     "sections": sections,
     "labels": labels
   }
-  // get data store Draft
-  Draftist_helperUpdateObjectInStoreDraft(storeDraft, todoistDataToStore);
+  if(!Draftist_writeDataStoreToFile(todoistDataToStore)){
+    Draftist_failAction("get data store","unexpected failure, please try again and if the issue persists, contact @FlohGro with a description to reproduce the issue.")
+  }
   Draftist_infoMessage("", "updated local Todoist data");
 }
 
 
-
 /**
- * Draftist_helperGetObjectFromStoredDraft - helper function to get the stored object in the passed draft - this function is used internally
- *
- * @param  {Draft} draftToUse Draft object to read the stored object from
- * @return {Object}            the stored object
- */
-function Draftist_helperGetObjectFromStoredDraft(draftToUse) {
-
-  let commentLinesArr = [];
-  let jsonLinesArr = [];
-  for (line of draftToUse.content.split("\n")) {
-    if (line.startsWith("// ")) {
-      commentLinesArr.push(line);
-    } else {
-      jsonLinesArr.push(line)
-    }
-  }
-  return JSON.parse(jsonLinesArr.join("\n"))
-
-}
-
-
-/**
- * Draftist_helperUpdateObjectInStoreDraft - helper function to store the passed object in the passed Draft - this function is used internally
- *
- * @param  {Draft} draftToUse    Draft object where to store the passed objectToStore
- * @param  {Object} objectToStore the Object to store in the Draft
- */
-function Draftist_helperUpdateObjectInStoreDraft(draftToUse, objectToStore) {
-  // store lines with comments at the beginning
-  let commentLinesArr = [];
-  for (line of draftToUse.content.split("\n")) {
-    if (line.startsWith("// ")) {
-      commentLinesArr.push(line);
-    }
-  }
-  // join the lines again and parse the json string into the settings variable
-  let comments = commentLinesArr.join("\n");
-  let jsonData = JSON.stringify(objectToStore);
-  draftToUse.content = comments + "\n" + jsonData;
-  draftToUse.update()
-}
-
-
-/**
- * Draftist_getStoredTodoistData - function to retrieve the stored Todoist Data from the data store Draft - the stored data will be updated if the dataStoreUpdateInterval was exceeded and the stored data will be loaded into the global variables to be accessible for all other functions
+ * Draftist_getStoredTodoistData - function to retrieve the stored Todoist Data from the data store file - the stored data will be updated if the dataStoreUpdateInterval was exceeded and the stored data will be loaded into the global variables to be accessible for all other functions
  */
 function Draftist_getStoredTodoistData() {
 
-  const storeDraft = Draftist_findOrCreateDataStoreDraft();
-  const storedData = Draftist_helperGetObjectFromStoredDraft(storeDraft);
+  const storedData = Draftist_getDataStoreFromFile();
 
   lastUpdated = parseInt(storedData["lastUpdated"]);
   //projects = storedData["projects"]
