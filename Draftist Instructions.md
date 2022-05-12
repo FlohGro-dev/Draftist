@@ -21,24 +21,23 @@ It is divided into several sections:
 - modify Actions
 - Switch labels
 
-## Created Drafts
+## Created Files
 
-Draftist will create three new drafts in your library:
+Draftist will create three new files in your iCloud Drive folder at the path `.../Drafts/Library/Scripts`:
 
-- Draftist Todoist Data Store
-	- this draft stores data from your Todoist account which is used by several actions
-	- the data includes:
-		- projects (and their metadata)
-		- sections (and their metadata)
-		- labels (and their metadata)
-	- none of this data leaves your drafts library - it's just used to not always request the data from Todoists API which slows down the process of e.g. creating tasks with settings a lot.
-- Draftist Action Group Settings
-	- this draft stores the settings you can modify with the [Draftist Settings Action](https://github.com/FlohGro-dev/Draftist/blob/main/Action%20Descriptions.md#Draftist%20Settings)
-- Draftist Function Store
-	- this draft stores the functions all the Draftist Actions use under the hood. This enables the update process without the need to reinstall the complete Action Group.
+- `DraftistDataStore.json`: Draftist Todoist Data Store
+  - this file stores data from your Todoist account which is used by several actions
+  - the data includes:
+    - projects (and their metadata)
+    - sections (and their metadata)
+    - labels (and their metadata)
+  - none of this data leaves your iCloud Account, it is synced in the Drafts directory - it's just used to not always request the data from Todoists API which slows down the process of e.g. creating tasks with settings a lot.
+- `DraftistSettings.json`: Draftist Action Group Settings
+  - this file stores the settings you can modify with the [Draftist Settings Action](https://github.com/FlohGro-dev/Draftist/blob/main/Action%20Descriptions.md#Draftist%20Settings)
+- `Draftist.js`: Draftist Functions
+  - this file contains the functions all the Draftist Actions use under the hood. This enables the update process without the need to reinstall the complete Action Group.
 
-You can archive them to move them out of your sight, but if you delete them they will be recreated.
-Using drafts to store your settings, your todoist data and the functions themselves in a Draft speeds up execution compared to storing these things in the directory of Drafts.
+I don't recommend to delete these files unless you have issues using Draftist. If you delete the `Draftist.js` no Action in the Draftist Action Group will work anymore until you reinstall the file. The Settings and Data Store file will be recreated automatically.
 
 ## Using Draftist
 
