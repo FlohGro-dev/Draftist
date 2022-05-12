@@ -1142,8 +1142,16 @@ function Draftist_importTasksFromFilterInPrompt() {
  * @param {String} newProjectName? - ATTENTION: currently 05/2022 not supported by the todoist API, providing this parameter will fail the action - the new valid project name for the provided task
  * @returns {Boolean} true when updated successfully, false when updating failed or any parameter was not valid (e.g. label name is not existing)
  */
-function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToRemove = [],labelNamesToAdd = [],newDueDate = undefined, newDueDateTime = undefined, newProjectName = undefined}){
-  if(!taskToUpdate){
+function Draftist_updateTask({
+  todoist = new Todoist(),
+  taskToUpdate,
+  labelNamesToRemove = [],
+  labelNamesToAdd = [],
+  newDueDate = undefined,
+  newDueDateTime = undefined,
+  newProjectName = undefined
+}) {
+  if (!taskToUpdate) {
     Draftist_failAction("update task", "no task to update was provided")
     return false
   }
@@ -1154,7 +1162,7 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
   // init projectId variable
 
   // load todoist data if not already loaded and a relevant parameter is present & contains relevant values (e.g. labels, project id)
-  if(labelsNameToIdMap.size == 0 && (labelNamesToRemove.length > 0 || labelNamesToAdd.length > 0 || newProjectName)){
+  if (labelsNameToIdMap.size == 0 && (labelNamesToRemove.length > 0 || labelNamesToAdd.length > 0 || newProjectName)) {
     Draftist_getStoredTodoistData();
   }
 
@@ -1162,18 +1170,18 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
   let labelIdsToRemove = [];
   let labelIdsToAdd = [];
 
-  for(labelName of labelNamesToRemove){
+  for (labelName of labelNamesToRemove) {
     const curLabelId = labelsNameToIdMap.get(labelName);
-    if(!curLabelId){
+    if (!curLabelId) {
       Draftist_failAction("update task", "provided label name \"" + labelName + "\" is not existing.");
       return false
     }
     labelIdsToRemove.push(curLabelId);
   }
 
-  for(labelName of labelNamesToAdd){
+  for (labelName of labelNamesToAdd) {
     const curLabelId = labelsNameToIdMap.get(labelName);
-    if(!curLabelId){
+    if (!curLabelId) {
       Draftist_failAction("update task", "provided label name \"" + labelName + "\" is not existing.");
       return false
     }
@@ -1182,9 +1190,9 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
 
   let updatedLabelIds = labelIdsToAdd;
 
-  for(curLabel of currentLabels){
+  for (curLabel of currentLabels) {
     // add the label to the updated array if its not already included and it is not contained in the labelsToRemove Array
-    if(!labelIdsToRemove.includes(curLabel) && !updatedLabelIds.includes(curLabel)){
+    if (!labelIdsToRemove.includes(curLabel) && !updatedLabelIds.includes(curLabel)) {
       updatedLabelIds.push(curLabel);
     }
   }
@@ -1192,33 +1200,33 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
   // update due date / date time
 
   // if date and datetime are provided, return false since this is not possible
-  if(newDueDate && newDueDateTime){
+  if (newDueDate && newDueDateTime) {
     Draftist_failAction("update task", "due date and due date time where provided, this is not allowed")
     return false
   }
 
   let dueDate = taskToUpdate.due_date;
-  if(newDueDate){
+  if (newDueDate) {
     // new due date was provided
     dueDate = newDueDate
   }
 
   let dueDateTime = taskToUpdate.due_datetime;
-  if(newDueDateTime){
+  if (newDueDateTime) {
     // new due date time was provided
     dueDateTime = newDueDateTime
   }
-  
+
   // attention the project ID was implemented based on the task property. 
   // turned out that project_id is not a parameter for the update task request: https://developer.todoist.com/rest/v1/#update-a-task
   // support request was sent on 2022-05-12 but until implementation this is a point of failure and will fail the function for now.
   let projectId = taskToUpdate.project_id;
-  if(newProjectName){
+  if (newProjectName) {
     // fail the action until project id is supported by Todoist:
     Draftist_failAction("update task", "new project name was provided but is currently not supported by Todoist")
     return false;
     projectId = projectsNameToIdMap.get(newProjectName);
-    if(!projectId){
+    if (!projectId) {
       Draftist_failAction("update task", "provided project name \"" + newProjectName + "\" is not existing.");
       return false
     }
@@ -1239,10 +1247,10 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
     "assignee": taskToUpdate.assignee
   };
 
-  const updateTaskResult = todoist.updateTask(taskId,options);
-  if(!updateTaskResult){
+  const updateTaskResult = todoist.updateTask(taskId, options);
+  if (!updateTaskResult) {
     const lastError = Draftist_getLastTodoistError(todoist);
-    if(lastError){
+    if (lastError) {
       Draftist_failAction("update task", "todoist returned error: " + lastError)
     } else {
       Draftist_failAction("update task", "unknown error occured. please try again and contact @FlohGro with steps to reproduce")
@@ -1263,8 +1271,18 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
  * @param {String[]} labelNamesToAdd? - the valid label names which should be added to the provided task
  * @returns {Boolean} true when updated successfully, false when updating failed or any parameter was not valid (e.g. label name is not existing)
  */
- function Draftist_updateLabelsOfTask({todoist = new Todoist(),taskToUpdate,labelNamesToRemove,labelNamesToAdd}){
-  return Draftist_updateTask({todoist:todoist,taskToUpdate:taskToUpdate,labelNamesToRemove:labelNamesToRemove,labelNamesToAdd:labelNamesToAdd})
+function Draftist_updateLabelsOfTask({
+  todoist = new Todoist(),
+  taskToUpdate,
+  labelNamesToRemove,
+  labelNamesToAdd
+}) {
+  return Draftist_updateTask({
+    todoist: todoist,
+    taskToUpdate: taskToUpdate,
+    labelNamesToRemove: labelNamesToRemove,
+    labelNamesToAdd: labelNamesToAdd
+  })
 }
 
 /**
@@ -1275,8 +1293,16 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
  * @param {String} newProjectName - the valid new project name for the task
  * @returns {Boolean} true when updated successfully, false when updating failed or any parameter was not valid (e.g. project name is not existing)
  */
- function Draftist_updateProjectOfTask({todoist = new Todoist(),taskToUpdate,newProjectName}){
-  return Draftist_updateTask({todoist:todoist,taskToUpdate:taskToUpdate,newProjectName:newProjectName})
+function Draftist_updateProjectOfTask({
+  todoist = new Todoist(),
+  taskToUpdate,
+  newProjectName
+}) {
+  return Draftist_updateTask({
+    todoist: todoist,
+    taskToUpdate: taskToUpdate,
+    newProjectName: newProjectName
+  })
 }
 
 
@@ -1288,28 +1314,28 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
  * @param {String} promptMessage? - a descriptive message which should be displayed inside the prompt
  * @returns {Todoist Task []} - Array of selected Todoist Task (might be empty)
  */
-function Draftist_selectTasksFromTaskObjects(taskObjects, allowSelectMultiple, promptMessage = ""){
+function Draftist_selectTasksFromTaskObjects(taskObjects, allowSelectMultiple, promptMessage = "") {
   let selectedTasks = [];
-  if(taskObjects.length == 0){
+  if (taskObjects.length == 0) {
     // return empty array immediately
     return [];
   }
   let pTasks = new Prompt();
   pTasks.title = "select tasks";
-  if(promptMessage != ""){
+  if (promptMessage != "") {
     pTasks.message = promptMessage;
   }
-  pTasks.addSelect("selectedTasks","",taskObjects.map(task => task.content),[],allowSelectMultiple)
+  pTasks.addSelect("selectedTasks", "", taskObjects.map(task => task.content), [], allowSelectMultiple)
   pTasks.addButton("select")
-  if(pTasks.show()){
+  if (pTasks.show()) {
     const selectedTaskContents = pTasks.fieldValues["selectedTasks"];
     // iterate through the selected task contents
-    for(taskContent of selectedTaskContents){
+    for (taskContent of selectedTaskContents) {
       // add the task Object with the selected content to the array
       selectedTasks = selectedTasks.concat(taskObjects.filter(task => (task.content == taskContent)))
     }
   } else {
-    Draftist_cancelAction("","user cancelled selection")
+    Draftist_cancelAction("", "user cancelled selection")
   }
   return selectedTasks;
 }
@@ -1319,22 +1345,22 @@ function Draftist_selectTasksFromTaskObjects(taskObjects, allowSelectMultiple, p
  * @param {Todoist Task []} taskObjects - array of todoist tasks
  * @returns {String[]} Array of present label names in at least one of the provided tasks
  */
-function Draftist_helperGetAnyPresentLabelNamesInTasks(taskObjects){
+function Draftist_helperGetAnyPresentLabelNamesInTasks(taskObjects) {
   // prevent empty taskObjects and return empty array in that case
-  if(taskObjects.length == 0){
+  if (taskObjects.length == 0) {
     return [];
   }
   // use a Set to prevent duplicates
   let labelNames = new Set();
 
   // load stored data if not laoded already
-  if(labelsIdToNameMap.size == 0){
+  if (labelsIdToNameMap.size == 0) {
     Draftist_getStoredTodoistData();
   }
 
-  for(task of taskObjects){
+  for (task of taskObjects) {
     // add each label id to the set
-    for(lId of task.label_ids){
+    for (lId of task.label_ids) {
       labelNames.add(labelsIdToNameMap.get(lId))
     }
   }
@@ -1347,14 +1373,14 @@ function Draftist_helperGetAnyPresentLabelNamesInTasks(taskObjects){
  * @param {Todoist Task []} taskObjects - array of todoist tasks
  * @returns {String[]} Array of present label names present in all of the provided tasks
  */
-function Draftist_helperGetCommonPresentLabelNamesInTasks(taskObjects){
+function Draftist_helperGetCommonPresentLabelNamesInTasks(taskObjects) {
   // prevent empty taskObjects and return empty array in that case
-  if(taskObjects.length == 0){
+  if (taskObjects.length == 0) {
     return [];
   }
 
   // load stored data if not laoded already
-  if(labelsIdToNameMap.size == 0){
+  if (labelsIdToNameMap.size == 0) {
     Draftist_getStoredTodoistData();
   }
 
@@ -1368,14 +1394,14 @@ function Draftist_helperGetCommonPresentLabelNamesInTasks(taskObjects){
 
   let presentLabelIds = taskObjects[0].label_ids;
 
-  if(presentLabelIds.length == 0){
+  if (presentLabelIds.length == 0) {
     return [];
   }
 
-  for(task of taskObjects){
+  for (task of taskObjects) {
     presentLabelIds = presentLabelIds.filter(x => task.label_ids.includes(x))
   }
-  
+
 
   return presentLabelIds.map((x) => labelsIdToNameMap.get(x))
 }
@@ -1385,15 +1411,15 @@ function Draftist_helperGetCommonPresentLabelNamesInTasks(taskObjects){
  * @param {Todoist Task []} taskObjects - array of todoist tasks
  * @returns {String[]} Array of present label names not present in all of the provided tasks
  */
-function Draftist_helperGetLabelNamesNotPresentInAllTasks(taskObjects){
+function Draftist_helperGetLabelNamesNotPresentInAllTasks(taskObjects) {
   // get all labelNames
   // load stored data if not laoded already
-  if(labelsNameToIdMap.size == 0){
+  if (labelsNameToIdMap.size == 0) {
     Draftist_getStoredTodoistData();
   }
   let labelNames = Array.from(labelsNameToIdMap.keys());
   let commonLabels = Draftist_helperGetCommonPresentLabelNamesInTasks(taskObjects)
-  
+
   return labelNames.filter(x => !commonLabels.includes(x))
 }
 
@@ -1403,38 +1429,38 @@ function Draftist_helperGetLabelNamesNotPresentInAllTasks(taskObjects){
  * @param {String} filterString - a valid todoist filter string
  * @returns true if updated successfully, false if update failed or user cancelled
  */
-function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString){
+function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString) {
   let tasksFromFilter = Draftist_getTodoistTasksFromFilter(filterString)
   // early retrun if no task was retrieved
-  if(!tasksFromFilter){
+  if (!tasksFromFilter) {
     return false;
   }
   // let the user select the tasks
-  let selectedTasks = Draftist_selectTasksFromTaskObjects(tasksFromFilter,true,"from filter \"" + filterString + "\"");
+  let selectedTasks = Draftist_selectTasksFromTaskObjects(tasksFromFilter, true, "from filter \"" + filterString + "\"");
   let availableLableNames = Draftist_helperGetAnyPresentLabelNamesInTasks(selectedTasks);
   let potentialLabelNamesToAdd = Draftist_helperGetLabelNamesNotPresentInAllTasks(selectedTasks);
 
-  if(selectedTasks.length == 0){
+  if (selectedTasks.length == 0) {
     return false;
   }
   // load stored data if not laoded already
-  if(labelsNameToIdMap.size == 0){
+  if (labelsNameToIdMap.size == 0) {
     Draftist_getStoredTodoistData();
   }
-  
+
   // declare before if condition
   let labelNamesToRemove = []
   // only present remove menu if any label is present
-  if(availableLableNames.length > 0){
+  if (availableLableNames.length > 0) {
     let pLabelsToRemove = new Prompt()
     pLabelsToRemove.title = "select labels to remove";
     pLabelsToRemove.message = "all selected labels will be removed from the tasks (if they have the tags assigned). If you don't want to remove labels, just select no label and press \"select\""
-    pLabelsToRemove.addSelect("labelsToRemove","",availableLableNames,[],true)
+    pLabelsToRemove.addSelect("labelsToRemove", "", availableLableNames, [], true)
     pLabelsToRemove.addButton("select")
-    if(pLabelsToRemove.show()){
+    if (pLabelsToRemove.show()) {
       labelNamesToRemove = pLabelsToRemove.fieldValues["labelsToRemove"]
     } else {
-      Draftist_cancelAction("update labels","user cancelled")
+      Draftist_cancelAction("update labels", "user cancelled")
       return false;
     }
   }
@@ -1443,12 +1469,12 @@ function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString){
   let pLabelsToAdd = new Prompt()
   pLabelsToAdd.title = "select labels to add";
   pLabelsToAdd.message = "all selected labels will be added to the selected tasks. If you don't want to add labels, just select no label and press \"select\""
-  pLabelsToAdd.addSelect("labelsToAdd","",potentialLabelNamesToAdd,[],true)
+  pLabelsToAdd.addSelect("labelsToAdd", "", potentialLabelNamesToAdd, [], true)
   pLabelsToAdd.addButton("select")
-  if(pLabelsToAdd.show()){
+  if (pLabelsToAdd.show()) {
     labelNamesToAdd = pLabelsToAdd.fieldValues["labelsToAdd"]
   } else {
-    Draftist_cancelAction("update labels","user cancelled")
+    Draftist_cancelAction("update labels", "user cancelled")
     return false;
   }
 
@@ -1456,16 +1482,21 @@ function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString){
   let todoistObj = new Todoist()
   let updatedTasksCount = 0;
   // iterate through all selected tasks and update them
-  for(task of selectedTasks){
-    if(!Draftist_updateLabelsOfTask({todoist:todoistObj, taskToUpdate:task, labelNamesToRemove:labelNamesToRemove, labelNamesToAdd:labelNamesToAdd})){
+  for (task of selectedTasks) {
+    if (!Draftist_updateLabelsOfTask({
+        todoist: todoistObj,
+        taskToUpdate: task,
+        labelNamesToRemove: labelNamesToRemove,
+        labelNamesToAdd: labelNamesToAdd
+      })) {
       // failed updating failure is already presented, just exit the function here
       return false;
     } else {
       updatedTasksCount = updatedTasksCount + 1;
     }
   }
-  
-  Draftist_succeedAction("update labels",false,"updated labels of " + updatedTasksCount + " tasks")
+
+  Draftist_succeedAction("update labels", false, "updated labels of " + updatedTasksCount + " tasks")
   return true;
 
 }
@@ -1476,31 +1507,31 @@ function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString){
  * @param {String} filterString - a valid todoist filter string
  * @returns true if updated successfully, false if update failed or user cancelled
  */
- function Draftist_updateProjectOfSelectedTasksFromFilter(filterString){
-   // fail the action until project id is supported by Todoist:
-   Draftist_failAction("update project of tasks", "this is currently not supported by Todoist")
-   return false;
+function Draftist_updateProjectOfSelectedTasksFromFilter(filterString) {
+  // fail the action until project id is supported by Todoist:
+  Draftist_failAction("update project of tasks", "this is currently not supported by Todoist")
+  return false;
   let tasksFromFilter = Draftist_getTodoistTasksFromFilter(filterString)
   // early retrun if no task was retrieved
-  if(!tasksFromFilter){
+  if (!tasksFromFilter) {
     return false;
   }
   // let the user select the tasks
-  let selectedTasks = Draftist_selectTasksFromTaskObjects(tasksFromFilter,true,"from filter \"" + filterString + "\"");
-  if(selectedTasks.length == 0){
+  let selectedTasks = Draftist_selectTasksFromTaskObjects(tasksFromFilter, true, "from filter \"" + filterString + "\"");
+  if (selectedTasks.length == 0) {
     return false;
   }
 
   // load stored data if not laoded already
-  if(projectsNameToIdMap.size == 0){
+  if (projectsNameToIdMap.size == 0) {
     Draftist_getStoredTodoistData();
   }
   let pProject = new Prompt();
   pProject.title = "select new project"
   // add a button to the prompt for each available project name
   Array.from(projectsNameToIdMap.keys()).map((x) => pProject.addButton(x));
-  
-  if(!pProject.show()){
+
+  if (!pProject.show()) {
     // user did not select a project
   }
 
@@ -1510,18 +1541,22 @@ function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString){
   let todoistObj = new Todoist()
   let updatedTasksCount = 0;
   // iterate through all selected tasks and update them
-  for(task of selectedTasks){
-    if(!Draftist_updateProjectOfTask({todoistObj,taskToUpdate:task,newProjectName:selectedProject})){
+  for (task of selectedTasks) {
+    if (!Draftist_updateProjectOfTask({
+        todoistObj,
+        taskToUpdate: task,
+        newProjectName: selectedProject
+      })) {
       // failed updating failure is already presented, just exit the function here
       return false;
     } else {
       updatedTasksCount = updatedTasksCount + 1;
     }
   }
-  
-  Draftist_succeedAction("update project",false,"updated project of " + updatedTasksCount + " tasks")
+
+  Draftist_succeedAction("update project", false, "updated project of " + updatedTasksCount + " tasks")
   return true;
- }
+}
 
 
 
@@ -1566,13 +1601,13 @@ const dataStoreFilePath = "/Library/Scripts/DraftistDataStore.json"
  * Draftist_getSettingsFromFile - reads the settings from the stored file, creates file with default settings if not already present
  * @returns {Object} the settings object stored in the settings file
  */
-function Draftist_getSettingsFromFile(){
+function Draftist_getSettingsFromFile() {
   // iCloud file manager
   let fmCloud = FileManager.createCloud();
   const readResult = fmCloud.readJSON(settingsFilePath);
-  if(!readResult){
+  if (!readResult) {
     // file is not existing, write initial Data
-    fmCloud.writeJSON(settingsFilePath,defaultSettingsParams)
+    fmCloud.writeJSON(settingsFilePath, defaultSettingsParams)
     return defaultSettingsParams;
   } else {
     // read settings into global variable
@@ -1584,15 +1619,15 @@ function Draftist_getSettingsFromFile(){
  * Draftist_writeActiveSettingsToFile - writes the current active loaded settings to the settings file
  * @returns {Boolean} true if writing was successfull or no settings are loaded right now; false if writing failed
  */
-function Draftist_writeActiveSettingsToFile(){
-  if(!activeSettings){
+function Draftist_writeActiveSettingsToFile() {
+  if (!activeSettings) {
     // active Settings are undefined, nothing to write (but nothing failed either)
     return true;
   }
   // iCloud file manager
   let fmCloud = FileManager.createCloud();
   // write active Settings to file
-  const writeResult = fmCloud.writeJSON(settingsFilePath,activeSettings);
+  const writeResult = fmCloud.writeJSON(settingsFilePath, activeSettings);
   return writeResult;
 }
 
@@ -1612,9 +1647,9 @@ function Draftist_restoreDefaultSettings() {
   // iCloud file manager
   let fmCloud = FileManager.createCloud();
   // write active Settings to file
-  const writeResult = fmCloud.writeJSON(settingsFilePath,defaultSettingsParams);
-  if(!writeResult){
-    Draftist_failAction("restore default settings","failed writing settings");
+  const writeResult = fmCloud.writeJSON(settingsFilePath, defaultSettingsParams);
+  if (!writeResult) {
+    Draftist_failAction("restore default settings", "failed writing settings");
   } else {
     Draftist_infoMessage("", "restored default settings")
   }
@@ -1654,65 +1689,65 @@ function Draftist_Settings() {
  */
 function Draftist_changeConfigurationSettings() {
   let proceedSettingsPrompts = true;
-  if(proceedSettingsPrompts){
+  if (proceedSettingsPrompts) {
     // setting for local storage usage
-  let pStore = new Prompt();
-  pStore.title = "update inteval for todoist data"
-  pStore.message = "the action group stores todoist data locally in a Draft, this includes e.g. project/label names, ids which are necessary to quickly add tasks to projects (or add labels to tasks), the local storage speeds up creating tasks a lot. The data will be updated in the time period of your choice (in hours default: every 24h)";
-  pStore.addSelect("updateInterval", "update interval [h]", ["1", "2", "5", "10", "24", "36", "48"], [activeSettings["dataStoreUpdateInterval"].toString()], false)
-  pStore.addButton("Apply");
-  if (pStore.show()) {
-    // user selected to apply the settings
-    // store the setting in current active settings variable
-    activeSettings["dataStoreUpdateInterval"] = parseInt(pStore.fieldValues["updateInterval"])
-  } else {
-    proceedSettingsPrompts = false;
+    let pStore = new Prompt();
+    pStore.title = "update inteval for todoist data"
+    pStore.message = "the action group stores todoist data locally in a Draft, this includes e.g. project/label names, ids which are necessary to quickly add tasks to projects (or add labels to tasks), the local storage speeds up creating tasks a lot. The data will be updated in the time period of your choice (in hours default: every 24h)";
+    pStore.addSelect("updateInterval", "update interval [h]", ["1", "2", "5", "10", "24", "36", "48"], [activeSettings["dataStoreUpdateInterval"].toString()], false)
+    pStore.addButton("Apply");
+    if (pStore.show()) {
+      // user selected to apply the settings
+      // store the setting in current active settings variable
+      activeSettings["dataStoreUpdateInterval"] = parseInt(pStore.fieldValues["updateInterval"])
+    } else {
+      proceedSettingsPrompts = false;
+    }
   }
-  }
-  if(proceedSettingsPrompts){
-  // settings for crosslinked Task Urls
-  let pTaskLinks = new Prompt();
-  pTaskLinks.title = "task link settings"
-  pTaskLinks.message = "the crosslink task actions can append / prepend links to the created tasks in Todoist to the current draft. App links only work reliably on iOS / iPadOS - If you want to use task links on macOS, too you need to enable web links"
-  pTaskLinks.addSelect("linkTypes", "link types", ["app", "web"], activeSettings["taskLinkTypes"], true)
-  pTaskLinks.addButton("Apply");
-  if (pTaskLinks.show()) {
-    activeSettings["taskLinkTypes"] = pTaskLinks.fieldValues["linkTypes"]
-  } else {
-    proceedSettingsPrompts = false;
-  }
-  }
-
-  if(proceedSettingsPrompts){
-  // settings for import task contents
-  let pImportContents = new Prompt();
-  pImportContents.title = "task import content settings"
-  pImportContents.message = "each imported tasks will contain the information you select in this prompt"
-  pImportContents.addSelect("taskImportContents", "task import contents", ["appLink", "webLink", "projectName", "priority", "labels"], activeSettings["taskImportContents"], true)
-  pImportContents.addButton("Apply");
-  if (pImportContents.show()) {
-    activeSettings["taskImportContents"] = pImportContents.fieldValues["taskImportContents"]
-  } else {
-    proceedSettingsPrompts = false;
-  }
+  if (proceedSettingsPrompts) {
+    // settings for crosslinked Task Urls
+    let pTaskLinks = new Prompt();
+    pTaskLinks.title = "task link settings"
+    pTaskLinks.message = "the crosslink task actions can append / prepend links to the created tasks in Todoist to the current draft. App links only work reliably on iOS / iPadOS - If you want to use task links on macOS, too you need to enable web links"
+    pTaskLinks.addSelect("linkTypes", "link types", ["app", "web"], activeSettings["taskLinkTypes"], true)
+    pTaskLinks.addButton("Apply");
+    if (pTaskLinks.show()) {
+      activeSettings["taskLinkTypes"] = pTaskLinks.fieldValues["linkTypes"]
+    } else {
+      proceedSettingsPrompts = false;
+    }
   }
 
-  if(!Draftist_writeActiveSettingsToFile()){
-    Draftist_failAction("change settings","unexpected failure, please try again and if the issue persists, contact @FlohGro with a description to reproduce the issue.")
+  if (proceedSettingsPrompts) {
+    // settings for import task contents
+    let pImportContents = new Prompt();
+    pImportContents.title = "task import content settings"
+    pImportContents.message = "each imported tasks will contain the information you select in this prompt"
+    pImportContents.addSelect("taskImportContents", "task import contents", ["appLink", "webLink", "projectName", "priority", "labels"], activeSettings["taskImportContents"], true)
+    pImportContents.addButton("Apply");
+    if (pImportContents.show()) {
+      activeSettings["taskImportContents"] = pImportContents.fieldValues["taskImportContents"]
+    } else {
+      proceedSettingsPrompts = false;
+    }
+  }
+
+  if (!Draftist_writeActiveSettingsToFile()) {
+    Draftist_failAction("change settings", "unexpected failure, please try again and if the issue persists, contact @FlohGro with a description to reproduce the issue.")
   } else {
-    Draftist_infoMessage("","settings updated")
+    Draftist_infoMessage("", "settings updated")
   }
 }
 
 
-function Draftist_getDataStoreFromFile(){
+function Draftist_getDataStoreFromFile() {
   // iCloud file manager
   let fmCloud = FileManager.createCloud();
   const readResult = fmCloud.readJSON(dataStoreFilePath);
-  if(!readResult){
+  if (!readResult) {
     // file is not existing, write initial Data
-    if(!Draftist_updateStoredTodoistData()){
-      Draftist_failAction("get data store","unexpected failure, please try again and if the issue persists, contact @FlohGro with a description to reproduce the issue.")
+    if (!Draftist_updateStoredTodoistData()) {
+      Draftist_failAction("get data store", "unexpected failure, please try again and if the issue persists, contact @FlohGro with a description to reproduce the issue.")
     }
   } else {
     // return the read object
@@ -1720,15 +1755,15 @@ function Draftist_getDataStoreFromFile(){
   }
 }
 
-function Draftist_writeDataStoreToFile(dataToStore){
-  if(!dataToStore){
+function Draftist_writeDataStoreToFile(dataToStore) {
+  if (!dataToStore) {
     // lastUpdated, nothing to write (but nothing failed either)
     return true;
   }
   // iCloud file manager
   let fmCloud = FileManager.createCloud();
   // write data to file
-  const writeResult = fmCloud.writeJSON(dataStoreFilePath,dataToStore);
+  const writeResult = fmCloud.writeJSON(dataStoreFilePath, dataToStore);
   return writeResult;
 }
 
@@ -1775,8 +1810,8 @@ function Draftist_updateStoredTodoistData(todoist = new Todoist()) {
     "sections": sections,
     "labels": labels
   }
-  if(!Draftist_writeDataStoreToFile(todoistDataToStore)){
-    Draftist_failAction("get data store","unexpected failure, please try again and if the issue persists, contact @FlohGro with a description to reproduce the issue.")
+  if (!Draftist_writeDataStoreToFile(todoistDataToStore)) {
+    Draftist_failAction("get data store", "unexpected failure, please try again and if the issue persists, contact @FlohGro with a description to reproduce the issue.")
   }
   Draftist_infoMessage("", "updated local Todoist data");
 }
