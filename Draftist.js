@@ -1265,7 +1265,7 @@ function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString){
   let labelNamesToRemove = []
   let pLabelsToRemove = new Prompt()
   pLabelsToRemove.title = "select labels to remove";
-  pLabelsToRemove.message = "all selected labels will be removed from the selected tasks. If you don't want to remove labels, just select no label and press \"select\""
+  pLabelsToRemove.message = "all selected labels will be removed from the tasks (if they have the tags assigned). If you don't want to remove labels, just select no label and press \"select\""
   pLabelsToRemove.addSelect("labelsToRemove","",Array.from(labelsNameToIdMap.keys()),[],true)
   pLabelsToRemove.addButton("select")
   if(pLabelsToRemove.show()){
