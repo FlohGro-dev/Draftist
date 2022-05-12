@@ -1248,8 +1248,34 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
 
 }
 
-function Draftist_selectTasksFromTaskObjects(taskObjects, allowSelectMultiple, promptMessage){
+/**
+ * Draftist_updateTask updates the provided task with the provided options
+ * 
+ * @param {Todoist_Object} todoist_obj? - if already created, otherwise the function will create its own.
+ * @param {Todoist_Task} taskToUpdate - the task that should be updated
+ * @param {String[]} labelNamesToRemove? - the valid label names which should be removed from the provided task
+ * @param {String[]} labelNamesToAdd? - the valid label names which should be added to the provided task
+ * @returns {Boolean} true when updated successfully, false when updating failed or any parameter was not valid (e.g. label name is not existing)
+ */
+ function Draftist_updateLabelsOfTask({todoist = new Todoist(),taskToUpdate,labelNamesToRemove,labelNamesToAdd}){
+  return Draftist_updateTask({todoist:todoist,taskToUpdate:taskToUpdate,labelNamesToRemove:labelNamesToRemove,labelNamesToAdd:labelNamesToAdd})
+}
+
+
+/**
+ * Draftist_selectTasksFromTaskObjects - displays a prompt to let the user select one or multiple tasks and returns the selected ones
+ * 
+ * @param {Todoist Task []} taskObjects - array of todoist task objects
+ * @param {Boolean} allowSelectMultiple - parameter to define if selecting multiple tasks shall be allowed (true) or not (false)
+ * @param {String} promptMessage? - a descriptive message which should be displayed inside the prompt
+ * @returns {Todoist Task []} - Array of selected Todoist Task (might be empty)
+ */
+function Draftist_selectTasksFromTaskObjects(taskObjects, allowSelectMultiple, promptMessage = ""){
   let selectedTasks = [];
+  if(taskObjects.length == 0){
+    // return empty array immediately
+    return [];
+  }
   let pTasks = new Prompt();
   pTasks.title = "select tasks";
   if(promptMessage != ""){
@@ -1270,14 +1296,110 @@ function Draftist_selectTasksFromTaskObjects(taskObjects, allowSelectMultiple, p
   return selectedTasks;
 }
 
-function Draftist_updateLabelsOfTask({todoist = new Todoist(),taskToUpdate,labelNamesToRemove,labelNamesToAdd}){
-  return Draftist_updateTask({todoist:todoist,taskToUpdate:taskToUpdate,labelNamesToRemove:labelNamesToRemove,labelNamesToAdd:labelNamesToAdd})
+/**
+ * Draftist_helperGetAnyPresentLabelNamesInTasks - gets the names of labels present in at least one of the provided tasks
+ * @param {Todoist Task []} taskObjects - array of todoist tasks
+ * @returns {String[]} Array of present label names in at least one of the provided tasks
+ */
+function Draftist_helperGetAnyPresentLabelNamesInTasks(taskObjects){
+  // prevent empty taskObjects and return empty array in that case
+  if(taskObjects.length == 0){
+    return [];
+  }
+  // use a Set to prevent duplicates
+  let labelNames = new Set();
+
+  // load stored data if not laoded already
+  if(labelsIdToNameMap.size == 0){
+    Draftist_getStoredTodoistData();
+  }
+
+  for(task of taskObjects){
+    // add each label id to the set
+    for(lId of task.label_ids){
+      labelNames.add(labelsIdToNameMap.get(lId))
+    }
+  }
+  // convert to array to return it
+  return Array.from(labelNames.values())
 }
 
+/**
+ * Draftist_helperGetCommonPresentLabelNamesInTasks - gets the names of labels present in all of the provided tasks
+ * @param {Todoist Task []} taskObjects - array of todoist tasks
+ * @returns {String[]} Array of present label names present in all of the provided tasks
+ */
+function Draftist_helperGetCommonPresentLabelNamesInTasks(taskObjects){
+  // prevent empty taskObjects and return empty array in that case
+  if(taskObjects.length == 0){
+    return [];
+  }
+
+  // load stored data if not laoded already
+  if(labelsIdToNameMap.size == 0){
+    Draftist_getStoredTodoistData();
+  }
+
+  // logic: 
+  // 1) start with the first task and store its label ids
+  // 2) if no labelids are present, immideately return an empty array
+  // 3) repeat with each task: check if all current stored labelsids are present in it
+  //   3.1) if yes, continue
+  //   3.2) if not, remove the labelids not present from the store and continue
+  // 4) get the names from all remaining labelids and return as an array
+
+  let presentLabelIds = taskObjects[0].label_ids;
+
+  if(presentLabelIds.length == 0){
+    return [];
+  }
+
+  for(task of taskObjects){
+    presentLabelIds = presentLabelIds.filter(x => task.label_ids.includes(x))
+  }
+  
+
+  return presentLabelIds.map((x) => labelsIdToNameMap.get(x))
+}
+
+/**
+ * Draftist_helperGetLabelNamesNotPresentInAllTasks - gets the names of labels not present in all of the provided tasks
+ * @param {Todoist Task []} taskObjects - array of todoist tasks
+ * @returns {String[]} Array of present label names not present in all of the provided tasks
+ */
+function Draftist_helperGetLabelNamesNotPresentInAllTasks(taskObjects){
+  // get all labelNames
+  // load stored data if not laoded already
+  if(labelsNameToIdMap.size == 0){
+    Draftist_getStoredTodoistData();
+  }
+  let labelNames = Array.from(labelsNameToIdMap.keys());
+  let commonLabels = Draftist_helperGetCommonPresentLabelNamesInTasks(taskObjects)
+  
+  return labelNames.filter(x => !commonLabels.includes(x))
+}
+
+
+/**
+ * Draftist_updateLabelsOfSelectedTasksFromFilter - updates the label(s) of the selected tasks returned for the provided filter
+ * @param {String} filterString - a valid todoist filter string
+ * @returns 
+ */
 function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString){
   let tasksFromFilter = Draftist_getTodoistTasksFromFilter(filterString)
+  // early retrun if no task was retrieved
+  if(!tasksFromFilter){
+    return
+  }
+  // let the user select the tasks
   let selectedTasks = Draftist_selectTasksFromTaskObjects(tasksFromFilter,true,"from filter \"" + filterString + "\"");
-  
+  let availableLableNames = Draftist_helperGetAnyPresentLabelNamesInTasks(selectedTasks);
+  let potentialLabelNamesToAdd = Draftist_helperGetLabelNamesNotPresentInAllTasks(selectedTasks);
+
+  let dbg = "availableLableNames: " + availableLableNames + "\n"
+  dbg = dbg + "potentialLabelNamesToAdd: " + potentialLabelNamesToAdd + "\n"
+  alert(dbg)
+
   if(selectedTasks.length == 0){
     return
   }
@@ -1285,31 +1407,29 @@ function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString){
   if(labelsNameToIdMap.size == 0){
     Draftist_getStoredTodoistData();
   }
-
-  let dbgstr = ""
-  for(task of selectedTasks){
-    dbgstr = dbgstr + task.content + "\n"
-  }
-  alert(dbgstr)
   
+  // declare before if condition
   let labelNamesToRemove = []
-  let pLabelsToRemove = new Prompt()
-  pLabelsToRemove.title = "select labels to remove";
-  pLabelsToRemove.message = "all selected labels will be removed from the tasks (if they have the tags assigned). If you don't want to remove labels, just select no label and press \"select\""
-  pLabelsToRemove.addSelect("labelsToRemove","",Array.from(labelsNameToIdMap.keys()),[],true)
-  pLabelsToRemove.addButton("select")
-  if(pLabelsToRemove.show()){
-    labelNamesToRemove = pLabelsToRemove.fieldValues["labelsToRemove"]
-  } else {
-    Draftist_cancelAction("update labels","user cancelled")
-    return
+  // only present remove menu if any label is present
+  if(availableLableNames.length > 0){
+    let pLabelsToRemove = new Prompt()
+    pLabelsToRemove.title = "select labels to remove";
+    pLabelsToRemove.message = "all selected labels will be removed from the tasks (if they have the tags assigned). If you don't want to remove labels, just select no label and press \"select\""
+    pLabelsToRemove.addSelect("labelsToRemove","",availableLableNames,[],true)
+    pLabelsToRemove.addButton("select")
+    if(pLabelsToRemove.show()){
+      labelNamesToRemove = pLabelsToRemove.fieldValues["labelsToRemove"]
+    } else {
+      Draftist_cancelAction("update labels","user cancelled")
+      return
+    }
   }
 
   let labelNamesToAdd = []
   let pLabelsToAdd = new Prompt()
   pLabelsToAdd.title = "select labels to add";
   pLabelsToAdd.message = "all selected labels will be added to the selected tasks. If you don't want to add labels, just select no label and press \"select\""
-  pLabelsToAdd.addSelect("labelsToAdd","",Array.from(labelsNameToIdMap.keys()),[],true)
+  pLabelsToAdd.addSelect("labelsToAdd","",potentialLabelNamesToAdd,[],true)
   pLabelsToAdd.addButton("select")
   if(pLabelsToAdd.show()){
     labelNamesToAdd = pLabelsToAdd.fieldValues["labelsToAdd"]
