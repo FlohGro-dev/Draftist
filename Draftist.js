@@ -88,7 +88,7 @@ function Draftist_quickAdd({
 /**
  * Draftist_createTask - creates a Task with the given parameters
  *
- * @param {Todoist_Object|undefined} todoist_obj - if already created, otherwise the function will create its own.
+ * @param {Todoist_Object} todoist_obj? - if already created, otherwise the function will create its own.
  * @param  {String} content: Task content. This value may contain markdown-formatted text and hyperlinks. Details on markdown support can be found in the Text Formatting article in the Todoist Help Center.
  * @param  {String} description?: A description for the task. This value may contain markdown-formatted text and hyperlinks. Details on markdown support can be found in the Text Formatting article in the Todoist Help Center.
  * @param  {Integer} project_id?: Task project ID. If not set, task is put to user's Inbox.
@@ -1130,7 +1130,23 @@ function Draftist_importTasksFromFilterInPrompt() {
 // MODIFY TASKS
 // #############################################################################
 
+/**
+ * Draftist_updateTask updates the provided task with the provided options
+ * 
+ * @param {Todoist_Object} todoist_obj? - if already created, otherwise the function will create its own.
+ * @param {Todoist_Task} taskToUpdate - the task that should be updated
+ * @param {String[]} labelNamesToRemove? - the valid label names which should be removed from the provided task
+ * @param {String[]} labelNamesToAdd? - the valid label names which should be added to the provided task
+ * @param {String} newDueDate? - the new due date provided as String in the format YYYY-MM-DD (https://developer.todoist.com/rest/v1/#update-a-task) - must not be presend when `newDueDateTime` is used
+ * @param {String} newDueDateTime? - the new specific due date and time provided as String in RFC3339 format in UTC (https://developer.todoist.com/rest/v1/#update-a-task) - must not be presend when `newDueDate` is used
+ * @param {String} newProjectName? - the new valid project name for the provided task
+ * @returns {Boolean} true when updated successfully, false when updating failed or parameters where not valid
+ */
 function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToRemove = [],labelNamesToAdd = [],newDueDate = undefined, newDueDateTime = undefined, newProjectName = undefined}){
+  if(!taskToUpdate){
+    Draftist_failAction("update task", "no task to update was provided")
+    return false
+  }
   const taskId = taskToUpdate.id;
 
   // update labels
@@ -1147,11 +1163,21 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
   let labelIdsToAdd = [];
 
   for(labelName of labelNamesToRemove){
-    labelIdsToRemove.push(labelsNameToIdMap.get(labelName));
+    const curLabelId = labelsNameToIdMap.get(labelName);
+    if(!curLabelId){
+      Draftist_failAction("update task", "provided label name \"" + labelName + "\" is not existing.");
+      return false
+    }
+    labelIdsToRemove.push(curLabelId);
   }
 
   for(labelName of labelNamesToAdd){
-    labelIdsToAdd.push(labelsNameToIdMap.get(labelName));
+    const curLabelId = labelsNameToIdMap.get(labelName);
+    if(!curLabelId){
+      Draftist_failAction("update task", "provided label name \"" + labelName + "\" is not existing.");
+      return false
+    }
+    labelIdsToAdd.push(curLabelId);
   }
 
   let updatedLabelIds = labelIdsToAdd;
@@ -1186,6 +1212,10 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
   let projectId = taskToUpdate.project_id;
   if(newProjectName){
     projectId = projectsNameToIdMap.get(newProjectName);
+    if(!projectId){
+      Draftist_failAction("update task", "provided project name \"" + newProjectName + "\" is not existing.");
+      return false
+    }
   }
 
   // create task options
@@ -1288,7 +1318,7 @@ function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString){
     return
   }
 
-  // create todoist oobject to use
+  // create todoist object to use
   let todoistObj = new Todoist()
   let updatedTasksCount = 0;
   // iterate through all selected tasks and update them
