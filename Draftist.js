@@ -1140,7 +1140,7 @@ function Draftist_importTasksFromFilterInPrompt() {
  * @param {String} newDueDate? - the new due date provided as String in the format YYYY-MM-DD (https://developer.todoist.com/rest/v1/#update-a-task) - must not be presend when `newDueDateTime` is used
  * @param {String} newDueDateTime? - the new specific due date and time provided as String in RFC3339 format in UTC (https://developer.todoist.com/rest/v1/#update-a-task) - must not be presend when `newDueDate` is used
  * @param {String} newProjectName? - the new valid project name for the provided task
- * @returns {Boolean} true when updated successfully, false when updating failed or parameters where not valid
+ * @returns {Boolean} true when updated successfully, false when updating failed or any parameter was not valid (e.g. label name is not existing)
  */
 function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToRemove = [],labelNamesToAdd = [],newDueDate = undefined, newDueDateTime = undefined, newProjectName = undefined}){
   if(!taskToUpdate){
