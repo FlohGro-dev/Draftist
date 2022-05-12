@@ -1531,18 +1531,6 @@ function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString){
 // #############################################################################
 
 /**
- * settingParamTypes: this defines the types of the settings parameters in text format
- */
-const settingsParamTypes = {
-  "settingsDraftTags": "textArray",
-  "dataStoreDraftTags": "textArray",
-  "dataStoreUpdateInterval": "number",
-  "taskLinkTypes": "textArray",
-  "taskImportContents": "textArray"
-}
-
-
-/**
  * defaultSettingsParams: these are the default settings for the Action Group
  */
 const defaultSettingsParams = {
@@ -1578,6 +1566,7 @@ let projectsNameToIdMap = new Map();
 let projectsIdToNameMap = new Map();
 let labelsNameToIdMap = new Map();
 let labelsIdToNameMap = new Map();
+const settingsFilePath = "/Library/Scripts/DraftistSettings.json"
 
 
 /**
@@ -1587,7 +1576,6 @@ let labelsIdToNameMap = new Map();
  */
 function Draftist_findOrCreateSettingsDraft() {
   const draftName = settingsDraftName;
-  let notificationMessage = ""
   let resultDrafts = [];
   let dResults = Draft.queryByTitle(draftName);
   if (dResults.length > 0) {
@@ -1610,6 +1598,31 @@ function Draftist_findOrCreateSettingsDraft() {
     Draftist_readConfigurationSettingsFromDraft(resultDrafts[0]);
     return resultDrafts[0]
   }
+}
+
+function Draftist_readSettingsFromFile(){
+  // iCloud file manager
+  let fmCloud = FileManager.createCloud();
+  const readResult = fmCloud.readJSON(settingsFilePath);
+  if(!readResult){
+    // file is not existing, write initial Data
+    fmCloud.writeJSON(settingsFilePath,defaultSettingsParams)
+  } else {
+    // read settings into global variable
+    activeSettings = readResult;
+  }
+}
+
+function Draftist_writeSettingsToFile(){
+  if(!activeSettings){
+    // active Settings are undefined, nothing to write (but nothing failed either)
+    return true;
+  }
+  // iCloud file manager
+  let fmCloud = FileManager.createCloud();
+  // write active Settings to file
+  const writeResult = fmCloud.writeJSON(settingsFilePath,activeSettings);
+  return writeResult;
 }
 
 
