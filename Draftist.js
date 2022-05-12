@@ -1139,7 +1139,7 @@ function Draftist_importTasksFromFilterInPrompt() {
  * @param {String[]} labelNamesToAdd? - the valid label names which should be added to the provided task
  * @param {String} newDueDate? - the new due date provided as String in the format YYYY-MM-DD (https://developer.todoist.com/rest/v1/#update-a-task) - must not be presend when `newDueDateTime` is used
  * @param {String} newDueDateTime? - the new specific due date and time provided as String in RFC3339 format in UTC (https://developer.todoist.com/rest/v1/#update-a-task) - must not be presend when `newDueDate` is used
- * @param {String} newProjectName? - the new valid project name for the provided task
+ * @param {String} newProjectName? - ATTENTION: currently 05/2022 not supported by the todoist API, providing this parameter will fail the action - the new valid project name for the provided task
  * @returns {Boolean} true when updated successfully, false when updating failed or any parameter was not valid (e.g. label name is not existing)
  */
 function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToRemove = [],labelNamesToAdd = [],newDueDate = undefined, newDueDateTime = undefined, newProjectName = undefined}){
@@ -1208,9 +1208,15 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
     // new due date time was provided
     dueDateTime = newDueDateTime
   }
-
+  
+  // attention the project ID was implemented based on the task property. 
+  // turned out that project_id is not a parameter for the update task request: https://developer.todoist.com/rest/v1/#update-a-task
+  // support request was sent on 2022-05-12 but until implementation this is a point of failure and will fail the function for now.
   let projectId = taskToUpdate.project_id;
   if(newProjectName){
+    // fail the action until project id is supported by Todoist:
+    Draftist_failAction("update task", "new project name was provided but is currently not supported by Todoist")
+    return false;
     projectId = projectsNameToIdMap.get(newProjectName);
     if(!projectId){
       Draftist_failAction("update task", "provided project name \"" + newProjectName + "\" is not existing.");
@@ -1249,7 +1255,7 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
 }
 
 /**
- * Draftist_updateTask updates the provided task with the provided options
+ * Draftist_updateLabelsOfTask updates the labels of the provided task with the provided options
  * 
  * @param {Todoist_Object} todoist_obj? - if already created, otherwise the function will create its own.
  * @param {Todoist_Task} taskToUpdate - the task that should be updated
@@ -1259,6 +1265,18 @@ function Draftist_updateTask({todoist = new Todoist(),taskToUpdate,labelNamesToR
  */
  function Draftist_updateLabelsOfTask({todoist = new Todoist(),taskToUpdate,labelNamesToRemove,labelNamesToAdd}){
   return Draftist_updateTask({todoist:todoist,taskToUpdate:taskToUpdate,labelNamesToRemove:labelNamesToRemove,labelNamesToAdd:labelNamesToAdd})
+}
+
+/**
+ * Draftist_updateProjectOfTask updates the labels of the provided task with the provided options
+ * 
+ * @param {Todoist_Object} todoist_obj? - if already created, otherwise the function will create its own.
+ * @param {Todoist_Task} taskToUpdate - the task that should be updated
+ * @param {String} newProjectName - the valid new project name for the task
+ * @returns {Boolean} true when updated successfully, false when updating failed or any parameter was not valid (e.g. project name is not existing)
+ */
+ function Draftist_updateProjectOfTask({todoist = new Todoist(),taskToUpdate,newProjectName}){
+  return Draftist_updateTask({todoist:todoist,taskToUpdate:taskToUpdate,newProjectName:newProjectName})
 }
 
 
@@ -1383,25 +1401,21 @@ function Draftist_helperGetLabelNamesNotPresentInAllTasks(taskObjects){
 /**
  * Draftist_updateLabelsOfSelectedTasksFromFilter - updates the label(s) of the selected tasks returned for the provided filter
  * @param {String} filterString - a valid todoist filter string
- * @returns 
+ * @returns true if updated successfully, false if update failed or user cancelled
  */
 function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString){
   let tasksFromFilter = Draftist_getTodoistTasksFromFilter(filterString)
   // early retrun if no task was retrieved
   if(!tasksFromFilter){
-    return
+    return false;
   }
   // let the user select the tasks
   let selectedTasks = Draftist_selectTasksFromTaskObjects(tasksFromFilter,true,"from filter \"" + filterString + "\"");
   let availableLableNames = Draftist_helperGetAnyPresentLabelNamesInTasks(selectedTasks);
   let potentialLabelNamesToAdd = Draftist_helperGetLabelNamesNotPresentInAllTasks(selectedTasks);
 
-  let dbg = "availableLableNames: " + availableLableNames + "\n"
-  dbg = dbg + "potentialLabelNamesToAdd: " + potentialLabelNamesToAdd + "\n"
-  alert(dbg)
-
   if(selectedTasks.length == 0){
-    return
+    return false;
   }
   // load stored data if not laoded already
   if(labelsNameToIdMap.size == 0){
@@ -1421,7 +1435,7 @@ function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString){
       labelNamesToRemove = pLabelsToRemove.fieldValues["labelsToRemove"]
     } else {
       Draftist_cancelAction("update labels","user cancelled")
-      return
+      return false;
     }
   }
 
@@ -1435,7 +1449,7 @@ function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString){
     labelNamesToAdd = pLabelsToAdd.fieldValues["labelsToAdd"]
   } else {
     Draftist_cancelAction("update labels","user cancelled")
-    return
+    return false;
   }
 
   // create todoist object to use
@@ -1445,22 +1459,70 @@ function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString){
   for(task of selectedTasks){
     if(!Draftist_updateLabelsOfTask({todoist:todoistObj, taskToUpdate:task, labelNamesToRemove:labelNamesToRemove, labelNamesToAdd:labelNamesToAdd})){
       // failed updating failure is already presented, just exit the function here
-      return
+      return false;
     } else {
       updatedTasksCount = updatedTasksCount + 1;
     }
   }
   
   Draftist_succeedAction("update labels",false,"updated labels of " + updatedTasksCount + " tasks")
+  return true;
 
 }
 
 
+/**
+ * Draftist_updateProjectOfSelectedTasksFromFilter - ATTENTION: this is currently not supported by Todoists API - updates the project of the selected tasks returned for the provided filter
+ * @param {String} filterString - a valid todoist filter string
+ * @returns true if updated successfully, false if update failed or user cancelled
+ */
+ function Draftist_updateProjectOfSelectedTasksFromFilter(filterString){
+   // fail the action until project id is supported by Todoist:
+   Draftist_failAction("update project of tasks", "this is currently not supported by Todoist")
+   return false;
+  let tasksFromFilter = Draftist_getTodoistTasksFromFilter(filterString)
+  // early retrun if no task was retrieved
+  if(!tasksFromFilter){
+    return false;
+  }
+  // let the user select the tasks
+  let selectedTasks = Draftist_selectTasksFromTaskObjects(tasksFromFilter,true,"from filter \"" + filterString + "\"");
+  if(selectedTasks.length == 0){
+    return false;
+  }
 
+  // load stored data if not laoded already
+  if(projectsNameToIdMap.size == 0){
+    Draftist_getStoredTodoistData();
+  }
+  let pProject = new Prompt();
+  pProject.title = "select new project"
+  // add a button to the prompt for each available project name
+  Array.from(projectsNameToIdMap.keys()).map((x) => pProject.addButton(x));
+  
+  if(!pProject.show()){
+    // user did not select a project
+  }
 
-function Draftist_updateTaskTester(){
-  Draftist_updateLabelsOfSelectedTasksFromFilter("@testlabel")
-}
+  const selectedProject = pProject.buttonPressed;
+
+  // create todoist object to use
+  let todoistObj = new Todoist()
+  let updatedTasksCount = 0;
+  // iterate through all selected tasks and update them
+  for(task of selectedTasks){
+    if(!Draftist_updateProjectOfTask({todoistObj,taskToUpdate:task,newProjectName:selectedProject})){
+      // failed updating failure is already presented, just exit the function here
+      return false;
+    } else {
+      updatedTasksCount = updatedTasksCount + 1;
+    }
+  }
+  
+  Draftist_succeedAction("update project",false,"updated project of " + updatedTasksCount + " tasks")
+  return true;
+ }
+
 
 
 

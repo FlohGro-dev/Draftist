@@ -42,6 +42,9 @@
     - [import tasks with any selected label(s)](#import-tasks-with-any-selected-labels)
     - [import tasks from filter](#import-tasks-from-filter)
     - [import tasks from filter in prompt](#import-tasks-from-filter-in-prompt)
+  - [Modify Tasks](#modify-tasks)
+    - [update labels of selected tasks from filter](#update-labels-of-selected-tasks-from-filter)
+    - [update project of selected tasks from filter](#update-project-of-selected-tasks-from-filter)
 
 <!-- /TOC -->
 
@@ -253,4 +256,19 @@ If you want to make you're own Action based on Draftist functions simply include
 
 > This Action imports tasks for the filter query provided into the text field of the presented prompt. The meta information included for each task can be configured with the `Draftist Settings` Action.
 >  
+> After Success Setting: Nothing
+
+## Modify Tasks
+
+### update labels of selected tasks from filter
+
+> This Action updates the labels of the selected tasks for the configured filter. To configure the used filter , edit the "Define Template Tag" step and change the Template from "UNCONFIGURED" to the filter query you want to use (best you test the filter in todoist and then copy it into the template step). This is e.g. useful if you use labels like "@LATER" and "@NEXT" to define the next steps in projects.
+> The Action presents several prompts. in the first one you'll see the returned tasks for the filter and can select the ones you want to update. The next prompt will als you for the labels you want to remove (if no selected task has any label, this prompt will not be presented). The last prompt lets you choose the labels you want to add to all selected tasks. If you only want to remove/add labels, just don't select any label in the corresponding prompt.
+>  
+> After Success Setting: Nothing
+
+### update project of selected tasks from filter
+
+> This Action ...
+>
 > After Success Setting: Nothing
