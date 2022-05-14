@@ -44,7 +44,7 @@
     - [import tasks from filter in prompt](#import-tasks-from-filter-in-prompt)
   - [Modify Tasks](#modify-tasks)
     - [update labels of selected tasks from filter](#update-labels-of-selected-tasks-from-filter)
-    - [update project of selected tasks from filter](#update-project-of-selected-tasks-from-filter)
+    - [duplicate selected tasks with other label](#duplicate-selected-tasks-with-other-label)
 
 <!-- /TOC -->
 
@@ -263,12 +263,14 @@ If you want to make you're own Action based on Draftist functions simply include
 ### update labels of selected tasks from filter
 
 > This Action updates the labels of the selected tasks for the configured filter. To configure the used filter , edit the "Define Template Tag" step and change the Template from "UNCONFIGURED" to the filter query you want to use (best you test the filter in todoist and then copy it into the template step). This is e.g. useful if you use labels like "@LATER" and "@NEXT" to define the next steps in projects.
-> The Action presents several prompts. in the first one you'll see the returned tasks for the filter and can select the ones you want to update. The next prompt will als you for the labels you want to remove (if no selected task has any label, this prompt will not be presented). The last prompt lets you choose the labels you want to add to all selected tasks. If you only want to remove/add labels, just don't select any label in the corresponding prompt.
+> The Action presents several prompts. In the first one you'll see the returned tasks for the filter and can select the ones you want to update. The next prompt will als you for the labels you want to remove (if no selected task has any label, this prompt will not be presented). The last prompt lets you choose the labels you want to add to all selected tasks. If you only want to remove/add labels, just don't select any label in the corresponding prompt.
 >  
 > After Success Setting: Nothing
 
-### update project of selected tasks from filter
+### duplicate selected tasks with other label
 
-> This Action ...
+> This Action duplicates the selected tasks and changes a configurable source label to a destination label. This means that if you e.g. have a label "@waiting4" and you want follow up one or more of them, you can use this Action to e.g. create duplicates of the tasks you select with the destination label "@followUp" (the duplicates will not contain the ”@waiting4" label anymore).
+> To configure the labels used by this Action you need to edit the two "Define Template Tag" steps and change the Template from "UNCONFIGURED" to the name of the source / destination label you want to use.
+> The Action presents a prompt showing the tasks which contain the configured source label. You can check all the tasks you want to duplicate with the destination label.
 >
 > After Success Setting: Nothing

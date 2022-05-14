@@ -557,8 +557,8 @@ function Draftist_helperCreateMdLinkToCurrentDraft() {
 /**
  * Draftist_helperCreateOpenTaskUrlFromTaskObject - creates the weblink to the given task object
  *
- * @param  {Task} taskObject Todoist Task Object in JSON format
- * @return {String}          web link to the Todoist task
+ * @param  {Todoist_Task} taskObject Todoist Task Object in JSON format
+ * @return {String}          web / mobile link(s) to the Todoist Task depending on the stored settings
  */
 function Draftist_helperCreateOpenTaskUrlFromTaskObject(taskObject) {
   // load settings
@@ -1309,10 +1309,10 @@ function Draftist_updateProjectOfTask({
 /**
  * Draftist_selectTasksFromTaskObjects - displays a prompt to let the user select one or multiple tasks and returns the selected ones
  * 
- * @param {Todoist Task []} taskObjects - array of todoist task objects
+ * @param {Todoist_Task[]} taskObjects - array of todoist task objects
  * @param {Boolean} allowSelectMultiple - parameter to define if selecting multiple tasks shall be allowed (true) or not (false)
  * @param {String} promptMessage? - a descriptive message which should be displayed inside the prompt
- * @returns {Todoist Task []} - Array of selected Todoist Task (might be empty)
+ * @returns {Todoist_Task[]} - Array of selected Todoist Task (might be empty)
  */
 function Draftist_selectTasksFromTaskObjects(taskObjects, allowSelectMultiple, promptMessage = "") {
   let selectedTasks = [];
@@ -1342,7 +1342,7 @@ function Draftist_selectTasksFromTaskObjects(taskObjects, allowSelectMultiple, p
 
 /**
  * Draftist_helperGetAnyPresentLabelNamesInTasks - gets the names of labels present in at least one of the provided tasks
- * @param {Todoist Task []} taskObjects - array of todoist tasks
+ * @param {Todoist_Task[]} taskObjects - array of todoist tasks
  * @returns {String[]} Array of present label names in at least one of the provided tasks
  */
 function Draftist_helperGetAnyPresentLabelNamesInTasks(taskObjects) {
@@ -1370,7 +1370,7 @@ function Draftist_helperGetAnyPresentLabelNamesInTasks(taskObjects) {
 
 /**
  * Draftist_helperGetCommonPresentLabelNamesInTasks - gets the names of labels present in all of the provided tasks
- * @param {Todoist Task []} taskObjects - array of todoist tasks
+ * @param {Todoist_Task[]} taskObjects - array of todoist tasks
  * @returns {String[]} Array of present label names present in all of the provided tasks
  */
 function Draftist_helperGetCommonPresentLabelNamesInTasks(taskObjects) {
@@ -1408,7 +1408,7 @@ function Draftist_helperGetCommonPresentLabelNamesInTasks(taskObjects) {
 
 /**
  * Draftist_helperGetLabelNamesNotPresentInAllTasks - gets the names of labels not present in all of the provided tasks
- * @param {Todoist Task []} taskObjects - array of todoist tasks
+ * @param {Todoist_Task[]} taskObjects - array of todoist tasks
  * @returns {String[]} Array of present label names not present in all of the provided tasks
  */
 function Draftist_helperGetLabelNamesNotPresentInAllTasks(taskObjects) {
@@ -1555,6 +1555,65 @@ function Draftist_updateProjectOfSelectedTasksFromFilter(filterString) {
   }
 
   Draftist_succeedAction("update project", false, "updated project of " + updatedTasksCount + " tasks")
+  return true;
+}
+
+function Draftist_duplicateSelectedTasksFromLabelWithOtherLabel({
+  todoistObj = new Todoist(),
+  sourceLabelName,
+  destinationLabelName
+}) {
+  // remove "@" sign from labelNames if they are present.
+  sourceLabelName = sourceLabelName.replace(/@(.*)/gm, `$1`);
+  destinationLabelName = destinationLabelName.replace(/@(.*)/gm, `$1`);
+
+  // load stored data if not laoded already
+  if (labelsNameToIdMap.size == 0) {
+    Draftist_getStoredTodoistData();
+  }
+  //get label Ids for source and destination label
+  const sourceLabelId = labelsNameToIdMap.get(sourceLabelName);
+  const destinationLabelId = labelsNameToIdMap.get(destinationLabelName);
+  if (!sourceLabelId) {
+    // source label id is not existing
+    Draftist_failAction("duplicate task with different label", "source label \"" + sourceLabelName + "\" not found");
+    return false;
+  }
+  if (!destinationLabelId) {
+    // destination label id is not existing
+    Draftist_failAction("duplicate task with different label", "destination label \"" + destinationLabelName + "\" not found");
+    return false;
+  }
+
+  // retrieve all tasks with the given source label name and let the user select the tasks to duplicate
+  const sourceTasks = Draftist_getTodoistTasksFromFilter("@" + sourceLabelName);
+  const selectedTasks = Draftist_selectTasksFromTaskObjects(sourceTasks, true, "duplicate tasks from @" + sourceLabelName + " to @" + destinationLabelName);
+  if (selectedTasks.length == 0) {
+    Draftist_cancelAction("", "user cancelled / did not select any task")
+    return true;
+  }
+  let createdTasksCount = 0;
+  for (task of selectedTasks) {
+    // create a new task object, remove the source label and add the destination label
+    let curNewTask = task;
+    let labelIds = new Set(task.label_ids);
+    if (!labelIds.has(destinationLabelId)) {
+      labelIds.add(destinationLabelId)
+    }
+    labelIds.delete(sourceLabelId)
+    curNewTask.label_ids = Array.from(labelIds.values());
+    // delete section id if it is zero (Todoist will otherwise report an error)
+    if (curNewTask.section_id == 0) {
+      delete curNewTask["section_id"];
+    }
+    if (!todoistObj.createTask(curNewTask)) {
+      let lastError = Draftist_getLastTodoistError(todoistObj);
+      Draftist_failAction("duplicate task with different label", "Todoist returned error:\n" + lastError)
+      return false;
+    }
+    createdTasksCount = createdTasksCount + 1;
+  }
+  Draftist_succeedAction("duplicate task with different label", false, "created " + createdTasksCount + " tasks")
   return true;
 }
 
