@@ -2138,6 +2138,7 @@ function Draftist_getStoredTodoistData() {
  * @return {undefined}  always returns undefined
  */
 function Draftist_helperDraftistActionReplicator() {
+  const replicatorOmitList = ["Draftist Instructions", "Draftist Setup/Update", "Draftist", "Draftist Settings", "Draftist Action Replicator", "update local Todoist data"];
   const actionGroup = ActionGroup.find("Draftist");
   if (!actionGroup) {
     // ActionGroup not found
@@ -2150,7 +2151,9 @@ function Draftist_helperDraftistActionReplicator() {
     if (action.isSeparator) {
       // nothing to be done
     } else {
-      pAction.addButton(action.name, action)
+      if(replicatorOmitList.indexOf(action.name) == -1){
+        pAction.addButton(action.name, action)
+      }
     }
   }
   if (!pAction.show()) {
