@@ -58,7 +58,7 @@ You can choose the amount you want to donate on those platforms.
 If you encounter any issues or have additional feature requests you can reach out to me in different ways:
 
 - report / request issues in the GitHub repository [here](https://github.com/FlohGro-dev/Draftist/issues)
-- take part in the conversation in the Drafts forums [here](https://forums.getdrafts.com/u/flohgro/summary)
+- take part in the conversation in the Drafts forums [here](https://forums.getdrafts.com/t/draftist-a-drafts-action-group-for-todoist/12674)
 - contact me on other platforms of your choice [here](https://flohgro.com/contactme)
 
 ## Created Files
@@ -81,5 +81,5 @@ I don't recommend to delete these files unless you have issues using Draftist. I
 
 ## Changelog
 
-To stay up to date on new updates you can follow me on [Twitter](https://twitter.com/FlohGro) or take part in the converstaion in the [Drafts forums post](https://forums.getdrafts.com/u/flohgro/summary)
+To stay up to date on new updates you can follow me on [Twitter](https://twitter.com/FlohGro) or take part in the converstaion in the [Drafts forums post](https://forums.getdrafts.com/t/draftist-a-drafts-action-group-for-todoist/12674)
 You can find a changelog of updates to Action Group in the [Changelog](https://github.com/FlohGro-dev/Draftist#changelog) section of the README in this repository.
