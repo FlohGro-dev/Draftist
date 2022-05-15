@@ -2141,3 +2141,51 @@ function Draftist_helperDraftistActionReplicator() {
   app.openURL(actionToReplicate.installURL)
   return undefined
 }
+
+/**
+ * Draftist_updateDraftist - presents a prompt to let the user select to update either the Action Group (by opening the link) or the Draftist.js file. To let the user check the latest version, also a "view" option is included which opens the file in the repository
+ */
+function Draftist_updateDraftist(){
+  let pConfirmationPrompt = new Prompt()
+  pConfirmationPrompt.title = "Update Draftist";
+  pConfirmationPrompt.message = "This Action can update the \"Draftist.js\" file to the newest version of the GitHub repository.\nThis is necessary for bug fixes and version updates\n\n\nTo update the Draftist Action Group itself you need to update (reinstall) Draftist from Drafts Action Directory.\nThis will update Draftist to new releases with new Actions in the Action Group\n\n\nTo view the latest version you can open it in the repository and check out the latest changes there\n\nSelect what you want to do:"
+  pConfirmationPrompt.addButton("View newest version","view")
+  pConfirmationPrompt.addButton("Update Draftist.js","updateJs")
+  pConfirmationPrompt.addButton("Update Draftist Action Group", "updateAG")
+  if(pConfirmationPrompt.show()){
+    switch(pConfirmationPrompt.buttonPressed){
+      case "view": app.openURL("https://github.com/FlohGro-dev/Draftist/blob/main/Draftist.js",true); break;
+      case "updateJs": Draftust_setupOrUpdateDraftistJsFilte(); break;
+      case "updateAG": app.openURL("https://directory.getdrafts.com/g/1wK",false); break;
+    }
+  }
+}
+
+/**
+ * Draftust_setupOrUpdateDraftistJsFilte - this Action updates the Draftist.js file in the iCloud directory of the Drafts/Library folder to the latest version from GitHub
+ * @returns true if update successful, false if update was not performed successfully
+ */
+function Draftust_setupOrUpdateDraftistJsFilte(){
+  const filename = "Draftist.js"
+  const subfoldername = "Scripts"
+  const filepath = "/Library/" + subfoldername + "/"
+
+  // file url  "https://github.com/FlohGro-dev/Draftist/blob/main/Draftist.js"
+  // need the raw url to get the files content
+  const draftistSourceUrl = "https://raw.githubusercontent.com/FlohGro-dev/Draftist/main/Draftist.js"
+  let fmCloud = FileManager.createCloud();
+	fmCloud.createDirectory(subfoldername, "/Library/");
+  
+  http = new HTTP();
+  // get the file
+  let requestResult = http.request({"url": draftistSourceUrl, "method": "GET"});
+  // check if the result was successful
+  if(requestResult.success){
+    fmCloud.writeString(filepath + filename,requestResult.responseText)
+  } else {
+    Draftist_failAction("setup or update","download failed")
+    return false;
+  }
+  Draftist_succeedAction("setup/update Draftist",true,"downloaded latest version")
+  return true;
+}

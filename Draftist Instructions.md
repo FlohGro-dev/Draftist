@@ -7,37 +7,22 @@
 - **Twitter:** [@FlohGro](https://twitter.com/FlohGro)
 
 > Welcome to Draftist - an Action Group for Draft to integrate with Todoist. This might be the most advanced Action Group to use Drafts with Todoist so please read the instructions.
+> Before running any other Action, you have to run the "Draftist Setup/Update" Action which downloads the latest version of Draftist from the repository
 
 Draftist contains a big amount of Actions to integrate Drafts with Todoist.
-It is divided into several sections:
 
-- General Actions
-- Create Tasks
+The Actions are divided into the following sections:
 
-**TODO:**??
-
+- General
+- Quick Add Tasks
+- Create Single Task
+- Create (cross)Linked Task From Draft
+- Create Multiple Tasks
+- Create Tasks from MD Tasks in Draft
 - Import Tasks
-- Create Projects
-- modify Actions
-- Switch labels
+- Modify Tasks
 
-## Created Files
-
-Draftist will create three new files in your iCloud Drive folder at the path `.../Drafts/Library/Scripts`:
-
-- `DraftistDataStore.json`: Draftist Todoist Data Store
-  - this file stores data from your Todoist account which is used by several actions
-  - the data includes:
-    - projects (and their metadata)
-    - sections (and their metadata)
-    - labels (and their metadata)
-  - none of this data leaves your iCloud Account, it is synced in the Drafts directory - it's just used to not always request the data from Todoists API which slows down the process of e.g. creating tasks with settings a lot.
-- `DraftistSettings.json`: Draftist Action Group Settings
-  - this file stores the settings you can modify with the [Draftist Settings Action](https://github.com/FlohGro-dev/Draftist/blob/main/Action%20Descriptions.md#Draftist%20Settings)
-- `Draftist.js`: Draftist Functions
-  - this file contains the functions all the Draftist Actions use under the hood. This enables the update process without the need to reinstall the complete Action Group.
-
-I don't recommend to delete these files unless you have issues using Draftist. If you delete the `Draftist.js` no Action in the Draftist Action Group will work anymore until you reinstall the file. The Settings and Data Store file will be recreated automatically.
+Before running any Action in this Action Group, make sure to Setup the `Draftist.js` file in your directory by running the `Draftist Setup/Update` Action.
 
 ## Using Draftist
 
@@ -68,11 +53,33 @@ You can choose the amount you want to donate on those platforms.
 
 <a href="https://www.patreon.com/flohgro" target="_blank"><img src="https://user-images.githubusercontent.com/13785667/162812708-55b96cdc-8c32-4433-a340-6dd4c1f7326d.jpg" alt="Become A patreon" style="height: 110px !important;width: 220px !important;" ></a>
 
-**TODO:**
-- Action Descriptions (linking)
-- Keywords (search improvements)?
-- further instructions needed?
+## Feature Requests and Issue Reporting
+
+If you encounter any issues or have additional feature requests you can reach out to me in different ways:
+
+- report / request issues in the GitHub repository [here](https://github.com/FlohGro-dev/Draftist/issues)
+- take part in the conversation in the Drafts forums [here](https://forums.getdrafts.com/u/flohgro/summary)
+- contact me on other platforms of your choice [here](https://flohgro.com/contactme)
+
+## Created Files
+
+Draftist will create three new files in your iCloud Drive folder at the path `.../Drafts/Library/Scripts`:
+
+- `DraftistDataStore.json`: Draftist Todoist Data Store
+  - this file stores data from your Todoist account which is used by several actions
+  - the data includes:
+    - projects (and their metadata)
+    - sections (and their metadata)
+    - labels (and their metadata)
+  - none of this data leaves your iCloud Account, it is synced in the Drafts directory - it's just used to not always request the data from Todoists API which slows down the process of e.g. creating tasks with settings a lot.
+- `DraftistSettings.json`: Draftist Action Group Settings
+  - this file stores the settings you can modify with the [Draftist Settings Action](https://github.com/FlohGro-dev/Draftist/blob/main/Action%20Descriptions.md#Draftist%20Settings)
+- `Draftist.js`: Draftist Functions
+  - this file contains the functions all the Draftist Actions use under the hood. This enables the update process without the need to reinstall the complete Action Group.
+
+I don't recommend to delete these files unless you have issues using Draftist. If you delete the `Draftist.js` no Action in the Draftist Action Group will work anymore until you reinstall the file. The Settings and Data Store file will be recreated automatically.
 
 ## Changelog
 
+To stay up to date on new updates you can follow me on [Twitter](https://twitter.com/FlohGro) or take part in the converstaion in the [Drafts forums post](https://forums.getdrafts.com/u/flohgro/summary)
 You can find a changelog of updates to Action Group in the [Changelog](https://github.com/FlohGro-dev/Draftist#changelog) section of the README in this repository.

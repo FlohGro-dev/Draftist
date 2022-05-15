@@ -5,10 +5,10 @@
 - [Draftist Action Descriptions](#draftist-action-descriptions)
   - [General Actions](#general-actions)
     - [Draftist Instructions](#draftist-instructions)
+    - [Draftist Setup/Update](#draftist-setupupdate)
     - [Draftist](#draftist)
     - [Draftist Settings](#draftist-settings)
     - [Draftist Action Replicator](#draftist-action-replicator)
-    - [Draftist Update](#draftist-update)
     - [Update local Todoist data](#update-local-todoist-data)
   - [Quick Add Tasks](#quick-add-tasks)
     - [quick add lines from draft](#quick-add-lines-from-draft)
@@ -63,6 +63,12 @@ The description will also contain the default settings for the "after success" o
 >  
 > After Success Setting: Nothing
 
+### Draftist Setup/Update
+
+> This Action is used to setup or update the Draftist.js file in the iCloud directory of Draft at the path /Library/Scripts/. It downloads the latest version from the GitHub repository of Draftist at https://github.com/FlohGro-dev/Draftist.
+>  
+> After Success Setting: Nothing
+
 ### Draftist
 
 > This Action loads all relevant functions that Draftist provides. Every Draftist Action includes this Action.
@@ -81,12 +87,6 @@ If you want to make you're own Action based on Draftist functions simply include
 > This Action eases the replication of an Action in the Draftist Action Group. When a user runs this Action it will display a prompt with all available Draftist Actions as buttons. When the user selects one action the installURL of this Action will be opened. This results in an *Action Import* prompt. Make sure to select `Import as New Action` in the prompt and select the destination Action Group of the replicated Action. After the Action is installed rename it to your personal choice.
 >  
 > After Success Setting: Nothing
-
-### Draftist Update
-
-> **TODO**
->  
-> After Success Setting:
 
 ### Update local Todoist data
 
