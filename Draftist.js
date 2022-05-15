@@ -349,7 +349,7 @@ function Draftist_createTaskWithDescriptionFromPrompt() {
  *
  * @param  {String} content     content of the task (must not be empty)
  * @param  {String} description? description for the task (can be empty)
- * @return {taskObject}             taskObject for a todoist task which can be passed to the Todoist.createTask() API of Drafts
+ * @return {taskObject}         taskObject for a todoist task which can be passed to the Todoist.createTask() API of Drafts
  */
 function Draftist_createTaskObjectWithSettingsFromPrompt(content, description = "") {
   // check if any map of the todoist data contains data - if not, load the data into the vars
@@ -366,7 +366,7 @@ function Draftist_createTaskObjectWithSettingsFromPrompt(content, description = 
   pDate.addButton("other");
   pDate.addButton("no due date", undefined)
   pDate.isCancellable = false;
-  pDate.show();
+  pDate.show()
   // if buttonPressed is undefined no due date was selected
   const dateIsSet = (pDate.buttonPressed ? true : false);
   let selectedDateString = undefined;
@@ -1299,7 +1299,7 @@ function Draftist_updateProjectOfTask({
  * @param {String} newDueDateString - the new due date provided as String (best in the format YYYY-MM-DD; but Human defined dates are possible (https://developer.todoist.com/rest/v1/#update-a-task // https://todoist.com/help/articles/due-dates-and-times)
  * @returns {Boolean} true when updated successfully, false when updating failed or any parameter was not valid (e.g. unsupported date format)
  */
- function Draftist_updateDueDateOfTask({
+function Draftist_updateDueDateOfTask({
   todoist = new Todoist(),
   taskToUpdate,
   newDueDateString
@@ -1636,7 +1636,7 @@ function Draftist_duplicateSelectedTasksFromLabelWithOtherLabel({
  * @param {String} taskContent - the content of the task(s) to display in the prompt
  * @returns selected due date as String in the format "YYYY-MM-DD"
  */
-function Draftist_helperGetNewDueDateFromPrompt(taskContent){
+function Draftist_helperGetNewDueDateFromPrompt(taskContent) {
   // due date prompt
   let pDate = new Prompt()
   pDate.title = "select due date for task(s):";
@@ -1670,11 +1670,18 @@ function Draftist_helperGetNewDueDateFromPrompt(taskContent){
       selectedDateString = String(year) + "-" + String(month) + "-" + String(day);
     } else {
       let today = new Date()
-      switch(pDate.buttonPressed){
-        case "today": selectedDateString = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate(); break;
-        //case "today": selectedDateString = today.toISOString(); break;
-        case "tomorrow": let tomorrow = today.setDate(today.getDate() + 1); selectedDateString = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate(); break;
-        case "remove due date": selectedDateString = "no date"; break;
+      switch (pDate.buttonPressed) {
+        case "today":
+          selectedDateString = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+          break;
+          //case "today": selectedDateString = today.toISOString(); break;
+        case "tomorrow":
+          let tomorrow = today.setDate(today.getDate() + 1);
+          selectedDateString = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+          break;
+        case "remove due date":
+          selectedDateString = "no date";
+          break;
       }
     }
   }
@@ -1687,7 +1694,7 @@ function Draftist_helperGetNewDueDateFromPrompt(taskContent){
  * @param {String} filterString - a valid todoist filter string
  * @returns true if all selected tasks updated successfully, false if something failed
  */
-function Draftust_updateIndividualDueDateOfSelectedTasksFromFilter(filterString){
+function Draftust_updateIndividualDueDateOfSelectedTasksFromFilter(filterString) {
   let tasksFromFilter = Draftist_getTodoistTasksFromFilter(filterString)
   // early retrun if no task was retrieved
   if (!tasksFromFilter) {
@@ -1704,10 +1711,14 @@ function Draftust_updateIndividualDueDateOfSelectedTasksFromFilter(filterString)
   // update the task
   let updatedTasksCount = 0;
   let todoistObj = new Todoist();
-  for(task of selectedTasks){
+  for (task of selectedTasks) {
     let newDueDateString = Draftist_helperGetNewDueDateFromPrompt(task.content)
 
-    if (!Draftist_updateDueDateOfTask({todoist:todoistObj,taskToUpdate:task,newDueDateString:newDueDateString})) {
+    if (!Draftist_updateDueDateOfTask({
+        todoist: todoistObj,
+        taskToUpdate: task,
+        newDueDateString: newDueDateString
+      })) {
       // not needed, update function will already display the error
       //let lastError = Draftist_getLastTodoistError(todoistObj);
       //Draftist_failAction("update due date", "Todoist returned error:\n" + lastError)
@@ -1725,7 +1736,7 @@ function Draftust_updateIndividualDueDateOfSelectedTasksFromFilter(filterString)
  * @param {String} filterString - a valid todoist filter string
  * @returns true if all selected tasks updated successfully, false if something failed
  */
- function Draftust_updateDueDateToSameDateOfSelectedTasksFromFilter(filterString){
+function Draftust_updateDueDateToSameDateOfSelectedTasksFromFilter(filterString) {
   let tasksFromFilter = Draftist_getTodoistTasksFromFilter(filterString)
   // early retrun if no task was retrieved
   if (!tasksFromFilter) {
@@ -1743,8 +1754,12 @@ function Draftust_updateIndividualDueDateOfSelectedTasksFromFilter(filterString)
   let updatedTasksCount = 0;
   let todoistObj = new Todoist();
   let newDueDateString = Draftist_helperGetNewDueDateFromPrompt(selectedTasks.map((task) => task.content).join("\n"))
-  for(task of selectedTasks){
-    if (!Draftist_updateDueDateOfTask({todoist:todoistObj,taskToUpdate:task,newDueDateString:newDueDateString})) {
+  for (task of selectedTasks) {
+    if (!Draftist_updateDueDateOfTask({
+        todoist: todoistObj,
+        taskToUpdate: task,
+        newDueDateString: newDueDateString
+      })) {
       // not needed, update function will already display the error
       //let lastError = Draftist_getLastTodoistError(todoistObj);
       //Draftist_failAction("update due date", "Todoist returned error:\n" + lastError)
@@ -1762,7 +1777,7 @@ function Draftust_updateIndividualDueDateOfSelectedTasksFromFilter(filterString)
  * @param {String} filterString - a valid todoist filter string
  * @returns true if all selected tasks were resolved successfully, false if something failed
  */
-function Draftist_resolveSelectedTasksFromFilter(filterString){
+function Draftist_resolveSelectedTasksFromFilter(filterString) {
   let tasksFromFilter = Draftist_getTodoistTasksFromFilter(filterString)
   // early retrun if no task was retrieved
   if (!tasksFromFilter) {
@@ -1775,15 +1790,15 @@ function Draftist_resolveSelectedTasksFromFilter(filterString){
   }
   let todoist = new Todoist()
   let resolvedTasksCount = 0;
-  for(task of selectedTasks){
-    if(!todoist.closeTask(task.id)){
+  for (task of selectedTasks) {
+    if (!todoist.closeTask(task.id)) {
       const lastError = Draftist_getLastTodoistError(todoist);
-      Draftist_failAction("resolve tasks","Todoist returned error: " + lastError)
+      Draftist_failAction("resolve tasks", "Todoist returned error: " + lastError)
       return false;
     }
     resolvedTasksCount = resolvedTasksCount + 1;
   }
-  Draftist_succeedAction("resolve tasks",false,"resolved " + resolvedTasksCount + " tasks");
+  Draftist_succeedAction("resolve tasks", false, "resolved " + resolvedTasksCount + " tasks");
   return true;
 }
 
@@ -1793,7 +1808,7 @@ function Draftist_resolveSelectedTasksFromFilter(filterString){
  * @param {String} filterString - a valid todoist filter string
  * @returns true if all selected tasks were resolved successfully, false if something failed
  */
- function Draftist_deleteSelectedTasksFromFilter(filterString){
+function Draftist_deleteSelectedTasksFromFilter(filterString) {
   let tasksFromFilter = Draftist_getTodoistTasksFromFilter(filterString)
   // early retrun if no task was retrieved
   if (!tasksFromFilter) {
@@ -1806,19 +1821,19 @@ function Draftist_resolveSelectedTasksFromFilter(filterString){
   }
   let todoist = new Todoist()
   let deletedTasksCount = 0;
-  for(task of selectedTasks){
+  for (task of selectedTasks) {
     const settings = {
-      "method":"DELETE",
-      "url":"https://api.todoist.com/rest/v1/tasks/"+task.id
+      "method": "DELETE",
+      "url": "https://api.todoist.com/rest/v1/tasks/" + task.id
     }
-    if(!todoist.request(settings)){
+    if (!todoist.request(settings)) {
       const lastError = Draftist_getLastTodoistError(todoist);
-      Draftist_failAction("resolve tasks","Todoist returned error: " + lastError)
+      Draftist_failAction("resolve tasks", "Todoist returned error: " + lastError)
       return false;
     }
     deletedTasksCount = deletedTasksCount + 1;
   }
-  Draftist_succeedAction("delete tasks",false,"deleted " + deletedTasksCount + " tasks");
+  Draftist_succeedAction("delete tasks", false, "deleted " + deletedTasksCount + " tasks");
   return true;
 }
 
@@ -2002,16 +2017,21 @@ function Draftist_changeConfigurationSettings() {
   }
 }
 
-
+/**
+ * Draftist_getDataStoreFromFile - reads the stored data from the directory. updates the data if the file is not existing
+ * @returns true when the file was read successfully
+ */
 function Draftist_getDataStoreFromFile() {
   // iCloud file manager
   let fmCloud = FileManager.createCloud();
   const readResult = fmCloud.readJSON(dataStoreFilePath);
   if (!readResult) {
-    // file is not existing, write initial Data
-    if (!Draftist_updateStoredTodoistData()) {
-      Draftist_failAction("get data store", "unexpected failure, please try again and if the issue persists, contact @FlohGro with a description to reproduce the issue.")
-    }
+    // file is not existing, update the data which will write them to the file and then run this function again
+    Draftist_updateStoredTodoistData();
+    return Draftist_getDataStoreFromFile();
+    // if (!Draftist_updateStoredTodoistData()) {
+    //   Draftist_failAction("get data store", "unexpected failure, please try again and if the issue persists, contact @FlohGro with a description to reproduce the issue.")
+    // }
   } else {
     // return the read object
     return readResult
@@ -2145,18 +2165,24 @@ function Draftist_helperDraftistActionReplicator() {
 /**
  * Draftist_updateDraftist - presents a prompt to let the user select to update either the Action Group (by opening the link) or the Draftist.js file. To let the user check the latest version, also a "view" option is included which opens the file in the repository
  */
-function Draftist_updateDraftist(){
+function Draftist_updateDraftist() {
   let pConfirmationPrompt = new Prompt()
   pConfirmationPrompt.title = "Update Draftist";
   pConfirmationPrompt.message = "This Action can update the \"Draftist.js\" file to the newest version of the GitHub repository.\nThis is necessary for bug fixes and version updates\n\n\nTo update the Draftist Action Group itself you need to update (reinstall) Draftist from Drafts Action Directory.\nThis will update Draftist to new releases with new Actions in the Action Group\n\n\nTo view the latest version you can open it in the repository and check out the latest changes there\n\nSelect what you want to do:"
-  pConfirmationPrompt.addButton("View newest version","view")
-  pConfirmationPrompt.addButton("Update Draftist.js","updateJs")
+  pConfirmationPrompt.addButton("View newest version", "view")
+  pConfirmationPrompt.addButton("Update Draftist.js", "updateJs")
   pConfirmationPrompt.addButton("Update Draftist Action Group", "updateAG")
-  if(pConfirmationPrompt.show()){
-    switch(pConfirmationPrompt.buttonPressed){
-      case "view": app.openURL("https://github.com/FlohGro-dev/Draftist/blob/main/Draftist.js",true); break;
-      case "updateJs": Draftust_setupOrUpdateDraftistJsFilte(); break;
-      case "updateAG": app.openURL("https://directory.getdrafts.com/g/1wK",false); break;
+  if (pConfirmationPrompt.show()) {
+    switch (pConfirmationPrompt.buttonPressed) {
+      case "view":
+        app.openURL("https://github.com/FlohGro-dev/Draftist/blob/main/Draftist.js", true);
+        break;
+      case "updateJs":
+        Draftust_setupOrUpdateDraftistJsFilte();
+        break;
+      case "updateAG":
+        app.openURL("https://directory.getdrafts.com/g/1wK", false);
+        break;
     }
   }
 }
@@ -2165,7 +2191,7 @@ function Draftist_updateDraftist(){
  * Draftust_setupOrUpdateDraftistJsFilte - this Action updates the Draftist.js file in the iCloud directory of the Drafts/Library folder to the latest version from GitHub
  * @returns true if update successful, false if update was not performed successfully
  */
-function Draftust_setupOrUpdateDraftistJsFilte(){
+function Draftust_setupOrUpdateDraftistJsFilte() {
   const filename = "Draftist.js"
   const subfoldername = "Scripts"
   const filepath = "/Library/" + subfoldername + "/"
@@ -2174,18 +2200,21 @@ function Draftust_setupOrUpdateDraftistJsFilte(){
   // need the raw url to get the files content
   const draftistSourceUrl = "https://raw.githubusercontent.com/FlohGro-dev/Draftist/main/Draftist.js"
   let fmCloud = FileManager.createCloud();
-	fmCloud.createDirectory(subfoldername, "/Library/");
-  
+  fmCloud.createDirectory(subfoldername, "/Library/");
+
   http = new HTTP();
   // get the file
-  let requestResult = http.request({"url": draftistSourceUrl, "method": "GET"});
+  let requestResult = http.request({
+    "url": draftistSourceUrl,
+    "method": "GET"
+  });
   // check if the result was successful
-  if(requestResult.success){
-    fmCloud.writeString(filepath + filename,requestResult.responseText)
+  if (requestResult.success) {
+    fmCloud.writeString(filepath + filename, requestResult.responseText)
   } else {
-    Draftist_failAction("setup or update","download failed")
+    Draftist_failAction("setup or update", "download failed")
     return false;
   }
-  Draftist_succeedAction("setup/update Draftist",true,"downloaded latest version")
+  Draftist_succeedAction("setup/update Draftist", true, "downloaded latest version")
   return true;
 }
