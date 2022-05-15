@@ -1137,8 +1137,7 @@ function Draftist_importTasksFromFilterInPrompt() {
  * @param {Todoist_Task} taskToUpdate - the task that should be updated
  * @param {String[]} labelNamesToRemove? - the valid label names which should be removed from the provided task
  * @param {String[]} labelNamesToAdd? - the valid label names which should be added to the provided task
- * @param {String} newDueDate? - the new due date provided as String in the format YYYY-MM-DD (https://developer.todoist.com/rest/v1/#update-a-task) - must not be presend when `newDueDateTime` is used
- * @param {String} newDueDateTime? - the new specific due date and time provided as String in RFC3339 format in UTC (https://developer.todoist.com/rest/v1/#update-a-task) - must not be presend when `newDueDate` is used
+ * @param {String} newDueDateString? - the new due date provided as String (best in the format YYYY-MM-DD; but Human defined dates are possible (https://developer.todoist.com/rest/v1/#update-a-task // https://todoist.com/help/articles/due-dates-and-times)
  * @param {String} newProjectName? - ATTENTION: currently 05/2022 not supported by the todoist API, providing this parameter will fail the action - the new valid project name for the provided task
  * @returns {Boolean} true when updated successfully, false when updating failed or any parameter was not valid (e.g. label name is not existing)
  */
@@ -1147,8 +1146,7 @@ function Draftist_updateTask({
   taskToUpdate,
   labelNamesToRemove = [],
   labelNamesToAdd = [],
-  newDueDate = undefined,
-  newDueDateTime = undefined,
+  newDueDateString = undefined,
   newProjectName = undefined
 }) {
   if (!taskToUpdate) {
@@ -1199,22 +1197,10 @@ function Draftist_updateTask({
 
   // update due date / date time
 
-  // if date and datetime are provided, return false since this is not possible
-  if (newDueDate && newDueDateTime) {
-    Draftist_failAction("update task", "due date and due date time where provided, this is not allowed")
-    return false
-  }
-
-  let dueDate = taskToUpdate.due_date;
-  if (newDueDate) {
+  let dueDateString = taskToUpdate.due_date;
+  if (newDueDateString) {
     // new due date was provided
-    dueDate = newDueDate
-  }
-
-  let dueDateTime = taskToUpdate.due_datetime;
-  if (newDueDateTime) {
-    // new due date time was provided
-    dueDateTime = newDueDateTime
+    dueDateString = newDueDateString
   }
 
   // attention the project ID was implemented based on the task property. 
@@ -1242,8 +1228,7 @@ function Draftist_updateTask({
     "order": taskToUpdate.order,
     "label_ids": updatedLabelIds,
     "priority": taskToUpdate.priority,
-    "due_date": dueDate,
-    "due_datetime": dueDateTime,
+    "due_string": (dueDateString ? dueDateString : undefined),
     "assignee": taskToUpdate.assignee
   };
 
@@ -1286,7 +1271,7 @@ function Draftist_updateLabelsOfTask({
 }
 
 /**
- * Draftist_updateProjectOfTask updates the labels of the provided task with the provided options
+ * Draftist_updateProjectOfTask updates the project of the provided task to the provided project name (not supported by Todoist right now)
  * 
  * @param {Todoist_Object} todoist_obj? - if already created, otherwise the function will create its own.
  * @param {Todoist_Task} taskToUpdate - the task that should be updated
@@ -1302,6 +1287,27 @@ function Draftist_updateProjectOfTask({
     todoist: todoist,
     taskToUpdate: taskToUpdate,
     newProjectName: newProjectName
+  })
+}
+
+
+/**
+ * Draftist_updateDueDateOfTask updates the due date of the provided task to the provided new date
+ * 
+ * @param {Todoist_Object} todoist_obj? - if already created, otherwise the function will create its own.
+ * @param {Todoist_Task} taskToUpdate - the task that should be updated
+ * @param {String} newDueDateString - the new due date provided as String (best in the format YYYY-MM-DD; but Human defined dates are possible (https://developer.todoist.com/rest/v1/#update-a-task // https://todoist.com/help/articles/due-dates-and-times)
+ * @returns {Boolean} true when updated successfully, false when updating failed or any parameter was not valid (e.g. unsupported date format)
+ */
+ function Draftist_updateDueDateOfTask({
+  todoist = new Todoist(),
+  taskToUpdate,
+  newDueDateString
+}) {
+  return Draftist_updateTask({
+    todoist: todoist,
+    taskToUpdate: taskToUpdate,
+    newDueDateString: newDueDateString
   })
 }
 
@@ -1335,7 +1341,7 @@ function Draftist_selectTasksFromTaskObjects(taskObjects, allowSelectMultiple, p
       selectedTasks = selectedTasks.concat(taskObjects.filter(task => (task.content == taskContent)))
     }
   } else {
-    Draftist_cancelAction("", "user cancelled selection")
+    Draftist_cancelAction("select tasks", "user aborted")
   }
   return selectedTasks;
 }
@@ -1558,6 +1564,14 @@ function Draftist_updateProjectOfSelectedTasksFromFilter(filterString) {
   return true;
 }
 
+/**
+ * Draftist_duplicateSelectedTasksFromLabelWithOtherLabel - duplicates each selected task with a source label. the duplicated tasks will not contain the source label anymore but will contain the destination label
+ * 
+ * @param {Todoist_Object} todoistObj? - the todoist object to use  
+ * @param {String} sourceLabelName - the name of the source label (must be a valid name of a label in the users todoist account) with or without the @ sign 
+ * @param {String} destinationLabelName - the name of the destination label (must be a valid name of a label in the users todoist account) with or without the @ sign 
+ * @returns true if duplicating all selected tasks succeeded, false if it failed (will not proceed if one task fails)
+ */
 function Draftist_duplicateSelectedTasksFromLabelWithOtherLabel({
   todoistObj = new Todoist(),
   sourceLabelName,
@@ -1617,6 +1631,196 @@ function Draftist_duplicateSelectedTasksFromLabelWithOtherLabel({
   return true;
 }
 
+/**
+ * Draftist_helperGetNewDueDateFromPrompt - asks the user for a due date and creates an iso date string from the selected date
+ * @param {String} taskContent - the content of the task(s) to display in the prompt
+ * @returns selected due date as String in the format "YYYY-MM-DD"
+ */
+function Draftist_helperGetNewDueDateFromPrompt(taskContent){
+  // due date prompt
+  let pDate = new Prompt()
+  pDate.title = "select due date for task(s):";
+  pDate.message = taskContent;
+  pDate.addButton("today");
+  pDate.addButton("tomorrow");
+  pDate.addButton("other");
+  pDate.addButton("remove due date")
+  pDate.isCancellable = false;
+  pDate.show();
+  // if buttonPressed is undefined no due date was selected
+  const dateIsSet = (pDate.buttonPressed ? true : false);
+  let selectedDateString = undefined;
+  if (dateIsSet) {
+    if (pDate.buttonPressed == "other") {
+      let pSelDate = new Prompt();
+      pSelDate.title = "select custom date for \"" + taskContent + "\":";
+      let tomorrow = new Date(new Date().setDate(new Date().getDate() + 1));
+      pSelDate.addDatePicker("dueDatePicker", "", tomorrow, {
+        "mode": "date",
+        "minimumDate": tomorrow
+      });
+
+      pSelDate.addButton("set due date");
+      pSelDate.isCancellable = false;
+      pSelDate.show();
+      let pickedDueDate = pSelDate.fieldValues["dueDatePicker"];
+      let day = pickedDueDate.getDate();
+      let month = pickedDueDate.getMonth() + 1;
+      let year = pickedDueDate.getFullYear();
+      selectedDateString = String(year) + "-" + String(month) + "-" + String(day);
+    } else {
+      let today = new Date()
+      switch(pDate.buttonPressed){
+        case "today": selectedDateString = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate(); break;
+        //case "today": selectedDateString = today.toISOString(); break;
+        case "tomorrow": let tomorrow = today.setDate(today.getDate() + 1); selectedDateString = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate(); break;
+        case "remove due date": selectedDateString = "no date"; break;
+      }
+    }
+  }
+  return selectedDateString;
+}
+
+/**
+ * Draftust_updateIndividualDueDateOfSelectedTasksFromFilter - updates the due date of each selected task from a filter to an individual selectable due date
+ * 
+ * @param {String} filterString - a valid todoist filter string
+ * @returns true if all selected tasks updated successfully, false if something failed
+ */
+function Draftust_updateIndividualDueDateOfSelectedTasksFromFilter(filterString){
+  let tasksFromFilter = Draftist_getTodoistTasksFromFilter(filterString)
+  // early retrun if no task was retrieved
+  if (!tasksFromFilter) {
+    return false;
+  }
+  // let the user select the tasks
+  let selectedTasks = Draftist_selectTasksFromTaskObjects(tasksFromFilter, true, "from filter \"" + filterString + "\"");
+  if (selectedTasks.length == 0) {
+    return false;
+  }
+
+  // iterate through all selected tasks
+  // ask for new due date
+  // update the task
+  let updatedTasksCount = 0;
+  let todoistObj = new Todoist();
+  for(task of selectedTasks){
+    let newDueDateString = Draftist_helperGetNewDueDateFromPrompt(task.content)
+
+    if (!Draftist_updateDueDateOfTask({todoist:todoistObj,taskToUpdate:task,newDueDateString:newDueDateString})) {
+      // not needed, update function will already display the error
+      //let lastError = Draftist_getLastTodoistError(todoistObj);
+      //Draftist_failAction("update due date", "Todoist returned error:\n" + lastError)
+      return false;
+    }
+    updatedTasksCount = updatedTasksCount + 1;
+  }
+  Draftist_succeedAction("update due date", false, "updated " + updatedTasksCount + " tasks")
+  return true;
+}
+
+/**
+ * Draftust_updateDueDateToSameDateOfSelectedTasksFromFilter - updates the due date of each selected task from a filter to one common selectable due date
+ * 
+ * @param {String} filterString - a valid todoist filter string
+ * @returns true if all selected tasks updated successfully, false if something failed
+ */
+ function Draftust_updateDueDateToSameDateOfSelectedTasksFromFilter(filterString){
+  let tasksFromFilter = Draftist_getTodoistTasksFromFilter(filterString)
+  // early retrun if no task was retrieved
+  if (!tasksFromFilter) {
+    return false;
+  }
+  // let the user select the tasks
+  let selectedTasks = Draftist_selectTasksFromTaskObjects(tasksFromFilter, true, "from filter \"" + filterString + "\"");
+  if (selectedTasks.length == 0) {
+    return false;
+  }
+
+  // iterate through all selected tasks
+  // ask for new due date
+  // update the task
+  let updatedTasksCount = 0;
+  let todoistObj = new Todoist();
+  let newDueDateString = Draftist_helperGetNewDueDateFromPrompt(selectedTasks.map((task) => task.content).join("\n"))
+  for(task of selectedTasks){
+    if (!Draftist_updateDueDateOfTask({todoist:todoistObj,taskToUpdate:task,newDueDateString:newDueDateString})) {
+      // not needed, update function will already display the error
+      //let lastError = Draftist_getLastTodoistError(todoistObj);
+      //Draftist_failAction("update due date", "Todoist returned error:\n" + lastError)
+      return false
+    }
+    updatedTasksCount = updatedTasksCount + 1;
+  }
+  Draftist_succeedAction("update due date", false, "updated " + updatedTasksCount + " tasks")
+  return true;
+}
+
+/**
+ * Draftist_resolveSelectedTasksFromFilter - resolves the selected tasks from a filter
+ * 
+ * @param {String} filterString - a valid todoist filter string
+ * @returns true if all selected tasks were resolved successfully, false if something failed
+ */
+function Draftist_resolveSelectedTasksFromFilter(filterString){
+  let tasksFromFilter = Draftist_getTodoistTasksFromFilter(filterString)
+  // early retrun if no task was retrieved
+  if (!tasksFromFilter) {
+    return false;
+  }
+  // let the user select the tasks
+  let selectedTasks = Draftist_selectTasksFromTaskObjects(tasksFromFilter, true, "from filter \"" + filterString + "\"");
+  if (selectedTasks.length == 0) {
+    return false;
+  }
+  let todoist = new Todoist()
+  let resolvedTasksCount = 0;
+  for(task of selectedTasks){
+    if(!todoist.closeTask(task.id)){
+      const lastError = Draftist_getLastTodoistError(todoist);
+      Draftist_failAction("resolve tasks","Todoist returned error: " + lastError)
+      return false;
+    }
+    resolvedTasksCount = resolvedTasksCount + 1;
+  }
+  Draftist_succeedAction("resolve tasks",false,"resolved " + resolvedTasksCount + " tasks");
+  return true;
+}
+
+/**
+ * Draftist_deleteSelectedTasksFromFilter - deletes the selected tasks from a filter
+ * 
+ * @param {String} filterString - a valid todoist filter string
+ * @returns true if all selected tasks were resolved successfully, false if something failed
+ */
+ function Draftist_deleteSelectedTasksFromFilter(filterString){
+  let tasksFromFilter = Draftist_getTodoistTasksFromFilter(filterString)
+  // early retrun if no task was retrieved
+  if (!tasksFromFilter) {
+    return false;
+  }
+  // let the user select the tasks
+  let selectedTasks = Draftist_selectTasksFromTaskObjects(tasksFromFilter, true, "from filter \"" + filterString + "\"");
+  if (selectedTasks.length == 0) {
+    return false;
+  }
+  let todoist = new Todoist()
+  let deletedTasksCount = 0;
+  for(task of selectedTasks){
+    const settings = {
+      "method":"DELETE",
+      "url":"https://api.todoist.com/rest/v1/tasks/"+task.id
+    }
+    if(!todoist.request(settings)){
+      const lastError = Draftist_getLastTodoistError(todoist);
+      Draftist_failAction("resolve tasks","Todoist returned error: " + lastError)
+      return false;
+    }
+    deletedTasksCount = deletedTasksCount + 1;
+  }
+  Draftist_succeedAction("delete tasks",false,"deleted " + deletedTasksCount + " tasks");
+  return true;
+}
 
 
 

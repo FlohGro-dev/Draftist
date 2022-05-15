@@ -45,6 +45,10 @@
   - [Modify Tasks](#modify-tasks)
     - [update labels of selected tasks from filter](#update-labels-of-selected-tasks-from-filter)
     - [duplicate selected tasks with other label](#duplicate-selected-tasks-with-other-label)
+    - [update individual due date of selected task from filter](#update-individual-due-date-of-selected-task-from-filter)
+    - [update due date of selected task from filter to same date](#update-due-date-of-selected-task-from-filter-to-same-date)
+    - [resolve selected tasks from filter](#resolve-selected-tasks-from-filter)
+    - [delete selected tasks from filter](#delete-selected-tasks-from-filter)
 
 <!-- /TOC -->
 
@@ -272,5 +276,33 @@ If you want to make you're own Action based on Draftist functions simply include
 > This Action duplicates the selected tasks and changes a configurable source label to a destination label. This means that if you e.g. have a label "@waiting4" and you want follow up one or more of them, you can use this Action to e.g. create duplicates of the tasks you select with the destination label "@followUp" (the duplicates will not contain the ”@waiting4" label anymore).
 > To configure the labels used by this Action you need to edit the two "Define Template Tag" steps and change the Template from "UNCONFIGURED" to the name of the source / destination label you want to use.
 > The Action presents a prompt showing the tasks which contain the configured source label. You can check all the tasks you want to duplicate with the destination label.
+>
+> After Success Setting: Nothing
+
+### update individual due date of selected task from filter
+
+> This Action updates the individual due date of the selected tasks from a configurable filter. The Action lets the user select tasks from the configured filter and present a prompt for each selected task to select a new due date.
+> To configure the used filter , edit the "Define Template Tag" step and change the Template from "UNCONFIGURED" to the filter query you want to use (best you test the filter in todoist and then copy it into the template step). This Action may be useful to e.g. reschedule tasks from the filter "overdue,today", or schedule tasks from a label e.g. if you filter for "@thisWEEK".
+>
+> After Success Setting: Nothing
+
+### update due date of selected task from filter to same date
+
+> This Action updates the due date of the selected tasks from a configurable filter to the same selected due date. The Action lets the user select tasks from the configured filter and present a prompt for the due date which will be applied to all selected tasks
+> To configure the used filter , edit the "Define Template Tag" step and change the Template from "UNCONFIGURED" to the filter query you want to use (best you test the filter in todoist and then copy it into the template step). This Action may be useful to e.g. reschedule tasks from the filter "overdue,today" to the next day.
+>
+> After Success Setting: Nothing
+
+### resolve selected tasks from filter
+
+> This Action resolves the selected tasks from a configurable filter. The Action presents a prompt with all tasks returned for the configured filter. Each selected task will be resolved (marked as completed).
+> To configure the used filter , edit the "Define Template Tag" step and change the Template from "UNCONFIGURED" to the filter query you want to use (best you test the filter in todoist and then copy it into the template step). This Action may be useful to e.g. quickly resolve several tasks with a label or tasks from "today".
+>
+> After Success Setting: Nothing
+
+### delete selected tasks from filter
+
+> This Action deletes the selected tasks from a configurable filter. The Action presents a prompt with all tasks returned for the configured filter. Each selected task will be deleted from your Todoist Account.
+> To configure the used filter , edit the "Define Template Tag" step and change the Template from "UNCONFIGURED" to the filter query you want to use (best you test the filter in todoist and then copy it into the template step). This Action may be useful to e.g. quickly cleaning up your Inbox by using the filter "#inbox".
 >
 > After Success Setting: Nothing
