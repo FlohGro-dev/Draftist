@@ -24,6 +24,12 @@ The Actions are divided into the following sections:
 
 Before running any Action in this Action Group, make sure to Setup the `Draftist.js` file in your directory by running the `Draftist Setup/Update` Action.
 
+## Youtube Videos
+
+Here I'll collect Demos on Youtube about Draftist to get you started easier.
+
+- [Draftist Introduction & Setup](https://youtu.be/gHObL8GqThM)
+
 ## Using Draftist
 
 Since Draftist contains a lot of Actions and you may not need every single of them you may want to create your own `my Draftist` Action Group to only include the Actions you want.
