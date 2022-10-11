@@ -3,9 +3,8 @@
  * @author FlohGro
  * @copyright 2022, FlohGro
  * @licensing MIT free to use - but donate coffees to support development http://www.flohgro.com/donate
- * @version 0.1
+ * @version 0.2
  */
-
 
 /**
  * Draftist_checkTodoistForError - This function checks the provided Todoist Object for errors.
@@ -91,17 +90,17 @@ function Draftist_quickAdd({
  * @param {Todoist_Object} todoist_obj? - if already created, otherwise the function will create its own.
  * @param  {String} content: Task content. This value may contain markdown-formatted text and hyperlinks. Details on markdown support can be found in the Text Formatting article in the Todoist Help Center.
  * @param  {String} description?: A description for the task. This value may contain markdown-formatted text and hyperlinks. Details on markdown support can be found in the Text Formatting article in the Todoist Help Center.
- * @param  {Integer} project_id?: Task project ID. If not set, task is put to user's Inbox.
- * @param  {Integer} section_id?: ID of section to put task into.
- * @param  {Integer} parent_id?: Parent task ID.
+ * @param  {String} project_id?: Task project ID. If not set, task is put to user's Inbox.
+ * @param  {String} section_id?: ID of section to put task into.
+ * @param  {String} parent_id?: Parent task ID.
  * @param  {Integer} order?: Non-zero integer value used by clients to sort tasks under the same parent.
- * @param  {Integer[]} label_ids?: IDs of labels associated with the task.Integer
+ * @param  {String[]} label_ids?: names of labels associated with the task.
  * @param  {Ingeger} priority?: Task priority from 1 (normal) to 4 (urgent).
  * @param  {String} due_string?: No	Human defined task due date (ex.: "next Monday", "Tomorrow"). Value is set using local (not UTC) time.
  * @param  {String} due_date?: Specific date in YYYY-MM-DD format relative to user’s timezone.
  * @param  {String} due_datetime?: Specific date and time in RFC3339 format in UTC.
  * @param  {String} due_lang?: 2-letter code specifying language in case due_string is not written in English.
- * @param  {Integer} assignee?: The responsible user ID (if set, and only for shared tasks).
+ * @param  {Integer} assignee_id?: The responsible user ID (if set, and only for shared tasks).
  * @param  {Boolean} getTaskResult?: if set to true, the function will return the api response of the created Task
  * @return {Boolean} true when added successfully, false when adding task failed
  */
@@ -144,7 +143,8 @@ function Draftist_createTask({
     taskMap.set("order", order);
   }
   if (label_ids.length > 0) {
-    taskMap.set("label_ids", label_ids);
+    taskMap.set("labels", label_ids);
+    alert(label_ids)
   }
   if (priority) {
     taskMap.set("priority", priority);
@@ -166,6 +166,7 @@ function Draftist_createTask({
   }
 
   let taskObj = Object.fromEntries(taskMap)
+  alert(JSON.stringify(taskObj))
   let taskCreateResult = todoist.createTask(taskObj)
   if (taskCreateResult) {
     if (getTaskResult) {
@@ -440,6 +441,10 @@ function Draftist_createTaskObjectWithSettingsFromPrompt(content, description = 
   // labels prompt
   let pLabels = new Prompt();
   pLabels.title = "select labels for \"" + content + "\":";
+  
+  //TODO
+  
+  
   let sortedLabelsNameMap = new Map([...labelsNameToIdMap].sort((a, b) => String(a[0]).localeCompare(b[0])))
 
   pLabels.addSelect("labels", "select labels", Array.from(sortedLabelsNameMap.keys()), [], true);
@@ -449,7 +454,8 @@ function Draftist_createTaskObjectWithSettingsFromPrompt(content, description = 
   let selectedLabels = pLabels.fieldValues["labels"];
   let selectedlabelIDs = [];
   for (label of selectedLabels) {
-    selectedlabelIDs.push(labelsNameToIdMap.get(label));
+//    selectedlabelIDs.push(labelsNameToIdMap.get(label));
+		selectedlabelIDs.push(label);
   }
 
   let taskObject = {
