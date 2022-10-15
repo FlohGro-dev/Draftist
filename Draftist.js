@@ -94,7 +94,7 @@ function Draftist_quickAdd({
  * @param  {String} section_id?: ID of section to put task into.
  * @param  {String} parent_id?: Parent task ID.
  * @param  {Integer} order?: Non-zero integer value used by clients to sort tasks under the same parent.
- * @param  {String[]} label_ids?: names of labels associated with the task.
+ * @param  {String[]} labels?: names of labels associated with the task.
  * @param  {Ingeger} priority?: Task priority from 1 (normal) to 4 (urgent).
  * @param  {String} due_string?: No	Human defined task due date (ex.: "next Monday", "Tomorrow"). Value is set using local (not UTC) time.
  * @param  {String} due_date?: Specific date in YYYY-MM-DD format relative to user’s timezone.
@@ -112,7 +112,7 @@ function Draftist_createTask({
   section_id = undefined,
   parent_id = undefined,
   order = undefined,
-  label_ids = [],
+  labels = [],
   priority = undefined,
   due_string = undefined,
   due_date = undefined,
@@ -142,9 +142,8 @@ function Draftist_createTask({
   if (order) {
     taskMap.set("order", order);
   }
-  if (label_ids.length > 0) {
-    taskMap.set("labels", label_ids);
-    alert(label_ids)
+  if (labels.length > 0) {
+    taskMap.set("labels", labels);
   }
   if (priority) {
     taskMap.set("priority", priority);
@@ -166,7 +165,7 @@ function Draftist_createTask({
   }
 
   let taskObj = Object.fromEntries(taskMap)
-  alert(JSON.stringify(taskObj))
+
   let taskCreateResult = todoist.createTask(taskObj)
   if (taskCreateResult) {
     if (getTaskResult) {
@@ -452,18 +451,13 @@ function Draftist_createTaskObjectWithSettingsFromPrompt(content, description = 
   pLabels.isCancellable = false;
   pLabels.show();
   let selectedLabels = pLabels.fieldValues["labels"];
-  let selectedlabelIDs = [];
-  for (label of selectedLabels) {
-//    selectedlabelIDs.push(labelsNameToIdMap.get(label));
-		selectedlabelIDs.push(label);
-  }
 
   let taskObject = {
     content: content,
     description: description,
     project_id: selectedProjectId,
     section_id: undefined,
-    label_ids: selectedlabelIDs,
+    labels: selectedLabels,
     priority: selectedPriority,
     due_string: (selectedDateString ? selectedDateString : undefined),
   }
@@ -949,8 +943,8 @@ function Draftist_createStringFromTasks({
       if (labelsIdToNameMap.size == 0) {
         Draftist_getStoredTodoistData();
       }
-      for (labelId of task.label_ids) {
-        tasksString = tasksString + " @" + labelsIdToNameMap.get(labelId);
+      for (label of task.labels) {
+        tasksString = tasksString + " @" + label
       }
     }
     tasksString = tasksString + "\n"
@@ -1162,7 +1156,7 @@ function Draftist_updateTask({
   const taskId = taskToUpdate.id;
 
   // update labels
-  const currentLabels = taskToUpdate.label_ids;
+  const currentLabels = taskToUpdate.labels;
   // init projectId variable
 
   // load todoist data if not already loaded and a relevant parameter is present & contains relevant values (e.g. labels, project id)
@@ -1192,14 +1186,24 @@ function Draftist_updateTask({
     labelIdsToAdd.push(curLabelId);
   }
 
+  
+
   let updatedLabelIds = labelIdsToAdd;
+  let updatedLabels = labelNamesToAdd;
 
   for (curLabel of currentLabels) {
     // add the label to the updated array if its not already included and it is not contained in the labelsToRemove Array
     if (!labelIdsToRemove.includes(curLabel) && !updatedLabelIds.includes(curLabel)) {
       updatedLabelIds.push(curLabel);
     }
+    if (!labelNamesToRemove.includes(curLabel) && !updatedLabels.includes(curLabel)) {
+      updatedLabels.push(curLabel);
+    }
+    
   }
+  
+  let dbgText = "labelNamesToRemove: " + labelNamesToRemove + "\n"+ "labelNamesToAdd: " + labelNamesToAdd + "\n" + "UpdatedLabels: " + updatedLabels + "\n"
+  alert(dbgText)
 
   // update due date / date time
 
@@ -1232,7 +1236,7 @@ function Draftist_updateTask({
     "section_id": taskToUpdate.section_id,
     "parent_id": taskToUpdate.parent_id,
     "order": taskToUpdate.order,
-    "label_ids": updatedLabelIds,
+    "labels": updatedLabels,
     "priority": taskToUpdate.priority,
     "due_string": (dueDateString ? dueDateString : undefined),
     "assignee": taskToUpdate.assignee
@@ -1372,8 +1376,8 @@ function Draftist_helperGetAnyPresentLabelNamesInTasks(taskObjects) {
 
   for (task of taskObjects) {
     // add each label id to the set
-    for (lId of task.label_ids) {
-      labelNames.add(labelsIdToNameMap.get(lId))
+    for (labelName of task.labels) {
+      labelNames.add(labelName)
     }
   }
   // convert to array to return it
@@ -1397,25 +1401,25 @@ function Draftist_helperGetCommonPresentLabelNamesInTasks(taskObjects) {
   }
 
   // logic: 
-  // 1) start with the first task and store its label ids
-  // 2) if no labelids are present, immideately return an empty array
-  // 3) repeat with each task: check if all current stored labelsids are present in it
+  // 1) start with the first task and store its label names
+  // 2) if no labels are present, immideately return an empty array
+  // 3) repeat with each task: check if all current stored labels are present in it
   //   3.1) if yes, continue
-  //   3.2) if not, remove the labelids not present from the store and continue
-  // 4) get the names from all remaining labelids and return as an array
+  //   3.2) if not, remove the labels not present from the store and continue
+  // 4) get the names from all remaining labels and return as an array
 
-  let presentLabelIds = taskObjects[0].label_ids;
+  let presentLabelNames = taskObjects[0].labels;
 
-  if (presentLabelIds.length == 0) {
+  if (presentLabelNames.length == 0) {
     return [];
   }
 
   for (task of taskObjects) {
-    presentLabelIds = presentLabelIds.filter(x => task.label_ids.includes(x))
+    presentLabelNames = presentLabelNames.filter(x => task.labels.includes(x))
   }
 
 
-  return presentLabelIds.map((x) => labelsIdToNameMap.get(x))
+  return presentLabelNames
 }
 
 /**
