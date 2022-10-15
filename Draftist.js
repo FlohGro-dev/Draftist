@@ -126,7 +126,6 @@ function Draftist_createTask({
     return false;
   }
 
-
   let taskMap = new Map();
   taskMap.set("content", content);
   taskMap.set("description", description);
@@ -1201,9 +1200,6 @@ function Draftist_updateTask({
     }
     
   }
-  
-  let dbgText = "labelNamesToRemove: " + labelNamesToRemove + "\n"+ "labelNamesToAdd: " + labelNamesToAdd + "\n" + "UpdatedLabels: " + updatedLabels + "\n"
-  alert(dbgText)
 
   // update due date / date time
 
@@ -1620,12 +1616,15 @@ function Draftist_duplicateSelectedTasksFromLabelWithOtherLabel({
   for (task of selectedTasks) {
     // create a new task object, remove the source label and add the destination label
     let curNewTask = task;
-    let labelIds = new Set(task.label_ids);
-    if (!labelIds.has(destinationLabelId)) {
-      labelIds.add(destinationLabelId)
+    
+    curNewTask.due_string = task.due.string;
+
+    let labels = new Set(task.labels);
+    if (!labels.has(destinationLabelName)) {
+      labels.add(destinationLabelName)
     }
-    labelIds.delete(sourceLabelId)
-    curNewTask.label_ids = Array.from(labelIds.values());
+    labels.delete(sourceLabelName)
+    curNewTask.labels = Array.from(labels.values());
     // delete section id if it is zero (Todoist will otherwise report an error)
     if (curNewTask.section_id == 0) {
       delete curNewTask["section_id"];
