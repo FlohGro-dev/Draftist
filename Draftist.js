@@ -427,9 +427,26 @@ function Draftist_createTaskObjectWithSettingsFromPrompt(content, description = 
   pProject.message = "select Inbox if you want to sort it later"
 
   let sortedProjectNameMap = new Map([...projectsNameToIdMap].sort((a, b) => String(a[0]).localeCompare(b[0])))
+  
+  
+  
+  let inboxProject = sortedProjectNameMap.get("Inbox")
+  let teamInboxProject = sortedProjectNameMap.get("Team Inbox")
+  
+  if(inboxProject){
+    pProject.addButton("Inbox",inboxProject);
+  }
+  
+  if(teamInboxProject){
+    pProject.addButton("Team Inbox",teamInboxProject);
+  }
+  
   for (const [pName, pId] of sortedProjectNameMap) {
-    // selected button will directly contain the projects id as value
-    pProject.addButton(pName, pId);
+    if(pId != inboxProject && pId != teamInboxProject){
+    		// selected button will directly contain the projects id as value
+    		pProject.addButton(pName, pId);
+ 
+    }    
   }
 
   pProject.isCancellable = false;
