@@ -614,6 +614,11 @@ function Draftist_createTaskWithSettingsAndLinkToDraft() {
 function Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft(textToAdd) {
   let lines = draft.content.split("\n");
   let curIndex = 1
+  if(lines.length == 1){
+    // add two empty lines if draft has only one line
+    lines.push("")
+    lines.push("")
+  }
   if (lines[curIndex].length != 0) {
     lines.splice(curIndex, 0, "");
   }
