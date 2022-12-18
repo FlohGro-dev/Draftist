@@ -1639,7 +1639,9 @@ function Draftist_duplicateSelectedTasksFromLabelWithOtherLabel({
     // create a new task object, remove the source label and add the destination label
     let curNewTask = task;
     
-    curNewTask.due_string = task.due.string;
+    if(task.due){
+      curNewTask.due_string = task.due.string;
+    }
 
     let labels = new Set(task.labels);
     if (!labels.has(destinationLabelName)) {
