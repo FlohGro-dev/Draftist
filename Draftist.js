@@ -75,7 +75,7 @@ function Draftist_quickAdd({
   content
 }) {
   if (!todoist.quickAdd(content)) {
-    let error = Draftist_checkTodoistForError(todoist)
+    let error = Draftist_getLastTodoistError(todoist)
     let errorMsg = "adding tasks failed, todoist returned:\n" + error
     Draftist_failAction("Quick Add", errorMsg)
     return false;
