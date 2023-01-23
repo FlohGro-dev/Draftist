@@ -1664,6 +1664,66 @@ function Draftist_duplicateSelectedTasksFromLabelWithOtherLabel({
   return true;
 }
 
+
+/**
+ * Draftist_changeLabelofSelectedTasksToOtherLabel - changes the given label of each selected task to the new label
+ * 
+ * @param {Todoist_Object} todoistObj? - the todoist object to use  
+ * @param {String} sourceLabelName - the name of the source label (must be a valid name of a label in the users todoist account) with or without the @ sign 
+ * @param {String} destinationLabelName - the name of the destination label (must be a valid name of a label in the users todoist account) with or without the @ sign 
+ * @returns true if updating all selected tasks succeeded, false if it failed (will not proceed if one task fails)
+ */
+function Draftist_changeLabelofSelectedTasksToOtherLabel({
+  todoistObj = new Todoist(),
+  sourceLabelName,
+  destinationLabelName
+}) {
+  // remove "@" sign from labelNames if they are present.
+  sourceLabelName = sourceLabelName.replace(/@(.*)/gm, `$1`);
+  destinationLabelName = destinationLabelName.replace(/@(.*)/gm, `$1`);
+
+  // load stored data if not laoded already
+  if (labelsNameToIdMap.size == 0) {
+    Draftist_getStoredTodoistData();
+  }
+  //get label Ids for source and destination label
+  const sourceLabelId = labelsNameToIdMap.get(sourceLabelName);
+  const destinationLabelId = labelsNameToIdMap.get(destinationLabelName);
+  if (!sourceLabelId) {
+    // source label id is not existing
+    Draftist_failAction("change label of task", "source label \"" + sourceLabelName + "\" not found");
+    return false;
+  }
+  if (!destinationLabelId) {
+    // destination label id is not existing
+    Draftist_failAction("change label of task", "destination label \"" + destinationLabelName + "\" not found");
+    return false;
+  }
+  
+  // retrieve all tasks with the given source label name and let the user select the tasks to duplicate
+  const sourceTasks = Draftist_getTodoistTasksFromFilter("@" + sourceLabelName);
+  const selectedTasks = Draftist_selectTasksFromTaskObjects(sourceTasks, true, "duplicate tasks from @" + sourceLabelName + " to @" + destinationLabelName);
+  if (selectedTasks.length == 0) {
+    Draftist_cancelAction("", "user cancelled / did not select any task")
+    return true;
+  }
+  let updatedTasksCount = 0;
+  for (task of selectedTasks) {
+
+    alert(sourceLabelName)
+    Draftist_updateLabelsOfTask({
+      todoist: todoistObj,
+      taskToUpdate: task,
+      labelNamesToRemove: [sourceLabelName],
+      labelNamesToAdd: [destinationLabelName]
+    })
+    
+    updatedTasksCount = updatedTasksCount + 1;
+  }
+  Draftist_succeedAction("change label of task", false, "created " + updatedTasksCount + " tasks")
+  return true;
+}
+
 /**
  * Draftist_helperGetNewDueDateFromPrompt - asks the user for a due date and creates an iso date string from the selected date
  * @param {String} taskContent - the content of the task(s) to display in the prompt
