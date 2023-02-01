@@ -906,6 +906,55 @@ function Draftist_createTasksWithIdenticalSettingsFromMdTasksInCurrentDraft() {
 }
 
 /**
+ * Draftist_createTasksWithSubtasksAndOptionalDescriptions - creates tasks with subtasks from the passed text. based on the indentation level the tasks will be created as subtasks of the task above. tasks and subtasks can have optional descriptions. Formatting example:
+<Main Task> # Draft Title
+* <optional_main_task_desc> # Draft Content
+	<subtask_1_content>
+	* <optional_subtask_1_desc>
+	<subtask_2_content>
+	<subtask_3_content>
+ *
+ * @param  {String}	text the string containing the formatted text for the task/subtask creation
+ * @return {Boolean}	true if added successfully; false if adding tasks failed
+ */
+function Draftist_createTasksWithSubtasksAndOptionalDescriptions(text) {
+  if (text.length == 0) {
+    return false;
+  } else {
+    let taskCount = 0;
+    let currentIndentationLevel = 0;
+    let currentParentTaskId = -1;
+    let indentationString = "";
+    let lines = text.split("\n");
+    for (line of lines) {
+      if (line.length != 0) {
+        // get indentation level of current line (attention different settings possible)
+				// 2 spaces, 4 spaces, tabs
+				const indentRegex = /( {2}| {4}|\t)/gm;
+				if(line.startsWith(indentRegex){
+          // it's at least one indentation
+					if(indentationString == ""){
+            // define the indentation string
+						indentationString = line.replace(indentRegex,'$1');
+          }
+          
+        }
+        if (Draftist_createTask(Draftist_createTaskObjectWithSettingsFromPrompt(line))) {
+          // increase task counter
+          taskCount = taskCount + 1;
+        } else {
+          // stop adding tasks and return immideately
+          return false;
+        }
+      }
+    }
+    // succeeded
+    Draftist_succeedAction("", false, "successfully added " + taskCount + " task(s)");
+  }
+}
+
+
+/**
  * Draftist_createTasksWithIndividualSettingsFromMdTasksInCurrentDraft - creates tasks with individual settings for every md task in the current document. The settings can be selected in the displayed prompts.
  *
  * @return {Boolean}  true if added successfully (or no task was found), false if adding task failed
