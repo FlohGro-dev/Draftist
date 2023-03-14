@@ -427,26 +427,26 @@ function Draftist_createTaskObjectWithSettingsFromPrompt(content, description = 
   pProject.message = "select Inbox if you want to sort it later"
 
   let sortedProjectNameMap = new Map([...projectsNameToIdMap].sort((a, b) => String(a[0]).localeCompare(b[0])))
-  
-  
-  
+
+
+
   let inboxProject = sortedProjectNameMap.get("Inbox")
   let teamInboxProject = sortedProjectNameMap.get("Team Inbox")
-  
-  if(inboxProject){
-    pProject.addButton("Inbox",inboxProject);
+
+  if (inboxProject) {
+    pProject.addButton("Inbox", inboxProject);
   }
-  
-  if(teamInboxProject){
-    pProject.addButton("Team Inbox",teamInboxProject);
+
+  if (teamInboxProject) {
+    pProject.addButton("Team Inbox", teamInboxProject);
   }
-  
+
   for (const [pName, pId] of sortedProjectNameMap) {
-    if(pId != inboxProject && pId != teamInboxProject){
-    		// selected button will directly contain the projects id as value
-    		pProject.addButton(pName, pId);
- 
-    }    
+    if (pId != inboxProject && pId != teamInboxProject) {
+      // selected button will directly contain the projects id as value
+      pProject.addButton(pName, pId);
+
+    }
   }
 
   pProject.isCancellable = false;
@@ -456,10 +456,10 @@ function Draftist_createTaskObjectWithSettingsFromPrompt(content, description = 
   // labels prompt
   let pLabels = new Prompt();
   pLabels.title = "select labels for \"" + content + "\":";
-  
+
   //TODO
-  
-  
+
+
   let sortedLabelsNameMap = new Map([...labelsNameToIdMap].sort((a, b) => String(a[0]).localeCompare(b[0])))
 
   pLabels.addSelect("labels", "select labels", Array.from(sortedLabelsNameMap.keys()), [], true);
@@ -631,7 +631,7 @@ function Draftist_createTaskWithSettingsAndLinkToDraft() {
 function Draftist_helperAddTextBetweenTitleAndBodyOfCurrentDraft(textToAdd) {
   let lines = draft.content.split("\n");
   let curIndex = 1
-  if(lines.length == 1){
+  if (lines.length == 1) {
     // add two empty lines if draft has only one line
     lines.push("")
     lines.push("")
@@ -1207,7 +1207,7 @@ function Draftist_updateTask({
     labelIdsToAdd.push(curLabelId);
   }
 
-  
+
 
   let updatedLabelIds = labelIdsToAdd;
   let updatedLabels = labelNamesToAdd;
@@ -1220,7 +1220,7 @@ function Draftist_updateTask({
     if (!labelNamesToRemove.includes(curLabel) && !updatedLabels.includes(curLabel)) {
       updatedLabels.push(curLabel);
     }
-    
+
   }
 
   // update due date / date time
@@ -1638,8 +1638,8 @@ function Draftist_duplicateSelectedTasksFromLabelWithOtherLabel({
   for (task of selectedTasks) {
     // create a new task object, remove the source label and add the destination label
     let curNewTask = task;
-    
-    if(task.due){
+
+    if (task.due) {
       curNewTask.due_string = task.due.string;
     }
 
@@ -1699,7 +1699,7 @@ function Draftist_changeLabelofSelectedTasksToOtherLabel({
     Draftist_failAction("change label of task", "destination label \"" + destinationLabelName + "\" not found");
     return false;
   }
-  
+
   // retrieve all tasks with the given source label name and let the user select the tasks to duplicate
   const sourceTasks = Draftist_getTodoistTasksFromFilter("@" + sourceLabelName);
   const selectedTasks = Draftist_selectTasksFromTaskObjects(sourceTasks, true, "duplicate tasks from @" + sourceLabelName + " to @" + destinationLabelName);
@@ -1717,7 +1717,7 @@ function Draftist_changeLabelofSelectedTasksToOtherLabel({
       labelNamesToRemove: [sourceLabelName],
       labelNamesToAdd: [destinationLabelName]
     })
-    
+
     updatedTasksCount = updatedTasksCount + 1;
   }
   Draftist_succeedAction("change label of task", false, "created " + updatedTasksCount + " tasks")
@@ -1930,6 +1930,46 @@ function Draftist_deleteSelectedTasksFromFilter(filterString) {
   return true;
 }
 
+
+/**
+ * @returns Boolean to indicate success of the Action
+ */
+function Draftist_createProjectFromDraftsTitleAndAddLinksToDraft(todoist = new Todoist(), ) {
+  // get title of draft (use safe title)
+  let projectTitle = draft.processTemplate("[[safe_title]]")
+  let result = todoist.createProject({
+    "name": projectTitle
+  })
+  if (!result) {
+    const lastError = Draftist_getLastTodoistError(todoist);
+    Draftist_failAction("create project", "Todoist returned error: " + lastError)
+    return false;
+  }
+
+  let projectId = result.id
+
+  let text = `
+  Todoist Project: 
+  - [🌐](https://todoist.com/app/project/${projectId}) 
+  - [📱](todoist://project?id=${projectId})`
+
+  draft.insert(text, 1)
+  draft.update()
+
+  let linkedTaskContent = `* Project Draft: [${projectTitle}](${draft.permalink})`
+
+  if (!todoist.createTask({
+      "content": linkedTaskContent,
+      "project_id": projectId
+    })) {
+    const lastError = Draftist_getLastTodoistError(todoist);
+    Draftist_failAction("create task in project", "Todoist returned error: " + lastError)
+    return false;
+  }
+
+  Draftist_succeedAction("create linked project", false, "created linked project")
+  return true
+}
 
 
 // #############################################################################
@@ -2244,7 +2284,7 @@ function Draftist_helperDraftistActionReplicator() {
     if (action.isSeparator) {
       // nothing to be done
     } else {
-      if(replicatorOmitList.indexOf(action.name) == -1){
+      if (replicatorOmitList.indexOf(action.name) == -1) {
         pAction.addButton(action.name, action)
       }
     }
