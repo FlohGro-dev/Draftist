@@ -1936,7 +1936,25 @@ function Draftist_deleteSelectedTasksFromFilter(filterString) {
  */
 function Draftist_createProjectFromDraftsTitleAndAddLinksToDraft(todoist = new Todoist(), ) {
   // get title of draft (use safe title)
-  let projectTitle = draft.processTemplate("[[safe_title]]")
+  let projectTitle = draft.processTemplate("[[safe_title]]").trim()
+  if(projectTitle.length == 0){
+    // ask for new title of project
+    let tPrompt = new Prompt()
+    tPrompt.title = "Set Project Title"
+    tPrompt.addTextField("title","","",{wantsFocus: true})
+    tPrompt.addButton("set title")
+    if(tPrompt.show()){
+      projectTitle = tPrompt.fieldValues["title"]
+      if(projectTitle.trim().length == 0){
+        // still empty -> fail
+        let msg = "project title can't be empty"
+        Draftist_failAction("create linked project", msg)
+        return false;
+      }
+      // prepend project title
+      draft.prepend("# " + projectTitle);
+    }
+  }
   let result = todoist.createProject({
     "name": projectTitle
   })
