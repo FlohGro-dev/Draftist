@@ -942,11 +942,11 @@ function Draftist_createStringFromTasks({
     tasksString = tasksString + "- [ ] " + task.content
     // app link
     if (contentSettings.includes("appLink")) {
-      tasksString = tasksString + " [app link](todoist://task?id=" + task.id + ")";
+      tasksString = tasksString + " [📱](todoist://task?id=" + task.id + ")";
     }
     // web link
     if (contentSettings.includes("webLink")) {
-      tasksString = tasksString + " [web link](" + task.url + ")";
+      tasksString = tasksString + " [🌐](" + task.url + ")";
     }
 
     if (contentSettings.includes("projectName")) {
@@ -2332,7 +2332,7 @@ function Draftist_updateDraftist() {
         app.openURL("https://github.com/FlohGro-dev/Draftist/blob/main/Draftist.js", true);
         break;
       case "updateJs":
-        Draftust_setupOrUpdateDraftistJsFilte();
+        Draftist_setupOrUpdateDraftistJsFilte();
         break;
       case "updateAG":
         app.openURL("https://directory.getdrafts.com/g/1wK", false);
@@ -2342,10 +2342,10 @@ function Draftist_updateDraftist() {
 }
 
 /**
- * Draftust_setupOrUpdateDraftistJsFilte - this Action updates the Draftist.js file in the iCloud directory of the Drafts/Library folder to the latest version from GitHub
+ * Draftist_setupOrUpdateDraftistJsFilte - this Action updates the Draftist.js file in the iCloud directory of the Drafts/Library folder to the latest version from GitHub
  * @returns true if update successful, false if update was not performed successfully
  */
-function Draftust_setupOrUpdateDraftistJsFilte() {
+function Draftist_setupOrUpdateDraftistJsFilte() {
   const filename = "Draftist.js"
   const subfoldername = "Scripts"
   const filepath = "/Library/" + subfoldername + "/"
@@ -2371,4 +2371,29 @@ function Draftust_setupOrUpdateDraftistJsFilte() {
   }
   Draftist_succeedAction("setup/update Draftist", true, "downloaded latest version")
   return true;
+}
+
+
+// dev part
+
+// create a function that can retrieve all projects with their name and internal link in a markdown format
+function Draftist_TEST_createProjectsMdList() {
+  Draftist_updateStoredTodoistData()
+  if (projectsNameToIdMap.size == 0) {
+    Draftist_getStoredTodoistData();
+  }
+  let sortedProjectNameMap = new Map([...projectsNameToIdMap].sort((a, b) => String(a[0]).localeCompare(b[0])))
+
+  let projectMdLinks = []
+
+  for(const [pName, pId] of projectsNameToIdMap){
+    let str = "[" + pName + "](todoist://project?id=" +  pId + ")"
+    projectMdLinks.push(str)
+  }
+
+  let d = new Draft()
+  d.content = "# Todoist Project MD Links List\n\n" + projectMdLinks.join("\n")
+  d.update()
+  editor.load(d)
+
 }
