@@ -579,8 +579,8 @@ function Draftist_helperCreateMdLinkToCurrentDraft() {
 function Draftist_helperCreateOpenTaskUrlFromTaskObject(taskObject) {
   // load settings
   Draftist_loadCurrentConfigurationSettings()
-  const webLink = "[Todoist Task Weblink](" + taskObject.url + ")";
-  const mobileLink = "[Todoist Task Applink](todoist://task?id=" + taskObject.id + ")";
+  const webLink = "[🌐](" + taskObject.url + ")";
+  const mobileLink = "[📱](todoist://task?id=" + taskObject.id + ")";
   if (activeSettings["taskLinkTypes"].includes("web") && activeSettings["taskLinkTypes"].includes("app")) {
     return webLink + "\n" + mobileLink;
   } else if (activeSettings["taskLinkTypes"].includes("web") && !activeSettings["taskLinkTypes"].includes("app")) {
