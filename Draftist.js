@@ -985,6 +985,7 @@ function Draftist_getTodoistTasksFromFilter(filterString) {
   let tasks = todoist.getTasks({
     filter: filterString
   })
+  //alert("lastResponse: " + JSON.stringify(todoist.lastResponse) + "\n\nlastError: " + todoist.lastError)
   const occuredError = Draftist_getLastTodoistError(todoist)
   if (occuredError) {
     //error occured
@@ -1000,7 +1001,8 @@ function Draftist_getTodoistTasksFromFilter(filterString) {
  *
  */
 function Draftist_importTodaysTasksIntoDraft() {
-  const tasks = Draftist_getTodoistTasksFromFilter("overdue, today");
+  const tasks = Draftist_getTodoistTasksFromFilter("overdue | today");
+  alert(tasks)
   const stringToInsert = Draftist_createStringFromTasks({
     tasks: tasks
   })
@@ -1965,6 +1967,8 @@ function Draftist_createProjectFromDraftsTitleAndAddLinksToDraft(todoist = new T
   }
 
   let projectId = result.id
+  // set projectId as template tag to be used later
+  draft.setTemplateTag("createdProjectId",projectId)
 
   let text = `
   Todoist Project: 
@@ -2388,6 +2392,29 @@ function Draftist_TEST_createProjectsMdList() {
 
   for(const [pName, pId] of projectsNameToIdMap){
     let str = "[" + pName + "](todoist://project?id=" +  pId + ")"
+    // find related draft
+    let foundDrafts = Draft.queryByTitle(pName)
+    let dToUse = undefined
+    if(foundDrafts.length == 0){
+      // no draft found, thats ok
+    } else if(foundDrafts.length == 1){
+      // found just one draft -> perfect!
+      dToUse = foundDrafts[0]
+    } else {
+      // found several drafts, not that good :D
+      let p = new Prompt()
+      p.title = pName
+      p.message = "found several drafts, select one:"
+      for(d of foundDrafts){
+        p.addButton(d.displayTitle,d)
+      }
+      if(p.show){
+        dToUse = p.buttonPressed
+      }
+    }
+    if(dToUse){
+      str = str + " [" + dToUse.displayTitle + "](" + dToUse.permalink + ")"
+    }
     projectMdLinks.push(str)
   }
 
