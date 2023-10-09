@@ -579,8 +579,8 @@ function Draftist_helperCreateMdLinkToCurrentDraft() {
 function Draftist_helperCreateOpenTaskUrlFromTaskObject(taskObject) {
   // load settings
   Draftist_loadCurrentConfigurationSettings()
-  const webLink = "[Todoist Task Weblink](" + taskObject.url + ")";
-  const mobileLink = "[Todoist Task Applink](todoist://task?id=" + taskObject.id + ")";
+  const webLink = "[🌐](" + taskObject.url + ")";
+  const mobileLink = "[📱](todoist://task?id=" + taskObject.id + ")";
   if (activeSettings["taskLinkTypes"].includes("web") && activeSettings["taskLinkTypes"].includes("app")) {
     return webLink + "\n" + mobileLink;
   } else if (activeSettings["taskLinkTypes"].includes("web") && !activeSettings["taskLinkTypes"].includes("app")) {
@@ -942,11 +942,11 @@ function Draftist_createStringFromTasks({
     tasksString = tasksString + "- [ ] " + task.content
     // app link
     if (contentSettings.includes("appLink")) {
-      tasksString = tasksString + " [app link](todoist://task?id=" + task.id + ")";
+      tasksString = tasksString + " [📱](todoist://task?id=" + task.id + ")";
     }
     // web link
     if (contentSettings.includes("webLink")) {
-      tasksString = tasksString + " [web link](" + task.url + ")";
+      tasksString = tasksString + " [🌐](" + task.url + ")";
     }
 
     if (contentSettings.includes("projectName")) {
@@ -985,6 +985,7 @@ function Draftist_getTodoistTasksFromFilter(filterString) {
   let tasks = todoist.getTasks({
     filter: filterString
   })
+  //alert("lastResponse: " + JSON.stringify(todoist.lastResponse) + "\n\nlastError: " + todoist.lastError)
   const occuredError = Draftist_getLastTodoistError(todoist)
   if (occuredError) {
     //error occured
@@ -1000,7 +1001,8 @@ function Draftist_getTodoistTasksFromFilter(filterString) {
  *
  */
 function Draftist_importTodaysTasksIntoDraft() {
-  const tasks = Draftist_getTodoistTasksFromFilter("overdue, today");
+  const tasks = Draftist_getTodoistTasksFromFilter("overdue | today");
+  alert(tasks)
   const stringToInsert = Draftist_createStringFromTasks({
     tasks: tasks
   })
@@ -1965,6 +1967,8 @@ function Draftist_createProjectFromDraftsTitleAndAddLinksToDraft(todoist = new T
   }
 
   let projectId = result.id
+  // set projectId as template tag to be used later
+  draft.setTemplateTag("createdProjectId",projectId)
 
   let text = `
   Todoist Project: 
@@ -2332,7 +2336,7 @@ function Draftist_updateDraftist() {
         app.openURL("https://github.com/FlohGro-dev/Draftist/blob/main/Draftist.js", true);
         break;
       case "updateJs":
-        Draftust_setupOrUpdateDraftistJsFilte();
+        Draftist_setupOrUpdateDraftistJsFilte();
         break;
       case "updateAG":
         app.openURL("https://directory.getdrafts.com/g/1wK", false);
@@ -2342,10 +2346,10 @@ function Draftist_updateDraftist() {
 }
 
 /**
- * Draftust_setupOrUpdateDraftistJsFilte - this Action updates the Draftist.js file in the iCloud directory of the Drafts/Library folder to the latest version from GitHub
+ * Draftist_setupOrUpdateDraftistJsFilte - this Action updates the Draftist.js file in the iCloud directory of the Drafts/Library folder to the latest version from GitHub
  * @returns true if update successful, false if update was not performed successfully
  */
-function Draftust_setupOrUpdateDraftistJsFilte() {
+function Draftist_setupOrUpdateDraftistJsFilte() {
   const filename = "Draftist.js"
   const subfoldername = "Scripts"
   const filepath = "/Library/" + subfoldername + "/"
@@ -2371,4 +2375,52 @@ function Draftust_setupOrUpdateDraftistJsFilte() {
   }
   Draftist_succeedAction("setup/update Draftist", true, "downloaded latest version")
   return true;
+}
+
+
+// dev part
+
+// create a function that can retrieve all projects with their name and internal link in a markdown format
+function Draftist_TEST_createProjectsMdList() {
+  Draftist_updateStoredTodoistData()
+  if (projectsNameToIdMap.size == 0) {
+    Draftist_getStoredTodoistData();
+  }
+  let sortedProjectNameMap = new Map([...projectsNameToIdMap].sort((a, b) => String(a[0]).localeCompare(b[0])))
+
+  let projectMdLinks = []
+
+  for(const [pName, pId] of projectsNameToIdMap){
+    let str = "[" + pName + "](todoist://project?id=" +  pId + ")"
+    // find related draft
+    let foundDrafts = Draft.queryByTitle(pName)
+    let dToUse = undefined
+    if(foundDrafts.length == 0){
+      // no draft found, thats ok
+    } else if(foundDrafts.length == 1){
+      // found just one draft -> perfect!
+      dToUse = foundDrafts[0]
+    } else {
+      // found several drafts, not that good :D
+      let p = new Prompt()
+      p.title = pName
+      p.message = "found several drafts, select one:"
+      for(d of foundDrafts){
+        p.addButton(d.displayTitle,d)
+      }
+      if(p.show){
+        dToUse = p.buttonPressed
+      }
+    }
+    if(dToUse){
+      str = str + " [" + dToUse.displayTitle + "](" + dToUse.permalink + ")"
+    }
+    projectMdLinks.push(str)
+  }
+
+  let d = new Draft()
+  d.content = "# Todoist Project MD Links List\n\n" + projectMdLinks.join("\n")
+  d.update()
+  editor.load(d)
+
 }
