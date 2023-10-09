@@ -1002,7 +1002,6 @@ function Draftist_getTodoistTasksFromFilter(filterString) {
  */
 function Draftist_importTodaysTasksIntoDraft() {
   const tasks = Draftist_getTodoistTasksFromFilter("overdue | today");
-  alert(tasks)
   const stringToInsert = Draftist_createStringFromTasks({
     tasks: tasks
   })
