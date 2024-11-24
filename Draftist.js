@@ -1002,7 +1002,6 @@ function Draftist_getTodoistTasksFromFilter(filterString) {
  */
 function Draftist_importTodaysTasksIntoDraft() {
   const tasks = Draftist_getTodoistTasksFromFilter("overdue | today");
-  alert(tasks)
   const stringToInsert = Draftist_createStringFromTasks({
     tasks: tasks
   })
@@ -1630,7 +1629,14 @@ function Draftist_duplicateSelectedTasksFromLabelWithOtherLabel({
   }
 
   // retrieve all tasks with the given source label name and let the user select the tasks to duplicate
-  const sourceTasks = Draftist_getTodoistTasksFromFilter("@" + sourceLabelName);
+  let sourceTasks = Draftist_getTodoistTasksFromFilter("@" + sourceLabelName);
+  sourceTasks.sort((a, b) => a.content.localeCompare(b.content));
+
+  //priority from 1 to 4, 1 = normal, 4 = urgent
+  // sort by priority from urgent to normal
+  sourceTasks.sort((a, b) => b.priority - a.priority);
+  //sourceTasks.sort((a, b) => a.content.localeCompare(b.content));
+
   const selectedTasks = Draftist_selectTasksFromTaskObjects(sourceTasks, true, "duplicate tasks from @" + sourceLabelName + " to @" + destinationLabelName);
   if (selectedTasks.length == 0) {
     Draftist_cancelAction("", "user cancelled / did not select any task")
@@ -1971,7 +1977,9 @@ function Draftist_createProjectFromDraftsTitleAndAddLinksToDraft(todoist = new T
   draft.setTemplateTag("createdProjectId", projectId)
 
   let text = `
-Todoist Project: [📱](todoist://project?id=${projectId})`
+Todoist Project: 
+- [🌐](https://todoist.com/app/project/${projectId}) 
+- [📱](todoist://project?id=${projectId})`
 
   draft.insert(text, 1)
   draft.update()
