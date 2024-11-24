@@ -193,9 +193,9 @@ function Draftist_quickAddLines(text) {
   for (line of lines) {
     if (line.length !== 0) {
       if (!Draftist_quickAdd({
-          todoist: todoist,
-          content: line
-        })) {
+        todoist: todoist,
+        content: line
+      })) {
         // if failed directly return, quickadd will display the error
         return false;
       } else {
@@ -598,8 +598,8 @@ function Draftist_helperCreateOpenTaskUrlFromTaskObject(taskObject) {
  */
 function Draftist_createTaskInInboxWithLinkToDraft() {
   if (Draftist_createTask({
-      content: Draftist_helperCreateMdLinkToCurrentDraft()
-    })) {
+    content: Draftist_helperCreateMdLinkToCurrentDraft()
+  })) {
     Draftist_succeedAction("", false, "added linked task");
     return true;
   } else {
@@ -1520,11 +1520,11 @@ function Draftist_updateLabelsOfSelectedTasksFromFilter(filterString) {
   // iterate through all selected tasks and update them
   for (task of selectedTasks) {
     if (!Draftist_updateLabelsOfTask({
-        todoist: todoistObj,
-        taskToUpdate: task,
-        labelNamesToRemove: labelNamesToRemove,
-        labelNamesToAdd: labelNamesToAdd
-      })) {
+      todoist: todoistObj,
+      taskToUpdate: task,
+      labelNamesToRemove: labelNamesToRemove,
+      labelNamesToAdd: labelNamesToAdd
+    })) {
       // failed updating failure is already presented, just exit the function here
       return false;
     } else {
@@ -1579,10 +1579,10 @@ function Draftist_updateProjectOfSelectedTasksFromFilter(filterString) {
   // iterate through all selected tasks and update them
   for (task of selectedTasks) {
     if (!Draftist_updateProjectOfTask({
-        todoistObj,
-        taskToUpdate: task,
-        newProjectName: selectedProject
-      })) {
+      todoistObj,
+      taskToUpdate: task,
+      newProjectName: selectedProject
+    })) {
       // failed updating failure is already presented, just exit the function here
       return false;
     } else {
@@ -1769,7 +1769,7 @@ function Draftist_helperGetNewDueDateFromPrompt(taskContent) {
         case "today":
           selectedDateString = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
           break;
-          //case "today": selectedDateString = today.toISOString(); break;
+        //case "today": selectedDateString = today.toISOString(); break;
         case "tomorrow":
           let tomorrow = today.setDate(today.getDate() + 1);
           selectedDateString = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
@@ -1810,10 +1810,10 @@ function Draftust_updateIndividualDueDateOfSelectedTasksFromFilter(filterString)
     let newDueDateString = Draftist_helperGetNewDueDateFromPrompt(task.content)
 
     if (!Draftist_updateDueDateOfTask({
-        todoist: todoistObj,
-        taskToUpdate: task,
-        newDueDateString: newDueDateString
-      })) {
+      todoist: todoistObj,
+      taskToUpdate: task,
+      newDueDateString: newDueDateString
+    })) {
       // not needed, update function will already display the error
       //let lastError = Draftist_getLastTodoistError(todoistObj);
       //Draftist_failAction("update due date", "Todoist returned error:\n" + lastError)
@@ -1851,10 +1851,10 @@ function Draftust_updateDueDateToSameDateOfSelectedTasksFromFilter(filterString)
   let newDueDateString = Draftist_helperGetNewDueDateFromPrompt(selectedTasks.map((task) => task.content).join("\n"))
   for (task of selectedTasks) {
     if (!Draftist_updateDueDateOfTask({
-        todoist: todoistObj,
-        taskToUpdate: task,
-        newDueDateString: newDueDateString
-      })) {
+      todoist: todoistObj,
+      taskToUpdate: task,
+      newDueDateString: newDueDateString
+    })) {
       // not needed, update function will already display the error
       //let lastError = Draftist_getLastTodoistError(todoistObj);
       //Draftist_failAction("update due date", "Todoist returned error:\n" + lastError)
@@ -1936,18 +1936,18 @@ function Draftist_deleteSelectedTasksFromFilter(filterString) {
 /**
  * @returns Boolean to indicate success of the Action
  */
-function Draftist_createProjectFromDraftsTitleAndAddLinksToDraft(todoist = new Todoist(), ) {
+function Draftist_createProjectFromDraftsTitleAndAddLinksToDraft(todoist = new Todoist(),) {
   // get title of draft (use safe title)
   let projectTitle = draft.processTemplate("[[safe_title]]").trim()
-  if(projectTitle.length == 0){
+  if (projectTitle.length == 0) {
     // ask for new title of project
     let tPrompt = new Prompt()
     tPrompt.title = "Set Project Title"
-    tPrompt.addTextField("title","","",{wantsFocus: true})
+    tPrompt.addTextField("title", "", "", { wantsFocus: true })
     tPrompt.addButton("set title")
-    if(tPrompt.show()){
+    if (tPrompt.show()) {
       projectTitle = tPrompt.fieldValues["title"]
-      if(projectTitle.trim().length == 0){
+      if (projectTitle.trim().length == 0) {
         // still empty -> fail
         let msg = "project title can't be empty"
         Draftist_failAction("create linked project", msg)
@@ -1968,12 +1968,10 @@ function Draftist_createProjectFromDraftsTitleAndAddLinksToDraft(todoist = new T
 
   let projectId = result.id
   // set projectId as template tag to be used later
-  draft.setTemplateTag("createdProjectId",projectId)
+  draft.setTemplateTag("createdProjectId", projectId)
 
   let text = `
-  Todoist Project: 
-  - [🌐](https://todoist.com/app/project/${projectId}) 
-  - [📱](todoist://project?id=${projectId})`
+Todoist Project: [📱](todoist://project?id=${projectId})`
 
   draft.insert(text, 1)
   draft.update()
@@ -1981,9 +1979,9 @@ function Draftist_createProjectFromDraftsTitleAndAddLinksToDraft(todoist = new T
   let linkedTaskContent = `* Project Draft: [${projectTitle}](${draft.permalink})`
 
   if (!todoist.createTask({
-      "content": linkedTaskContent,
-      "project_id": projectId
-    })) {
+    "content": linkedTaskContent,
+    "project_id": projectId
+  })) {
     const lastError = Draftist_getLastTodoistError(todoist);
     Draftist_failAction("create task in project", "Todoist returned error: " + lastError)
     return false;
@@ -2390,14 +2388,14 @@ function Draftist_TEST_createProjectsMdList() {
 
   let projectMdLinks = []
 
-  for(const [pName, pId] of projectsNameToIdMap){
-    let str = "[" + pName + "](todoist://project?id=" +  pId + ")"
+  for (const [pName, pId] of projectsNameToIdMap) {
+    let str = "[" + pName + "](todoist://project?id=" + pId + ")"
     // find related draft
     let foundDrafts = Draft.queryByTitle(pName)
     let dToUse = undefined
-    if(foundDrafts.length == 0){
+    if (foundDrafts.length == 0) {
       // no draft found, thats ok
-    } else if(foundDrafts.length == 1){
+    } else if (foundDrafts.length == 1) {
       // found just one draft -> perfect!
       dToUse = foundDrafts[0]
     } else {
@@ -2405,14 +2403,14 @@ function Draftist_TEST_createProjectsMdList() {
       let p = new Prompt()
       p.title = pName
       p.message = "found several drafts, select one:"
-      for(d of foundDrafts){
-        p.addButton(d.displayTitle,d)
+      for (d of foundDrafts) {
+        p.addButton(d.displayTitle, d)
       }
-      if(p.show){
+      if (p.show) {
         dToUse = p.buttonPressed
       }
     }
-    if(dToUse){
+    if (dToUse) {
       str = str + " [" + dToUse.displayTitle + "](" + dToUse.permalink + ")"
     }
     projectMdLinks.push(str)
