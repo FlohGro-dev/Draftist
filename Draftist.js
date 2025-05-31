@@ -255,7 +255,7 @@ function Draftist_quickAddLinesFromPrompt() {
     Draftist_cancelAction("Add Tasks from Prompt", "No input provided")
     return false;
   } else {
-    let taskNumber = Draftist_quickAddLines(draft.content);
+    let taskNumber = Draftist_quickAddLines(input);
     if (taskNumber) {
       // succeeded
       Draftist_succeedAction("", false, "successfully added " + taskNumber + " tasks :)")
