@@ -255,7 +255,7 @@ function Draftist_quickAddLinesFromPrompt() {
     Draftist_cancelAction("Add Tasks from Prompt", "No input provided")
     return false;
   } else {
-    let taskNumber = Draftist_quickAddLines(draft.content);
+    let taskNumber = Draftist_quickAddLines(input);
     if (taskNumber) {
       // succeeded
       Draftist_succeedAction("", false, "successfully added " + taskNumber + " tasks :)")
@@ -938,6 +938,7 @@ function Draftist_createStringFromTasks({
   const contentSettings = activeSettings["taskImportContents"];
   let tasksString = ""
   for (task of tasks) {
+
     // task content
     tasksString = tasksString + "- [ ] " + task.content
     // app link
@@ -982,16 +983,98 @@ function Draftist_createStringFromTasks({
  */
 function Draftist_getTodoistTasksFromFilter(filterString) {
   let todoist = new Todoist()
-  let tasks = todoist.getTasks({
-    filter: filterString
-  })
-  //alert("lastResponse: " + JSON.stringify(todoist.lastResponse) + "\n\nlastError: " + todoist.lastError)
-  const occuredError = Draftist_getLastTodoistError(todoist)
-  if (occuredError) {
-    //error occured
-    Draftist_failAction("get tasks from filter \"" + filterString + "\"", occuredError)
-    return false;
+
+  // If filter contains comma, split it and query each part separately
+  if (filterString.includes(",")) {
+    let filterParts = filterString.split(",").map(part => part.trim()).filter(part => part.length > 0);
+    let allTasks = [];
+    let seenTaskIds = new Set();
+
+    for (let singleFilter of filterParts) {
+      let continueRequest = true;
+      let next_cursor = null;
+
+      while (continueRequest) {
+        let options = {};
+
+        if (next_cursor) {
+          options = {
+            query: singleFilter,
+            limit: 200,
+            cursor: next_cursor
+          };
+        } else {
+          options = {
+            query: singleFilter,
+            limit: 200,
+          };
+        }
+
+        let returnedTasks = todoist.getTasksByFilter(options);
+
+        // Add tasks, avoiding duplicates
+        for (let task of returnedTasks) {
+          if (!seenTaskIds.has(task.id)) {
+            seenTaskIds.add(task.id);
+            allTasks.push(task);
+          }
+        }
+
+        if (todoist.lastResponse.next_cursor) {
+          next_cursor = todoist.lastResponse.next_cursor;
+        } else {
+          continueRequest = false;
+        }
+
+        const occuredError = Draftist_getLastTodoistError(todoist);
+        if (occuredError) {
+          Draftist_failAction("get tasks from filter \"" + singleFilter + "\"", occuredError);
+          return false;
+        }
+      }
+    }
+    return allTasks;
   }
+
+  let continueRequest = true
+  let next_cursor = null
+
+  let tasks = []
+
+  while (continueRequest) {
+    let options = {}
+
+    if (next_cursor) {
+      options = {
+        query: filterString,
+        limit: 200,
+        cursor: next_cursor
+      };
+    } else {
+
+      options = {
+        query: filterString,
+        limit: 200,
+      };
+    }
+
+    returnedTasks = todoist.getTasksByFilter(options)
+
+    tasks.push(...returnedTasks)
+
+    if (todoist.lastResponse.next_cursor) {
+      next_cursor = todoist.lastResponse.next_cursor
+    } else {
+      continueRequest = false
+    }
+
+    const occuredError = Draftist_getLastTodoistError(todoist)
+    if (occuredError) {
+      Draftist_failAction("get tasks from filter \"" + filterString + "\"", occuredError)
+      return false;
+    }
+  }
+
   return tasks;
 }
 
@@ -1629,14 +1712,7 @@ function Draftist_duplicateSelectedTasksFromLabelWithOtherLabel({
   }
 
   // retrieve all tasks with the given source label name and let the user select the tasks to duplicate
-  let sourceTasks = Draftist_getTodoistTasksFromFilter("@" + sourceLabelName);
-  sourceTasks.sort((a, b) => a.content.localeCompare(b.content));
-
-  //priority from 1 to 4, 1 = normal, 4 = urgent
-  // sort by priority from urgent to normal
-  sourceTasks.sort((a, b) => b.priority - a.priority);
-  //sourceTasks.sort((a, b) => a.content.localeCompare(b.content));
-
+  const sourceTasks = Draftist_getTodoistTasksFromFilter("@" + sourceLabelName);
   const selectedTasks = Draftist_selectTasksFromTaskObjects(sourceTasks, true, "duplicate tasks from @" + sourceLabelName + " to @" + destinationLabelName);
   if (selectedTasks.length == 0) {
     Draftist_cancelAction("", "user cancelled / did not select any task")
@@ -1718,7 +1794,6 @@ function Draftist_changeLabelofSelectedTasksToOtherLabel({
   let updatedTasksCount = 0;
   for (task of selectedTasks) {
 
-    alert(sourceLabelName)
     Draftist_updateLabelsOfTask({
       todoist: todoistObj,
       taskToUpdate: task,
@@ -2241,10 +2316,75 @@ function Draftist_updateTodoistDataIfUpdateIntervalExceeded() {
  * @param  {Todoist} todoist? - the todoist object to use
  */
 function Draftist_updateStoredTodoistData(todoist = new Todoist()) {
-  // retrieve data from todoist
-  const projects = todoist.getProjects();
-  const sections = todoist.getSections();
-  const labels = todoist.getLabels();
+  // retrieve projects from todoist with pagination support
+  let projects = [];
+  let projectsContinue = true;
+  let projectsCursor = null;
+
+  while (projectsContinue) {
+    let projectsOptions = {};
+
+    if (projectsCursor) {
+      projectsOptions = {
+        cursor: projectsCursor,
+        limit: 200
+      };
+    }
+
+    let retrievedProjects = todoist.getProjects(projectsOptions);
+    projects.push(...retrievedProjects);
+    if (todoist.lastResponse.next_cursor) {
+      projectsCursor = todoist.lastResponse.next_cursor;
+    } else {
+      projectsContinue = false;
+    }
+  }
+  // retrieve sections from todoist with pagination support
+  let sections = [];
+  let sectionsContinue = true;
+  let sectionsCursor = null;
+
+  while (sectionsContinue) {
+    let sectionsOptions = {};
+    if (sectionsCursor) {
+      sectionsOptions = {
+        cursor: sectionsCursor,
+        limit: 200
+      };
+    }
+
+    let retrievedSections = todoist.getSections(sectionsOptions);
+    sections.push(...retrievedSections);
+    if (todoist.lastResponse.next_cursor) {
+      sectionsCursor = todoist.lastResponse.next_cursor;
+    } else {
+      sectionsContinue = false;
+    }
+  }
+  // retrieve labels from todoist with pagination support
+  let labels = [];
+  let labelsContinue = true;
+  let labelsCursor = null;
+
+  while (labelsContinue) {
+    let labelsOptions = {};
+
+    if (labelsCursor) {
+      labelsOptions = {
+        cursor: labelsCursor
+      };
+    }
+
+    let retrievedLabels = todoist.getLabels(labelsOptions);
+    labels.push(...retrievedLabels);
+
+    if (todoist.lastResponse.next_cursor) {
+      labelsCursor = todoist.lastResponse.next_cursor;
+    } else {
+      labelsContinue = false;
+    }
+  }
+
   const updatedTimeUnixMilliseconds = Date.now();
 
   // create object with all todoist data
