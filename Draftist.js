@@ -1,9 +1,9 @@
 /**
  * Draftist Action Group Functions
  * @author FlohGro
- * @copyright 2025, FlohGro
+ * @copyright 2026, FlohGro
  * @licensing MIT free to use - but donate coffees to support development http://www.flohgro.com/donate
- * @version 2025.1
+ * @version 2026.1
  */
 
 /**
