@@ -74,7 +74,7 @@ function Draftist_quickAdd({
   todoist = new Todoist(),
   content
 }) {
-  if (!todoist.quickAdd(content)) {
+  if (!todoist.quickAdd(content, "undefined", "undefined", { "auto_reminder": true })) {
     let error = Draftist_getLastTodoistError(todoist)
     let errorMsg = "adding tasks failed, todoist returned:\n" + error
     Draftist_failAction("Quick Add", errorMsg)
