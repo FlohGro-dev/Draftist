@@ -3,7 +3,7 @@
  * @author FlohGro
  * @copyright 2026, FlohGro
  * @licensing MIT free to use - but donate coffees to support development http://www.flohgro.com/donate
- * @version 2026.1
+ * @version 2026.2
  */
 
 /**
@@ -74,7 +74,7 @@ function Draftist_quickAdd({
   todoist = new Todoist(),
   content
 }) {
-  if (!todoist.quickAdd(content, "undefined", "undefined", { "auto_reminder": true })) {
+  if (!todoist.quickAdd(content)) {
     let error = Draftist_getLastTodoistError(todoist)
     let errorMsg = "adding tasks failed, todoist returned:\n" + error
     Draftist_failAction("Quick Add", errorMsg)
